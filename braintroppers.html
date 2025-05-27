@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Storm Trooper - AI Brainstorming Platform</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --dark: #1e1e1e;
+      --light: #f8fafc;
+      --accent: #0ea5e9;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      background: var(--light);
+      color: #111;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: #e0e7ff;
+      padding: 1rem;
+    }
+
+    nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    section {
+      margin-bottom: 4rem;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #dbeafe;
+      padding-bottom: 0.5rem;
+    }
+
+    ul, ol {
+      padding-left: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    li {
+      margin: 0.5rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    pre {
+      background: #000;
+      color: #0f0;
+      padding: 1rem;
+      overflow-x: auto;
+      border-radius: 5px;
+    }
+
+    .tag {
+      background: #bfdbfe;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+
+    .check {
+      color: green;
+      font-weight: bold;
+    }
+
+    .emoji {
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚡ Brain Troopers</h1>
+    <p class="lead">AI-Powered Collaborative Brainstorming Platform</p>
+  </header>
+
+  <nav>
+    <a href="#web-service">Web Service</a>
+    <a href="#mvp">MVP Scope</a>
+    <a href="#competitors">Competitors</a>
+    <a href="#tech">Tech Stack</a>
+    <a href="#roadmap">Roadmap</a>
+  </nav>
+
+  <main>
+    <!-- 1. Web Service -->
+    <section id="web-service">
+      <h2>🌐 Understanding the Web Service</h2>
+      <ul>
+        <li>Input topics for AI-driven brainstorming</li>
+        <li>Generate dynamic brain maps/workflows</li>
+        <li>Iterate on nodes (approve, comment, rewrite, request reviews, expand details)</li>
+        <li>Export maps to HD PDFs with optional detailed summaries</li>
+        <li>Core tech stack: Node.js, MongoDB, HTML/CSS/JS, LLM</li>
+      </ul>
+    </section>
+
+    <!-- 2. Improved Description -->
+    <section>
+      <h2>🚀 Enhanced Platform Features</h2>
+      <p><strong>Storm Trooper</strong> is an AI-powered collaborative brainstorming platform that transforms ideas into interactive visual workflows.</p>
+      <ul>
+        <li>Multi-user editing with role-based permissions</li>
+        <li>Version control with state rollback</li>
+        <li>LLM-powered idea suggestions</li>
+        <li>Dynamic filtering by tags/status/depth</li>
+        <li>Integrations with Slack/Notion</li>
+        <li>Offline mode with local save & sync</li>
+        <li>Custom node types (text, images, links, code)</li>
+      </ul>
+    </section>
+
+    <!-- 3. MVP Scope -->
+    <section id="mvp">
+      <h2>📦 MVP Scope</h2>
+      <ul>
+        <li>User authentication (Google/FB OAuth)</li>
+        <li>Topic input → LLM-generated JSON map</li>
+        <li>Frontend visualization with draggable nodes</li>
+        <li>Node actions: Approve, Rewrite, Request Review, Expand</li>
+        <li>Basic PDF export</li>
+        <li>GitHub repo with CI/CD via Render.com</li>
+      </ul>
+    </section>
+
+    <!-- 4. Competitor Analysis -->
+    <section>
+      <h2>🧮 Competitor Analysis</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Storm Trooper</th>
+            <th>XMind</th>
+            <th>Miro</th>
+            <th>Coggle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AI-Generated Maps</td><td class="check">✅ Yes</td><td>❌ No</td><td>❌ No</td><td>❌ No</td></tr>
+          <tr><td>Non-Hierarchical Layout</td><td class="check">✅ Yes</td><td>Limited</td><td>✅ Yes</td><td>Limited</td></tr>
+          <tr><td>Node Collaboration</td><td class="check">✅ Planned</td><td>❌</td><td>✅</td><td>✅</td></tr>
+          <tr><td>PDF Export</td><td class="check">✅ Yes</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>LLM Integration</td><td class="check">✅ Core</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5. Tools & Tech Stack -->
+    <section id="tech">
+      <h2>🛠️ Tools & Technology</h2>
+      <h3>Existing Tools</h3>
+      <ul>
+        <li>VSCode</li>
+        <li>GitHub</li>
+        <li>Render.com</li>
+        <li>MongoDB</li>
+        <li>Node.js</li>
+        <li>HTML/CSS/JS</li>
+      </ul>
+
+      <h3>Recommended Additions</h3>
+      <ul>
+        <li><strong>Frontend:</strong> React.js, D3.js, Socket.IO</li>
+        <li><strong>Backend:</strong> Express.js, Mongoose, OpenAI API</li>
+        <li><strong>PDF Export:</strong> Puppeteer or jsPDF</li>
+        <li><strong>Testing:</strong> Jest, Cypress</li>
+        <li><strong>Design:</strong> Figma, Mermaid.js</li>
+      </ul>
+    </section>
+
+    <!-- 6. Information Workflow -->
+    <section>
+      <h2>🔄 Information Workflow</h2>
+      <pre><code>[User Input] → [LLM Processes] → [JSON Map Schema] → [MongoDB Storage]
+↓
+UI Renders Map (D3.js)
+↓
+User Actions → Backend Routes → LLM Re-Processing
+↓
+Updated Map → PDF Export / Shareable Link</code></pre>
+
+      <h3>MongoDB Schema</h3>
+      <pre><code>{
+  project_id: ObjectId,
+  title: String,
+  nodes: [{
+    node_id: String,
+    content: String,
+    type: "text/image/link",
+    status: "approved/pending",
+    children: [node_id]
+  }],
+  created_at: Date
+}</code></pre>
+    </section>
+
+    <!-- Footer

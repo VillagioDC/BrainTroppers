@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Storm Trooper MVP Roadmap</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --secondary: #6366F1;
+      --bg: #F9FAFB;
+      --card-bg: #FFFFFF;
+      --text: #111827;
+      --muted: #6B7280;
+      --accent: #EC4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: var(--primary);
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .phase {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
+    }
+
+    .phase:hover {
+      transform: translateY(-5px);
+    }
+
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #E5E7EB;
+    }
+
+    .phase-title {
+      font-size: 1.5rem;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .phase-goal {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    th {
+      background-color: #F3F4F6;
+      color: var(--primary);
+    }
+
+    tr:hover {
+      background-color: #F9FAFB;
+    }
+
+    .day-cell {
+      width: 10%;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .task-cell {
+      width: 90%;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .phase-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .phase-goal {
+        margin-top: 0.5rem;
+      }
+
+      th, td {
+        display: block;
+        width: 100%;
+      }
+
+      .day-cell {
+        font-weight: bold;
+        color: var(--secondary);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Storm Trooper MVP Roadmap</h1>
+      <p>A 30-day plan to build an AI-powered brainstorming platform</p>
+    </header>
+
+    <!-- Phase 1 -->
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-title">Phase 1: Foundation Setup</div>
+        <div class="phase-goal">Establish core infrastructure</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">✅</td>
+            <td class="task-cell">Set initial name, logo and check namecheap namesilo availability</td>
+          </tr>
+          <tr>
+            <td class="day-cell">✅</td>
+            <td class="task-cell">Initialize GitHub repo, setup VSCode workspace, configure CI/CD via Netlify</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Define MongoDB schema for projects/nodes, validate with mock data</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Setup Express.js backend server with basic routing and middleware</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Connect MongoDB to backend using Mongoose ODM</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Create authentication framework (OAuth prep: Google/FB placeholders)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-title">Phase 2: Core Backend Development</div>
+        <div class="phase-goal">Build APIs for map generation and node manipulation</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Integrate OpenAI API for LLM-driven map generation</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Implement /create-map endpoint for user topics → JSON maps</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Develop /update-node endpoint for actions: approve, rewrite, expand</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Add bidirectional edge logic for non-hierarchical connections</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Test API endpoints with Postman (JSON schema validation)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-title">Phase 3: Frontend UI Development</div>
+        <div class="phase-goal">Create interactive map canvas and user interface</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Setup React.js project structure with D3.js visualization</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Design landing page and map canvas layout</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Implement draggable nodes and edges with D3.js physics</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Enable node creation/editing (text input, type selection)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Build context menu for node actions (approve, rewrite, expand)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-title">Phase 4: Integration & AI Features</div>
+        <div class="phase-goal">Connect frontend to backend and enhance AI functionality</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Link frontend to backend APIs for saving/loading maps</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Implement LLM-driven node rewriting (prompt + instruction)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Add "Expand Details" feature (LLM generates sub-nodes)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Optimize LLM prompts for consistency (JSON validation)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Add filtering/search for large maps (tags, approval status)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-title">Phase 5: Advanced Features</div>
+        <div class="phase-goal">Add collaboration, export, and productivity tools</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Build PDF export with jsPDF (basic layout: map preview only)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Enhance PDF export with detailed node metadata per page</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Implement real-time collaboration with Socket.IO</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Add keyboard shortcuts (Ctrl+Enter, Undo/Redo)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Develop project dashboard for saving/loading multiple maps</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phase 6 -->
+    <div class="phase">
+      <div class="phase-header">
+        <div class="phase-title">Phase 6: Testing & Optimization</div>
+        <div class="phase-goal">Ensure stability, performance, and user readiness</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Conduct usability testing with 5 users (record feedback)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Fix critical bugs and optimize load times (lazy loading)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Write technical documentation (APIs, schema, deployment guide)</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Record demo video and prepare marketing assets</td>
+          </tr>
+          <tr>
+            <td class="day-cell">❌</td>
+            <td class="task-cell">Deploy MVP and launch publicly</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
