@@ -2,99 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Storm Trooper Roadmap</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brain Troopers Roadmap</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f7fa;
-      color: #333;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+    :root {
+      --primary: #0a66c2;
+      --secondary: #1a2a44;
+      --background: #f0f2f5;
+      --card-bg: #ffffff;
+      --accent: #00d4ff;
+      --text: #1a1a1a;
+      --text-light: #5e6d82;
+    }
+
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--background) 0%, #e6e9ec 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
     header {
-      background: #007bff;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
-      padding: 2rem 1rem;
+      padding: 3rem 2rem;
       text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    h1 {
-      margin: 0;
-      font-size: 2rem;
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
     }
+
+    header p {
+      font-size: 1.2rem;
+      font-weight: 300;
+      opacity: 0.9;
+    }
+
     .timeline {
       max-width: 1200px;
-      margin: 2rem auto;
+      margin: 3rem auto;
       position: relative;
       padding: 2rem 1rem;
     }
+
     .timeline::before {
       content: '';
       position: absolute;
       top: 0;
       bottom: 0;
-      width: 4px;
-      background: #007bff;
+      width: 6px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
       left: 50%;
       transform: translateX(-50%);
+      border-radius: 3px;
     }
+
     .day-section {
       display: flex;
-      flex-direction: row-reverse;
       justify-content: space-between;
-      margin-bottom: 3rem;
+      margin-bottom: 4rem;
       position: relative;
-      clear: both;
+      animation: fadeInUp 0.6s ease-out;
     }
+
     .day-section:nth-child(even) {
-      flex-direction: row;
+      flex-direction: row-reverse;
     }
+
     .day-card {
-      width: 45%;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 1rem 1.5rem;
+      width: 48%;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem 2rem;
       position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
+    .day-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
     .day-card::before {
       content: '';
       position: absolute;
-      top: 20px;
-      width: 20px;
-      height: 20px;
-      background: #007bff;
+      top: 1.5rem;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border: 2px solid var(--card-bg);
       border-radius: 50%;
       z-index: 10;
+      transition: background 0.3s ease;
     }
+
     .day-section:nth-child(even) .day-card::before {
-      left: -10px;
+      left: -28px;
     }
+
     .day-section:nth-child(odd) .day-card::before {
-      right: -10px;
+      right: -28px;
     }
+
     .day-number {
-      font-weight: bold;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .day-number::before {
+      content: '📅';
       font-size: 1.2rem;
-      color: #007bff;
     }
+
     .tasks {
-      margin-top: 0.5rem;
-      padding-left: 1rem;
+      list-style: none;
+      padding-left: 0;
     }
+
     .tasks li {
-      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+      font-size: 1rem;
+      color: var(--text-light);
     }
+
+    .tasks li.completed::before {
+      content: '✅';
+    }
+
+    .tasks li.in-progress::before {
+      content: '🔄';
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     @media (max-width: 768px) {
+      .timeline::before {
+        left: 20px;
+      }
+
       .day-section {
         flex-direction: column !important;
+        align-items: flex-start;
       }
+
       .day-card {
         width: 100%;
         margin: 1rem 0;
       }
+
       .day-card::before {
-        left: -10px;
+        left: -28px;
+      }
+
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      header p {
+        font-size: 1rem;
       }
     }
   </style>
@@ -110,16 +207,16 @@
       <div class="day-card">
         <span class="day-number">Day 1</span>
         <ul class="tasks">
-          <li>✅ Create project name: "Storm Trooper"</li>
-          <li>✅ Create project logo and branding assets</li>
-          <li>✅ Initialize VSCode project folder</li>
-          <li>✅ Setup GitHub repository for version control</li>
-          <li>✅ Configure Netlify project for deployment</li>
-          <li>✅ Install Netlify CLI and test local deployment</li>
-          <li>✅ Deploy initial placeholder site to Netlify</li>
-          <li>✅ Design MongoDB schema for maps and nodes</li>
-          <li>✅ Finalize 'schema.json' for map structure</li>
-          <li>✅ Create MongoDB Atlas cluster and connect via UI</li>
+          <li class="completed">Create project name: "Storm Trooper"</li>
+          <li class="completed">Create project logo and branding assets</li>
+          <li class="completed">Initialize VSCode project folder</li>
+          <li class="completed">Setup GitHub repository for version control</li>
+          <li class="completed">Configure Netlify project for deployment</li>
+          <li class="completed">Install Netlify CLI and test local deployment</li>
+          <li class="completed">Deploy initial placeholder site to Netlify</li>
+          <li class="completed">Design MongoDB schema for maps and nodes</li>
+          <li class="completed">Finalize 'schema.json' for map structure</li>
+          <li class="completed">Create MongoDB Atlas cluster and connect via UI</li>
         </ul>
       </div>
     </div>
@@ -129,18 +226,18 @@
       <div class="day-card">
         <span class="day-number">Day 2</span>
         <ul class="tasks">
-          <li>✅ Install MongoDB Node.js driver and dotenv library</li>
-          <li>✅ Set MongoDB connection URI in .env file</li>
-          <li>✅ Create basic MongoDB connection endpoint</li>
-          <li>✅ Test database connectivity from backend</li>
-          <li>✅ Copy and adapt base MongoDB functions</li>
-          <li>✅ Function 'loadMapSchema' tested and working</li>
-          <li>✅ Function 'generateToken' implemented</li>
-          <li>✅ Function 'log' for debugging logs</li>
-          <li>✅ Function 'openDBCollection' operational</li>
-          <li>✅ Function 'closeDBCollection' operational</li>
-          <li>✅ Function 'cleanDatabase' for testing</li>
-          <li>🔁 Function 'executeDB' partially tested</li>
+          <li class="completed">Install MongoDB Node.js driver and dotenv library</li>
+          <li class="completed">Set MongoDB connection URI in .env file</li>
+          <li class="completed">Create basic MongoDB connection endpoint</li>
+          <li class="completed">Test database connectivity from backend</li>
+          <li class="completed">Copy and adapt base MongoDB functions</li>
+          <li class="completed">Function 'loadMapSchema' tested and working</li>
+          <li class="completed">Function 'generateToken' implemented</li>
+          <li class="completed">Function 'log' for debugging logs</li>
+          <li class="completed">Function 'openDBCollection' operational</li>
+          <li class="completed">Function 'closeDBCollection' operational</li>
+          <li class="completed">Function 'cleanDatabase' for testing</li>
+          <li class="in-progress">Function 'executeDB' partially tested</li>
         </ul>
       </div>
     </div>
@@ -150,14 +247,14 @@
       <div class="day-card">
         <span class="day-number">Day 3</span>
         <ul class="tasks">
-          <li>🔁 Complete 'executeDB' function and test</li>
-          <li>🔁 Write CRUD operations for maps (create, read, update, delete)</li>
-          <li>🔁 Implement serverless function for map creation</li>
-          <li>🔁 Add error handling to all DB functions</li>
-          <li>🔁 Add logging for failed queries</li>
-          <li>🔁 Write unit tests for core DB functions</li>
-          <li>🔁 Store sample map data in MongoDB</li>
-          <li>🔁 Retrieve and display map from DB successfully</li>
+          <li class="in-progress">Complete 'executeDB' function and test</li>
+          <li class="in-progress">Write CRUD operations for maps (create, read, update, delete)</li>
+          <li class="in-progress">Implement serverless function for map creation</li>
+          <li class="in-progress">Add error handling to all DB functions</li>
+          <li class="in-progress">Add logging for failed queries</li>
+          <li class="in-progress">Write unit tests for core DB functions</li>
+          <li class="in-progress">Store sample map data in MongoDB</li>
+          <li class="in-progress">Retrieve and display map from DB successfully</li>
         </ul>
       </div>
     </div>
@@ -167,13 +264,13 @@
       <div class="day-card">
         <span class="day-number">Day 4</span>
         <ul class="tasks">
-          <li>✅ Choose OpenAI 4o mini model</li>
-          <li>✅ Using LLM7 node library for API integration</li>
-          <li>🔁 Setup LLM client integration in Node.js</li>
-          <li>🔁 Write prompt template for brainstorming input</li>
-          <li>🔁 Send first topic to LLM and get output</li>
-          <li>🔁 Log raw LLM response for review</li>
-          <li>🔁 Validate JSON schema generation from LLM</li>
+          <li class="completed">Choose OpenAI 4o mini model</li>
+          <li class="completed">Using LLM7 node library for API integration</li>
+          <li class="in-progress">Setup LLM client integration in Node.js</li>
+          <li class="in-progress">Write prompt template for brainstorming input</li>
+          <li class="in-progress">Send first topic to LLM and get output</li>
+          <li class="in-progress">Log raw LLM response for review</li>
+          <li class="in-progress">Validate JSON schema generation from LLM</li>
         </ul>
       </div>
     </div>
@@ -183,12 +280,12 @@
       <div class="day-card">
         <span class="day-number">Day 5</span>
         <ul class="tasks">
-          <li>🔁 Build parser to convert LLM output into structured JSON map</li>
-          <li>🔁 Define node/edge structure for non-hierarchical graph</li>
-          <li>🔁 Map parent-child to peer-peer connections</li>
-          <li>🔁 Save generated map to MongoDB</li>
-          <li>🔁 Retrieve and validate stored map structure</li>
-          <li>🔁 Add metadata fields (created_at, updated_at, user_id)</li>
+          <li class="in-progress">Build parser to convert LLM output into structured JSON map</li>
+          <li class="in-progress">Define node/edge structure for non-hierarchical graph</li>
+          <li class="in-progress">Map parent-child to peer-peer connections</li>
+          <li class="in-progress">Save generated map to MongoDB</li>
+          <li class="in-progress">Retrieve and validate stored map structure</li>
+          <li class="in-progress">Add metadata fields (created_at, updated_at, user_id)</li>
         </ul>
       </div>
     </div>
@@ -198,11 +295,11 @@
       <div class="day-card">
         <span class="day-number">Day 6</span>
         <ul class="tasks">
-          <li>🔁 Build frontend canvas layout for map visualization</li>
-          <li>🔁 Add placeholders for nodes and edges</li>
-          <li>🔁 Fetch map data from backend and render in UI</li>
-          <li>🔁 Style nodes with colors and labels</li>
-          <li>🔁 Display basic map structure visually</li>
+          <li class="in-progress">Build frontend canvas layout for map visualization</li>
+          <li class="in-progress">Add placeholders for nodes and edges</li>
+          <li class="in-progress">Fetch map data from backend and render in UI</li>
+          <li class="in-progress">Style nodes with colors and labels</li>
+          <li class="in-progress">Display basic map structure visually</li>
         </ul>
       </div>
     </div>
@@ -212,11 +309,11 @@
       <div class="day-card">
         <span class="day-number">Day 7</span>
         <ul class="tasks">
-          <li>🔁 Integrate D3.js or Cytoscape.js for interactive graph</li>
-          <li>🔁 Enable zooming, panning, and dragging on canvas</li>
-          <li>🔁 Make nodes draggable and clickable</li>
-          <li>🔁 Show tooltips with node details on hover</li>
-          <li>🔁 Improve visual feedback when interacting with nodes</li>
+          <li class="in-progress">Integrate D3.js or Cytoscape.js for interactive graph</li>
+          <li class="in-progress">Enable zooming, panning, and dragging on canvas</li>
+          <li class="in-progress">Make nodes draggable and clickable</li>
+          <li class="in-progress">Show tooltips with node details on hover</li>
+          <li class="in-progress">Improve visual feedback when interacting with nodes</li>
         </ul>
       </div>
     </div>
@@ -226,11 +323,11 @@
       <div class="day-card">
         <span class="day-number">Day 8</span>
         <ul class="tasks">
-          <li>🔁 Implement node actions: approve, comment, rewrite, delete</li>
-          <li>🔁 Add context menu for right-click node actions</li>
-          <li>🔁 Modal for editing node content</li>
-          <li>🔁 Update node status in DB on approval</li>
-          <li>🔁 Send edited node back to backend</li>
+          <li class="in-progress">Implement node actions: approve, comment, rewrite, delete</li>
+          <li class="in-progress">Add context menu for right-click node actions</li>
+          <li class="in-progress">Modal for editing node content</li>
+          <li class="in-progress">Update node status in DB on approval</li>
+          <li class="in-progress">Send edited node back to backend</li>
         </ul>
       </div>
     </div>
@@ -240,11 +337,11 @@
       <div class="day-card">
         <span class="day-number">Day 9</span>
         <ul class="tasks">
-          <li>🔁 Trigger new LLM call when node needs expansion</li>
-          <li>🔁 Prompt LLM to elaborate on selected node</li>
-          <li>🔁 Replace old node content with expanded version</li>
-          <li>🔁 Update map structure dynamically in UI</li>
-          <li>🔁 Save updated node to MongoDB</li>
+          <li class="in-progress">Trigger new LLM call when node needs expansion</li>
+          <li class="in-progress">Prompt LLM to elaborate on selected node</li>
+          <li class="in-progress">Replace old node content with expanded version</li>
+          <li class="in-progress">Update map structure dynamically in UI</li>
+          <li class="in-progress">Save updated node to MongoDB</li>
         </ul>
       </div>
     </div>
@@ -254,11 +351,11 @@
       <div class="day-card">
         <span class="day-number">Day 10</span>
         <ul class="tasks">
-          <li>🔁 Implement edge creation/deletion between nodes</li>
-          <li>🔁 Allow users to define custom connections</li>
-          <li>🔁 Store edge relationships in MongoDB</li>
-          <li>🔁 Visualize edges on graph</li>
-          <li>🔁 Prevent invalid or duplicate connections</li>
+          <li class="in-progress">Implement edge creation/deletion between nodes</li>
+          <li class="in-progress">Allow users to define custom connections</li>
+          <li class="in-progress">Store edge relationships in MongoDB</li>
+          <li class="in-progress">Visualize edges on graph</li>
+          <li class="in-progress">Prevent invalid or duplicate connections</li>
         </ul>
       </div>
     </div>
@@ -268,11 +365,11 @@
       <div class="day-card">
         <span class="day-number">Day 11</span>
         <ul class="tasks">
-          <li>🔁 Build PDF export functionality</li>
-          <li>🔁 Generate simplified PDF with node titles only</li>
-          <li>🔁 Include map title and metadata in header</li>
-          <li>🔁 Style PDF with readable fonts and layout</li>
-          <li>🔁 Add download button for PDF export</li>
+          <li class="in-progress">Build PDF export functionality</li>
+          <li class="in-progress">Generate simplified PDF with node titles only</li>
+          <li class="in-progress">Include map title and metadata in header</li>
+          <li class="in-progress">Style PDF with readable fonts and layout</li>
+          <li class="in-progress">Add download button for PDF export</li>
         </ul>
       </div>
     </div>
@@ -282,11 +379,11 @@
       <div class="day-card">
         <span class="day-number">Day 12</span>
         <ul class="tasks">
-          <li>🔁 Generate detailed PDF with full node descriptions</li>
-          <li>🔁 Export node content and comments in PDF</li>
-          <li>🔁 Support exporting multiple maps at once</li>
-          <li>🔁 Add option to generate accessory PDF with full details</li>
-          <li>🔁 Allow PDF download and print options</li>
+          <li class="in-progress">Generate detailed PDF with full node descriptions</li>
+          <li class="in-progress">Export node content and comments in PDF</li>
+          <li class="in-progress">Support exporting multiple maps at once</li>
+          <li class="in-progress">Add option to generate accessory PDF with full details</li>
+          <li class="in-progress">Allow PDF download and print options</li>
         </ul>
       </div>
     </div>
@@ -296,11 +393,11 @@
       <div class="day-card">
         <span class="day-number">Day 13</span>
         <ul class="tasks">
-          <li>🔁 Implement JWT-based authentication</li>
-          <li>🔁 Add login/register screens</li>
-          <li>🔁 Protect backend routes with auth middleware</li>
-          <li>🔁 Assign maps to specific users</li>
-          <li>🔁 Restrict access to other users’ maps</li>
+          <li class="in-progress">Implement JWT-based authentication</li>
+          <li class="in-progress">Add login/register screens</li>
+          <li class="in-progress">Protect backend routes with auth middleware</li>
+          <li class="in-progress">Assign maps to specific users</li>
+          <li class="in-progress">Restrict access to other users’ maps</li>
         </ul>
       </div>
     </div>
@@ -310,11 +407,11 @@
       <div class="day-card">
         <span class="day-number">Day 14</span>
         <ul class="tasks">
-          <li>🔁 Secure API endpoints against unauthorized access</li>
-          <li>🔁 Sanitize inputs to prevent XSS attacks</li>
-          <li>🔁 Rate limit LLM calls to avoid abuse</li>
-          <li>🔁 Set up environment variables for production</li>
-          <li>🔁 Deploy latest build to Netlify</li>
+          <li class="in-progress">Secure API endpoints against unauthorized access</li>
+          <li class="in-progress">Sanitize inputs to prevent XSS attacks</li>
+          <li class="in-progress">Rate limit LLM calls to avoid abuse</li>
+          <li class="in-progress">Set up environment variables for production</li>
+          <li class="in-progress">Deploy latest build to Netlify</li>
         </ul>
       </div>
     </div>
@@ -324,16 +421,15 @@
       <div class="day-card">
         <span class="day-number">Day 15</span>
         <ul class="tasks">
-          <li>🔁 Conduct internal QA testing of all features</li>
-          <li>🔁 Fix bugs found during testing</li>
-          <li>🔁 Invite beta testers for feedback</li>
-          <li>🔁 Collect performance metrics (load times, errors)</li>
-          <li>🔁 Iterate on UI/UX based on user feedback</li>
-          <li>🔁 Optimize backend and frontend for speed</li>
+          <li class="in-progress">Conduct internal QA testing of all features</li>
+          <li class="in-progress">Fix bugs found during testing</li>
+          <li class="in-progress">Invite beta testers for feedback</li>
+          <li class="in-progress">Collect performance metrics (load times, errors)</li>
+          <li class="in-progress">Iterate on UI/UX based on user feedback</li>
+          <li class="in-progress">Optimize backend and frontend for speed</li>
         </ul>
       </div>
     </div>
   </div>
 </body>
-
 </html>
