@@ -3,382 +3,419 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Storm Trooper MVP Roadmap</title>
+  <title>Storm Trooper Roadmap</title>
   <style>
-    :root {
-      --primary: #4F46E5;
-      --secondary: #6366F1;
-      --bg: #F9FAFB;
-      --card-bg: #FFFFFF;
-      --text: #111827;
-      --muted: #6B7280;
-      --accent: #EC4899;
-    }
-
-    * {
-      box-sizing: border-box;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7fa;
+      color: #333;
       margin: 0;
       padding: 0;
     }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      padding: 2rem;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
     header {
-      text-align: center;
-      margin-bottom: 3rem;
-      padding: 2rem;
-      background: var(--primary);
+      background: #007bff;
       color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .phase {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s;
-    }
-
-    .phase:hover {
-      transform: translateY(-5px);
-    }
-
-    .phase-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #E5E7EB;
-    }
-
-    .phase-title {
-      font-size: 1.5rem;
-      color: var(--primary);
-      font-weight: bold;
-    }
-
-    .phase-goal {
-      font-style: italic;
-      color: var(--muted);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      padding: 1rem;
-      text-align: left;
-      border-bottom: 1px solid #E5E7EB;
-    }
-
-    th {
-      background-color: #F3F4F6;
-      color: var(--primary);
-    }
-
-    tr:hover {
-      background-color: #F9FAFB;
-    }
-
-    .day-cell {
-      width: 10%;
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .task-cell {
-      width: 90%;
-    }
-
-    footer {
+      padding: 2rem 1rem;
       text-align: center;
-      margin-top: 4rem;
-      color: var(--muted);
-      font-size: 0.9rem;
     }
-
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    .timeline {
+      max-width: 1200px;
+      margin: 2rem auto;
+      position: relative;
+      padding: 2rem 1rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #007bff;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .day-section {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      position: relative;
+      clear: both;
+    }
+    .day-section:nth-child(even) {
+      flex-direction: row;
+    }
+    .day-card {
+      width: 45%;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1rem 1.5rem;
+      position: relative;
+    }
+    .day-card::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      width: 20px;
+      height: 20px;
+      background: #007bff;
+      border-radius: 50%;
+      z-index: 10;
+    }
+    .day-section:nth-child(even) .day-card::before {
+      left: -10px;
+    }
+    .day-section:nth-child(odd) .day-card::before {
+      right: -10px;
+    }
+    .day-number {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #007bff;
+    }
+    .tasks {
+      margin-top: 0.5rem;
+      padding-left: 1rem;
+    }
+    .tasks li {
+      margin-bottom: 0.3rem;
+    }
     @media (max-width: 768px) {
-      .phase-header {
-        flex-direction: column;
-        align-items: flex-start;
+      .day-section {
+        flex-direction: column !important;
       }
-
-      .phase-goal {
-        margin-top: 0.5rem;
-      }
-
-      th, td {
-        display: block;
+      .day-card {
         width: 100%;
+        margin: 1rem 0;
       }
-
-      .day-cell {
-        font-weight: bold;
-        color: var(--secondary);
+      .day-card::before {
+        left: -10px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Storm Trooper MVP Roadmap</h1>
-      <p>A 30-day plan to build an AI-powered brainstorming platform</p>
-    </header>
-
-    <!-- Phase 1 -->
-    <div class="phase">
-      <div class="phase-header">
-        <div class="phase-title">Phase 1: Foundation Setup</div>
-        <div class="phase-goal">Establish core infrastructure</div>
+  <header>
+    <h1>Storm Trooper Project Roadmap</h1>
+    <p>MVP Development Timeline (Netlify Serverless Focus)</p>
+  </header>
+  <div class="timeline">
+    <!-- Day 1 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 1</span>
+        <ul class="tasks">
+          <li>✅ Create project name</li>
+          <li>✅ Create project logo</li>
+          <li>✅ Create VSCode folder</li>
+          <li>✅ Setup GitHub repo</li>
+          <li>✅ Create Netlify project</li>
+          <li>✅ Configure Netlify CLI for local development</li>
+          <li>✅ Deploy initial content to Netlify</li>
+          <li>✅ Design MongoDB schema for maps/nodes</li>
+          <li>✅ Create MongoDB Atlas cluster</li>
+        </ul>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Task</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="day-cell">✅</td>
-            <td class="task-cell">Set initial name, logo and check namecheap namesilo availability</td>
-          </tr>
-          <tr>
-            <td class="day-cell">✅</td>
-            <td class="task-cell">Initialize GitHub repo, setup VSCode workspace, configure CI/CD via Netlify</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Define MongoDB schema for projects/nodes, validate with mock data</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Setup Express.js backend server with basic routing and middleware</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Connect MongoDB to backend using Mongoose ODM</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Create authentication framework (OAuth prep: Google/FB placeholders)</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- Phase 2 -->
-    <div class="phase">
-      <div class="phase-header">
-        <div class="phase-title">Phase 2: Core Backend Development</div>
-        <div class="phase-goal">Build APIs for map generation and node manipulation</div>
+    <!-- Day 2 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 2</span>
+        <ul class="tasks">
+          <li>🔁 Install mongoDB and dotenv libraries</li>
+          <li>🔁 Set database uri on .env file</li>
+          <li>🔁 Create mongoDB test endpoint</li>
+          <li>🔁 Test connection to MongoDB</li>
+          <li>🔁 Copy basic functions of MongoDB</li>
+          <li>🔁 Create project functions to MongoDB</li>
+        </ul>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Task</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Integrate OpenAI API for LLM-driven map generation</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Implement /create-map endpoint for user topics → JSON maps</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Develop /update-node endpoint for actions: approve, rewrite, expand</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Add bidirectional edge logic for non-hierarchical connections</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Test API endpoints with Postman (JSON schema validation)</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- Phase 3 -->
-    <div class="phase">
-      <div class="phase-header">
-        <div class="phase-title">Phase 3: Frontend UI Development</div>
-        <div class="phase-goal">Create interactive map canvas and user interface</div>
+    <!-- Day 3 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 3</span>
+        <ul class="tasks">
+          <li>🔁 Create Netlify Function for /create-map endpoint</li>
+          <li>🔁 Install dependencies (React, Axios, D3.js)</li>
+        </ul>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Task</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Setup React.js project structure with D3.js visualization</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Design landing page and map canvas layout</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Implement draggable nodes and edges with D3.js physics</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Enable node creation/editing (text input, type selection)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Build context menu for node actions (approve, rewrite, expand)</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- Phase 4 -->
-    <div class="phase">
-      <div class="phase-header">
-        <div class="phase-title">Phase 4: Integration & AI Features</div>
-        <div class="phase-goal">Connect frontend to backend and enhance AI functionality</div>
+    <!-- Day 4 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 4</span>
+        <ul class="tasks">
+          <li>🔁 Integrate OpenAI API key in Netlify environment variables</li>
+          <li>🔁 Test LLM-generated JSON maps locally</li>
+        </ul>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Task</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Link frontend to backend APIs for saving/loading maps</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Implement LLM-driven node rewriting (prompt + instruction)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Add "Expand Details" feature (LLM generates sub-nodes)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Optimize LLM prompts for consistency (JSON validation)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Add filtering/search for large maps (tags, approval status)</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- Phase 5 -->
-    <div class="phase">
-      <div class="phase-header">
-        <div class="phase-title">Phase 5: Advanced Features</div>
-        <div class="phase-goal">Add collaboration, export, and productivity tools</div>
+    <!-- Day 5 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 5</span>
+        <ul class="tasks">
+          <li>🔁 Deploy /create-map function to Netlify</li>
+          <li>🔁 Fix CORS issues and test with frontend</li>
+        </ul>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Task</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Build PDF export with jsPDF (basic layout: map preview only)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Enhance PDF export with detailed node metadata per page</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Implement real-time collaboration with Socket.IO</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Add keyboard shortcuts (Ctrl+Enter, Undo/Redo)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Develop project dashboard for saving/loading multiple maps</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- Phase 6 -->
-    <div class="phase">
-      <div class="phase-header">
-        <div class="phase-title">Phase 6: Testing & Optimization</div>
-        <div class="phase-goal">Ensure stability, performance, and user readiness</div>
+    <!-- Day 6 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 6</span>
+        <ul class="tasks">
+          <li>🔁 Build basic React UI with map canvas</li>
+          <li>🔁 Add D3.js for rendering placeholder nodes</li>
+        </ul>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Task</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Conduct usability testing with 5 users (record feedback)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Fix critical bugs and optimize load times (lazy loading)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Write technical documentation (APIs, schema, deployment guide)</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Record demo video and prepare marketing assets</td>
-          </tr>
-          <tr>
-            <td class="day-cell">❌</td>
-            <td class="task-cell">Deploy MVP and launch publicly</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-
-    <footer>
+    <!-- Day 7 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 7</span>
+        <ul class="tasks">
+          <li>🔁 Implement drag-and-drop node movement</li>
+          <li>🔁 Add zoom/pan functionality with D3.js</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 8 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 8</span>
+        <ul class="tasks">
+          <li>🔁 Create Netlify Function for /update-node endpoint</li>
+          <li>🔁 Test node updates in MongoDB</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 9 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 9</span>
+        <ul class="tasks">
+          <li>🔁 Connect frontend to /update-node for saving edits</li>
+          <li>🔁 Add loading states for user feedback</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 10 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 10</span>
+        <ul class="tasks">
+          <li>🔁 Implement node context menu (approve, rewrite, expand)</li>
+          <li>🔁 Style menu with CSS transitions</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 11 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 11</span>
+        <ul class="tasks">
+          <li>🔁 Create Netlify Function for LLM-driven node rewriting</li>
+          <li>🔁 Prompt: "Rewrite node content: {content}"</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 12 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 12</span>
+        <ul class="tasks">
+          <li>🔁 Add "Expand Details" button to generate sub-nodes via LLM</li>
+          <li>🔁 Design sub-node hierarchy in JSON schema</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 13 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 13</span>
+        <ul class="tasks">
+          <li>🔁 Visualize bidirectional connections with D3.js edges</li>
+          <li>🔁 Add edge labels (e.g., "related to", "requires")</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 14 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 14</span>
+        <ul class="tasks">
+          <li>🔁 Handle edge case: Prevent duplicate node IDs</li>
+          <li>🔁 Add error logging in Netlify Functions</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 15 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 15</span>
+        <ul class="tasks">
+          <li>🔁 Implement basic PDF export with jsPDF</li>
+          <li>🔁 Test exporting map screenshot and node titles</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 16 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 16</span>
+        <ul class="tasks">
+          <li>🔁 Add filtering/search bar for large maps</li>
+          <li>🔁 Highlight matching nodes on search</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 17 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 17</span>
+        <ul class="tasks">
+          <li>🔁 Set up Firebase Auth for user login</li>
+          <li>🔁 Store user projects in MongoDB</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 18 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 18</span>
+        <ul class="tasks">
+          <li>🔁 Create project dashboard to list saved maps</li>
+          <li>🔁 Add "New Map" button with topic prompt</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 19 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 19</span>
+        <ul class="tasks">
+          <li>🔁 Deploy Firebase Auth and test user flows</li>
+          <li>🔁 Fix redirect issues after login</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 20 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 20</span>
+        <ul class="tasks">
+          <li>🔁 Deploy MVP frontend to Netlify for testing</li>
+          <li>🔁 Fix DNS and custom domain setup</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 21 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 21</span>
+        <ul class="tasks">
+          <li>🔁 Create Netlify Function for detailed PDF export</li>
+          <li>🔁 Use Puppeteer to generate PDFs with node content</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 22 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 22</span>
+        <ul class="tasks">
+          <li>🔁 Add keyboard shortcuts (Ctrl+Enter to create node)</li>
+          <li>🔁 Implement undo/redo with local state</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 23 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 23</span>
+        <ul class="tasks">
+          <li>🔁 Write unit tests for Netlify Functions (Jest)</li>
+          <li>🔁 Mock OpenAI responses for reliability</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 24 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 24</span>
+        <ul class="tasks">
+          <li>🔁 Conduct usability testing with 3 users</li>
+          <li>🔁 Collect feedback on UI/UX and bug reports</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 25 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 25</span>
+        <ul class="tasks">
+          <li>🔁 Optimize LLM prompts for JSON consistency</li>
+          <li>🔁 Add schema validation (Zod or Joi)</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 26 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 26</span>
+        <ul class="tasks">
+          <li>🔁 Implement rate limiting in Netlify Functions</li>
+          <li>🔁 Add error boundaries in React UI</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 27 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 27</span>
+        <ul class="tasks">
+          <li>🔁 Add tooltips for node metadata (author, timestamp)</li>
+          <li>🔁 Style tooltips with CSS animations</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 28 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 28</span>
+        <ul class="tasks">
+          <li>🔁 Finalize documentation (API guides, deployment steps)</li>
+          <li>🔁 Write README and CONTRIBUTING.md files</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 29 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 29</span>
+        <ul class="tasks">
+          <li>🔁 Record demo video showcasing core workflows</li>
+          <li>🔁 Use Loom or OBS Studio for screen capture</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 30 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 30</span>
+        <ul class="tasks">
+          <li>🔁 Deploy final MVP to Netlify with custom domain</li>
+          <li>🔁 Announce launch on Twitter/Discord communities</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
