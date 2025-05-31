@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Storm Trooper - AI Brainstorming Platform</title>
+  <title>Brain Trooper - AI Brainstorming Platform</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -256,18 +256,20 @@ User Actions → Backend Routes → LLM Re-Processing
 Updated Map → PDF Export / Shareable Link</code></pre>
 
       <h3>MongoDB Schema</h3>
-      <pre><code>{
-  project_id: ObjectId,
-  title: String,
-  nodes: [{
-    node_id: String,
-    content: String,
-    type: "text/image/link",
-    status: "approved/pending",
-    children: [node_id]
-  }],
-  created_at: Date
-}</code></pre>
+      <pre><code>{  
+  projectId: ObjectId,
+  userPrompt: String,         // user prompt
+  title: String,              // project title
+  lastUpdated: Date,          // last update date
+  nodes: [{  
+    nodeId: String,           // token
+    content: String,          // title of the node  
+    detail: String,           // detailed descriptions for PDF export  
+    status: String,           // "approved","pending"
+    directLink: [node_id],    // Strong, hierarchical dependencies  
+    relatedLink: [node_id]    // Weak, non-hierarchical relationships  
+  }]  
+} </code></pre>
     </section>
 
     <!-- Footer
