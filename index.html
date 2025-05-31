@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Braintrooper - AI-Powered Brain Mapping</title>
+    <link rel="stylesheet" href="src/style/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">braintrooper</div>
+                <input type="checkbox" id="mobile-menu-toggle" class="mobile-menu-toggle">
+                <label for="mobile-menu-toggle" class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><button id="sign-in-btn">Sign In</button></li>
+                    <li><button id="sign-up-btn">Sign Up</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Unlock Your Ideas with AI-Powered Brain Mapping</h1>
+                        <p>Create, develop, and visualize your thoughts like never before</p>
+                        <button class="cta-button" id="get-started-btn">Get Started</button>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://via.placeholder.com/600x400?text=Brain+Map+Illustration" alt="Brain Map Illustration">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon"><i class="fas fa-brain"></i></div>
+                        <h3>AI-Generated Brain Maps</h3>
+                        <p>Let our AI transform your ideas into structured maps</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon"><i class="fas fa-hand-pointer"></i></div>
+                        <h3>Dynamic Interaction</h3>
+                        <p>Easily manipulate nodes: approve, comment, review, or exclude</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon"><i class="fas fa-users"></i></div>
+                        <h3>Collaborative Workflows</h3>
+                        <p>Steer your projects with non-hierarchical connections</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon"><i class="fas fa-file-pdf"></i></div>
+                        <h3>Export to PDF</h3>
+                        <p>Materialize your brainstorms into high-quality documents</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title">About Braintrooper</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>At Braintrooper, we believe in the power of structured thinking. Our mission is to provide a platform where ideas can flourish through AI-assisted brain mapping and dynamic workflows. With over a decade of experience in digital transformation, our team is dedicated to helping you unlock your creative potential.</p>
+                        <p>Our innovative approach combines cutting-edge AI technology with user-friendly interfaces to ensure that your brainstorming sessions are not only productive but also enjoyable. Join us in revolutionizing the way you think and collaborate.</p>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://via.placeholder.com/600x400?text=About+Braintrooper" alt="About Braintrooper">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 class="section-title">Contact Us</h2>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <p>Address: 123 Innovation Street, Tech City</p>
+                        <p>Email: [email protected]</p>
+                        <p>Phone: +1 (555) 987-6543</p>
+                    </div>
+                    <form class="contact-form">
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Your Email" required>
+                        <textarea placeholder="Your Message" rows="5" required></textarea>
+                        <button type="submit" class="cta-button">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">braintrooper</div>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <p>&copy; 2023 Braintrooper. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="sign-in-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-sign-in">&times;</span>
+            <h2>Sign In</h2>
+            <form id="sign-in-form">
+                <input type="email" id="sign-in-email" placeholder="Email" required>
+                <input type="password" id="sign-in-password" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+                <button id="google-sign-in" class="oauth-button"><i class="fab fa-google"></i> Sign in with Google</button>
+                <div class="form-links">
+                    <a href="#" id="show-forgot-password">Forgot Password?</a>
+                    <a href="#" id="switch-to-sign-up">Don't have an account? Sign Up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="sign-up-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-sign-up">&times;</span>
+            <h2>Create Account</h2>
+            <form id="sign-up-form">
+                <input type="email" id="sign-up-email" placeholder="Email" required>
+                <input type="password" id="sign-up-password" placeholder="Password" required>
+                <p class="password-hint">Password must be at least 8 characters long, contain one uppercase letter and one special character.</p>
+                <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                <button type="submit">Sign Up</button>
+                <button id="google-sign-up" class="oauth-button"><i class="fab fa-google"></i> Sign up with Google</button>
+                <div class="form-links">
+                    <a href="#" id="switch-to-sign-in">Already have an account? Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="forgot-password-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-forgot-password">&times;</span>
+            <h2>Reset Password</h2>
+            <form id="forgot-password-form">
+                <input type="email" id="reset-email" placeholder="Enter your email" required>
+                <button type="submit">Send Reset Link</button>
+                <div class="form-links">
+                    <a href="#" id="back-to-sign-in">Back to Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="src/scripts/scripts.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948368061cc0a3fc',t:'MTc0ODY2MjM3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
