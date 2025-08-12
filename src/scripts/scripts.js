@@ -45,8 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Get Started Button
-    getStartedBtn?.addEventListener('click', function() {
-        signUpModal.style.display = 'block';
+    getStartedBtn?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = './src/pages/canvas.html';
     });
     
     // Close modal when clicking outside of it

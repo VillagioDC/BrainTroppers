@@ -39,10 +39,12 @@
                 <div class="hero-text">
                     <h1>Unlock Your Ideas with AI-Powered Brain Mapping</h1>
                     <p>Create, develop, and visualize your thoughts like never before</p>
-                    <button id="get-started-btn" class="cta-button">Get Started</button>
+                    <button id="get-started-btn" class="cta-button" aria-label="Get started with the canvas application">Get Started</button>
                 </div>
                 <div class="hero-image">
-                    <img src="hero-image.png" alt="Brain Mapping Visualization">
+                    <div class="hero-image">
+                        <canvas id="neuron-network"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,25 +94,6 @@
         </div>
     </section>
 
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">Contact Us</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <p>Address: 123 Innovation Street, Tech City</p>
-                    <p>Email: info@braintrooper.com</p>
-                    <p>Phone: +1 (555) 987-6543</p>
-                </div>
-                <form class="contact-form">
-                    <input type="text" placeholder="Your Name" required>
-                    <input type="email" placeholder="Your Email" required>
-                    <textarea placeholder="Your Message" rows="5" required></textarea>
-                    <button type="submit" class="cta-button">Send Message</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
     <footer class="site-footer">
         <div class="container">
             <div class="footer-content">
@@ -131,7 +114,7 @@
         </div>
     </footer>
 
-    <!-- Modals -->
+    <!-- Modals Sign in -->
     <div id="sign-in-modal" class="modal">
         <div class="modal-content">
             <span id="close-sign-in" class="close-btn">&times;</span>
@@ -148,7 +131,7 @@
             </form>
         </div>
     </div>
-
+    <!-- Modals Sign up -->
     <div id="sign-up-modal" class="modal">
         <div class="modal-content">
             <span id="close-sign-up" class="close-btn">&times;</span>
@@ -166,7 +149,7 @@
             </form>
         </div>
     </div>
-
+    <!-- Modals Forgot password -->
     <div id="forgot-password-modal" class="modal">
         <div class="modal-content">
             <span id="close-forgot-password" class="close-btn">&times;</span>

@@ -1,0 +1,433 @@
+/* style.css */
+:root {
+  --background: #132033;
+  --background-shadow: #1f2f45;
+  --primary: #56a1c0;
+  --secondary: #e5428e;
+  --text: #e0e0e0;
+  --accent: #54c3eb;
+  --border: #3a4d6a;
+  --menu-bg: #1a283b;
+  --menu-hover: #25374e;
+  --delete-color: #e5428e;
+  --gold-plan: #f9d440;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--background);
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+}
+/* Overlaid Logo */
+.logo-overlay {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: none;
+  z-index: 1000;
+}
+.logo-overlay img {
+  width: 35px;
+  height: 35px;
+}
+/* Panel (Top Section) */
+.panel {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+/* Sidebar Navigation */
+.sidebar {
+  width: 240px;
+  max-width: 240px;
+  background: var(--background-shadow);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 900;
+  /* Prevent popup clipping */
+  overflow-y: visible;
+}
+.sidebar.collapsed {
+  width: 0;
+  border-right: none;
+}
+/* Sidebar Header */
+.sidebar-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.3s ease;
+}
+.sidebar.collapsed .sidebar-header {
+  opacity: 0;
+  visibility: hidden;
+}
+.user-section {
+  display: flex;
+  align-items: center;
+  padding-left: 60px;
+  gap: 0.75rem;
+}
+.collapse-btn {
+  background: none;
+  border: 1px solid var(--background);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 50%;
+  transition: background-color 0.3s, border 0.3s;
+}
+.collapse-btn:hover {
+  background-color: var(--background-shadow);
+  border: 1px solid var(--primary);
+}
+.user-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.user-plan {
+  font-size: 0.85rem;
+  color: var(--accent);
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sidebar.collapsed .user-plan {
+  opacity: 0;
+  visibility: hidden;
+}
+/* New Map Button */
+.new-map-btn {
+  margin: 1rem;
+  padding: 0.65rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.new-map-btn:hover {
+  background: linear-gradient(135deg, var(--accent), var(--secondary));
+}
+.sidebar.collapsed .new-map-btn {
+  opacity: 0;
+  visibility: hidden;
+}
+/* Map List */
+.map-list {
+  list-style: none;
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+  width: 100%;
+  /* Allow popups to escape clipping */
+  overflow-y: visible;
+  overflow-x: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.3s ease;
+}
+.sidebar.collapsed .map-list {
+  opacity: 0;
+  visibility: hidden;
+}
+/* Map Item */
+.map-item {
+  position: relative;
+  width: calc(100% - 15px);
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  overflow-x: hidden;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+.map-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.map-item.active {
+  background: rgba(86, 161, 192, 0.2);
+  border-left-color: var(--primary);
+  font-weight: 400;
+}
+/* Map Menu Implementation */
+.map-menu-container {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+.map-menu-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.map-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.map-menu-btn.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+.map-item:hover .map-menu-btn.hidden {
+  opacity: 1;
+  visibility: visible;
+}
+/* Map Menu Popup */
+.map-menu-popup {
+  display: none;
+  position: fixed;
+  background: var(--menu-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 180px;
+  z-index: 1500;
+  animation: fadeIn 0.2s ease;
+  max-height: 200px;
+  overflow-y: auto;
+  /* Will be positioned by JS */
+}
+.map-menu-popup.show {
+  display: block;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.7rem;
+  font-weight: 400;
+  color: var(--text);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+.menu-item:hover,
+.menu-item:focus {
+  background: var(--menu-hover);
+  outline: none;
+}
+.delete-item {
+  color: var(--delete-color);
+}
+.delete-item:hover {
+  background: rgba(229, 66, 142, 0.15);
+}
+/* User Menu Popup */
+.user-menu-popup {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 110px;
+  background: var(--menu-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 180px;
+  z-index: 1500;
+  animation: fadeIn 0.2s ease;
+}
+.user-menu-popup.active {
+  display: block;
+}
+.user-menu-popup .pro-plan {
+  color: var(--gold-plan);
+}
+.user-menu-popup .pro-plan i {
+  color: var(--gold-plan);
+}
+
+/* Canvas */
+.canvas {
+  flex: 1;
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%231f2f45' opacity='0.1'%3E%3Cpath d='M-10 20h60M-10 40h60M-10 0h60M20-10v60M40-10v60M0-10v60'/%3E%3C/g%3E%3C/svg%3E");
+  position: relative;
+  overflow: hidden;
+}
+.grid {
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(var(--accent) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.2;
+}
+/* Command Bar (Bottom UI) */
+.command-bar {
+  height: 50px;
+  background: var(--background-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.cmd-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  background: rgba(86, 161, 192, 0.1);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+}
+.cmd-btn:hover {
+  background: rgba(86, 161, 192, 0.2);
+  border-color: var(--primary);
+}
+.cmd-btn i {
+  color: var(--accent);
+}
+/* Expand Button (when sidebar is collapsed) */
+.expand-btn {
+  position: absolute;
+  top: 20px;
+  left: 55px;
+  z-index: 1000;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: var(--background-shadow);
+  color: var(--text);
+  font-size: 0.9rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.expand-btn:hover {
+  background: var(--primary);
+}
+/* Zoom Controls */
+.zoom-controls {
+  position: absolute;
+  bottom: 65px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+}
+.zoom-controls button {
+  width: 35px;
+  height: 35px;
+  border: 1px solid var(--border);
+  background: var(--background-shadow);
+  color: var(--text);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.zoom-controls button:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .user-plan {
+    font-size: 0.8rem;
+  }
+  .user-menu-popup {
+    left: 85px;
+  }
+  .user-section {
+    padding-left: 40px;
+    gap: 0.4rem;
+  }
+  .command-bar {
+    height: 80px;
+    gap: 0.2rem;
+    padding: 0.5rem;
+  }
+  .cmd-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+  }
+  .sidebar {
+    width: 200px;
+  }
+  .zoom-controls {
+    bottom: 95px;
+  }
+}
