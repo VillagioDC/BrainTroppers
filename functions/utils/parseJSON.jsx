@@ -1,0 +1,41 @@
+// FUNCTION TO PARSE JSON
+const rjson = require('relaxed-json'); // npm install relaxed-json
+
+// Functions
+const log = require('./log.jsx');
+
+/* PARAMETERS
+    jsonString {string} - JSON string to parse
+    RETURN {object} || null - Return Json object or null
+*/
+
+function parseJSON(jsonString) {
+    
+    // Handle error
+    if (!jsonString) {
+        log("SERVER WARNING", "Empty JSON string @parseJSON");
+        return null;
+    }
+
+    // Parse json string using Relaxed Json library
+    try {
+        const jsonObject = rjson.parse(jsonString);
+
+        // Handle error
+        if (!jsonObject || typeof jsonObject !== "object") {
+            log("SERVER ERROR", "Unable to parse JSON string @parseJSON");
+            return null;
+        }
+
+        // Return
+        return jsonObject;
+    
+    // Catch error
+    } catch (error) {
+        log("SERVER ERROR", "Error while parsing JSON string @parseJSON", error);
+        return null;
+    }
+}
+
+module.exports = parseJSON;
+    
