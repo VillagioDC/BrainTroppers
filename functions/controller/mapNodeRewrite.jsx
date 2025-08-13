@@ -1,4 +1,4 @@
-// FUNCTION TO RECONNECT MAP
+// FUNCTION TO REWRITE NODE
 // No dependencies
 
 // Functions
@@ -7,31 +7,33 @@ const getInstructionsTxt = require('../ai/getInstructionsTxt.jsx');
 const constructConversation = require('../ai/constructConversation.jsx');
 const askAIBridge = require('../ai/askAIBridge.jsx');
 const parseJSON = require('../utils/parseJSON.jsx');
-const updateMap = require('./updateMap.jsx');
+const mapNodeUpdate = require('./mapNodeUpdate.jsx');
+const mapRewire = require('./mapRewire.jsx');
 
-/* PARAMETERS
-    input {object} - map
+/* PARAMETERES
+    input {object, string, string} - map, nodeId, user query
     RETURN {object} - updated map
 */
 
-async function reconnectMap(map) {
+async function mapNodeRewrite(map, nodeId, query) {
 
     // Deconstruct map
     const mapStr = deconstructMap(map);
 
     // Set stages
-    const stage = ["connections"];
+    let stage = ["reviewNode"];
 
     // Set user message
-    let userMessage = "Review all `directLink` and `relatedLink` connections and update the arrays.";
+    const nodeContent = map.nodes.find(n => n.nodeId === nodeId).content;
+    let userMessage = "Review node " + nodeId + " about " + nodeContent + ". " + (query || "") + ". ";
 
-    // Loop stages
+    // Construct response
     let response = "";
+    // Loop stages
     for (let i=0; i<stage.length; i++) {
 
         // Get instructions
-        const instructions = await getInstructionsTxt(stage[i]) + 
-                             (i === 0 ? ("\n" + "Full brainstorm map is: " + mapStr) : "");
+        const instructions = await getInstructionsTxt(stage[i]) + "\n" + "Full brainstorm map is: " + mapStr;
 
         // Set message
         const messages = [ 
@@ -59,16 +61,20 @@ async function reconnectMap(map) {
     // Parse response
     const jsonResponse = parseJSON(response);
 
-    // Update map 
-    let resultMap = jsonResponse;
-    resultMap.projectId = map.projectId;
-    resultMap.title = map.title;
-    resultMap.lastUpdated = Date.now();
-    resultMap.userPrompt = map.userPrompt;
-    const updatedMap = await updateMap(resultMap);
+    // Update node
+    let reviewNode = map.nodes.find(n => n.nodeId === nodeId);
+    reviewNode.content = jsonResponse.content;
+    reviewNode.detail = jsonResponse.detail;
+    reviewNode.status = "pending";
+
+    // Update node
+    const updatedNodeMap = await mapNodeUpdate(map, reviewNode);
+
+    // Reconnect map
+    const updatedMap = await mapRewire(updatedNodeMap);
 
     // Return
     return updatedMap;
 }
 
-module.exports = reconnectMap;
+module.exports = mapNodeRewrite;

@@ -25,10 +25,11 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#features">Features</a></li>
                     <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
                 </ul>
-                <button id="sign-in-btn" class="sign-button">Sign In</button>
-                <button id="sign-up-btn" class="sign-button">Sign Up</button>
+                <div class="sign-buttons-container">
+                    <button id="sign-in-btn" class="sign-button">Sign In</button>
+                    <button id="sign-up-btn" class="sign-button">Sign Up</button>
+                </div>
             </div>
         </div>
     </header>
@@ -38,13 +39,12 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <h1>Unlock Your Ideas with AI-Powered Brain Mapping</h1>
-                    <p>Create, develop, and visualize your thoughts like never before</p>
+                    <p>Create, develop, manipulate and visualize your thoughts like never before</p>
                     <button id="get-started-btn" class="cta-button" aria-label="Get started with the canvas application">Get Started</button>
                 </div>
                 <div class="hero-image">
-                    <div class="hero-image">
-                        <canvas id="neuron-network"></canvas>
-                    </div>
+                    <img src="src/images/brainstorm.webp" alt="braintroops">
+                    <canvas id="brain-overlay"></canvas>
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@
                 <div class="feature-card">
                     <div class="icon"><i class="fas fa-mouse-pointer"></i></div>
                     <h3>Dynamic Interaction</h3>
-                    <p>Easily manipulate nodes: approve, comment, review and exclude</p>
+                    <p>Easily manipulate nodes: create, edit, review and delete</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon"><i class="fas fa-file-pdf"></i></div>
@@ -94,7 +94,7 @@
         </div>
     </section>
 
-    <footer class="site-footer">
+    <footer id="footer" class="site-footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">braintrooper</div>
@@ -102,12 +102,9 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#features">Features</a></li>
                     <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
             <p>© 2025 Braintrooper. All rights reserved.</p>
@@ -165,5 +162,6 @@
     </div>
 
     <script src="src/scripts/scripts.js"></script>
+    <script src="src/scripts/brainstorm.js"></script>
 </body>
 </html>

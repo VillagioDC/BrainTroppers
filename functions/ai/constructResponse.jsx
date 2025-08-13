@@ -46,6 +46,7 @@ async function constructAIResponse (response) {
 
     // Return response
     return structuredResponse;
+    
 };
 
 module.exports = constructAIResponse;

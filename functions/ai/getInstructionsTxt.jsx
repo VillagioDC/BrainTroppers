@@ -6,7 +6,7 @@ const path = require('path'); // native
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
-    role {string} - role
+    role {string} - role of the instructions
     RETURN {string} || null - instructions
 */
 

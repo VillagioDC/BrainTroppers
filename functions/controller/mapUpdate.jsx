@@ -10,7 +10,7 @@ const log = require('../utils/log.jsx');
     RETURN {map} - map
 */
 
-async function updateMap(map) {
+async function mapUpdate(map) {
 
     // Update timestamp
     map.lastUpdated = Date.now();
@@ -30,4 +30,4 @@ async function updateMap(map) {
 
 }
 
-module.exports = updateMap;
+module.exports = mapUpdate;

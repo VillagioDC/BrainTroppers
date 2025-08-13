@@ -28,6 +28,7 @@ function constructConversation(instructions, messages) {
     // Define starting speaker
     let speaker = "user";
     if (messages.length % 2 === 0) speaker = "assistant";
+    // Construct conversation
     for (let i=0; i<messages.length; i++) {
         // Push message
         constructedConversation.push( { [speaker]: messages[i].message } );

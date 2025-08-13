@@ -1,4 +1,4 @@
-// FUNCTION TO REVIEW NODE ON MAP
+// FUNCTION TO EXPAND NODE ON MAP
 // No dependencies
 
 // Functions
@@ -7,32 +7,33 @@ const getInstructionsTxt = require('../ai/getInstructionsTxt.jsx');
 const constructConversation = require('../ai/constructConversation.jsx');
 const askAIBridge = require('../ai/askAIBridge.jsx');
 const parseJSON = require('../utils/parseJSON.jsx');
-const mapNodeUpdate = require('./mapNodeUpdate.jsx');
-const reconnectMap = require('./reconnectMap.jsx');
+const mapRewire = require('./mapRewire.jsx');
+const mapUpdate = require('./mapUpdate.jsx');
 
 /* PARAMETERES
     input {object, string, string} - map, nodeId, user query
     RETURN {object} - updated map
 */
 
-async function reviewNode(map, nodeId, query) {
+async function mapNodeExpand(map, nodeId, query) {
 
     // Deconstruct map
     const mapStr = deconstructMap(map);
 
     // Set stages
-    let stage = ["reviewNode"];
+    let stage = ["expandNode", "transformNodes"];
 
     // Set user message
     const nodeContent = map.nodes.find(n => n.nodeId === nodeId).content;
-    let userMessage = "Review node " + nodeId + " about " + nodeContent + ". " + (query || "") + ". ";
+    let userMessage = "Expand node " + nodeId + " about " + nodeContent + ". " + (query || "") + ". ";
 
     // Loop stages
     let response = "";
     for (let i=0; i<stage.length; i++) {
 
         // Get instructions
-        const instructions = await getInstructionsTxt(stage[i]) + "\n" + "Full brainstorm map is: " + mapStr;
+        const instructions = await getInstructionsTxt(stage[i]) + 
+                             (i === 0 ? ("\n" + "Full brainstorm map is: " + mapStr) : "");
 
         // Set message
         const messages = [ 
@@ -60,20 +61,22 @@ async function reviewNode(map, nodeId, query) {
     // Parse response
     const jsonResponse = parseJSON(response);
 
-    // Update node
-    let reviewNode = map.nodes.find(n => n.nodeId === nodeId);
-    reviewNode.content = jsonResponse.content;
-    reviewNode.detail = jsonResponse.detail;
-    reviewNode.status = "pending";
+    // New nodes
+    const newNodes = jsonResponse.nodes || [];
 
-    // Update node
-    const updatedNodeMap = await mapNodeUpdate(map, reviewNode);
+    // Update map with new nodes
+    for (let i=0; i<newNodes.length; i++) {
+        map.nodes.push(newNodes[i]);
+    }
 
     // Reconnect map
-    const updatedMap = await reconnectMap(updatedNodeMap);
+    const updatedMap = await mapRewire(map);
+
+    // Update map
+    await mapUpdate(newMap);
 
     // Return
     return updatedMap;
 }
 
-module.exports = reviewNode;
+module.exports = mapNodeExpand;

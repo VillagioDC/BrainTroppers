@@ -6,10 +6,10 @@ const executeDB = require('../mongoDB/executeDB.jsx');
 
 /* PARAMETERS
     input {object} - projectID
-    RETURN {object} - map or null
+    RETURN {object} - map || null
 */
 
-async function readMap(projectId) {
+async function mapRead(projectId) {
 
     // Find document on database
     const result = await executeDB({ collectionName: 'maps',
@@ -27,4 +27,4 @@ async function readMap(projectId) {
 
 }
 
-module.exports = readMap;
+module.exports = mapRead;

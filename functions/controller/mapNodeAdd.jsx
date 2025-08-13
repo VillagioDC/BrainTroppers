@@ -31,8 +31,6 @@ async function mapNodeAdd(map, node) {
     // Last update
     const updatedMap = await mapLastUpdate(map);
 
-    console.log("After updating last change", updatedMap.title, updatedMap.nodes.length);
-
     // Return
     return updatedMap;
 

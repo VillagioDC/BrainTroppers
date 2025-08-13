@@ -34,7 +34,7 @@ async function askAIBridge(constructedConversation) {
 
         // Remove unwanted lines
         const content = removeUnwantedLines(response.content);
-
+        
         // Return response (content only)
         return content;
 

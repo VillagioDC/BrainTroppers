@@ -9,15 +9,15 @@ const executeDB = require('../mongoDB/executeDB.jsx');
     RETURN (boolean) - true or false
 */
 
-async function deleteMap(map) {
+async function mapDelete(projectId) {
 
     // Delete node on database
     const result = await executeDB({ collectionName: 'maps',
                                      type: 'deleteOne',
-                                     filter: { projectId: map.projectId  } });
+                                     filter: { projectId: projectId  } });
     // Handle error
     if (!result || result.deletedCount === 0) {
-        log("SERVER ERROR", "Unable to delete map @deleteMapNode.");
+        log("SERVER ERROR", "Unable to delete map @deleteMap.");
         return false;
     }
 
@@ -26,4 +26,4 @@ async function deleteMap(map) {
 
 }
 
-module.exports = deleteMap;
+module.exports = mapDelete;

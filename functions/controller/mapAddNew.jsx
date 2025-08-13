@@ -1,4 +1,4 @@
-// FUNCTION TO CREATE NEW MAP
+// FUNCTION TO ADD NEW MAP
 // No dependencies
 
 // Functions
@@ -7,11 +7,11 @@ const generateToken = require('../utils/generateToken.jsx');
 const executeDB = require('../mongoDB/executeDB.jsx');
 
 /* PARAMETERS
-    input () - none
+    input {string} - user query
     RETURN {object} - map data or null
 */
 
-async function createNewMap(query) {
+async function mapAddNew(query) {
 
     // Get empty map
     const map = await loadMapSchema();
@@ -36,4 +36,4 @@ async function createNewMap(query) {
 
 }
 
-module.exports = createNewMap;
+module.exports = mapAddNew;

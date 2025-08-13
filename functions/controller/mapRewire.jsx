@@ -1,36 +1,38 @@
-// FUNCTION TO KICK OFF MAP
+// FUNCTION TO REWIRE MAP
 // No dependencies
 
 // Functions
-const createNewMap = require('./createNewMap.jsx');
+const deconstructMap = require('../utils/deconstructMap.jsx');
 const getInstructionsTxt = require('../ai/getInstructionsTxt.jsx');
 const constructConversation = require('../ai/constructConversation.jsx');
 const askAIBridge = require('../ai/askAIBridge.jsx');
 const parseJSON = require('../utils/parseJSON.jsx');
-const updateMap = require('../controller/updateMap.jsx');
+const mapUpdate = require('./mapUpdate.jsx');
 
 /* PARAMETERS
-    input {string} - user query
-    RETURN {object} - new map
+    input {object} - map
+    RETURN {object} - updated map
 */
 
-async function kickOff(query) {
+async function mapRewire(map) {
 
-    // Create new map
-    const newMap = await createNewMap(query);
+    // Deconstruct map
+    const mapStr = deconstructMap(map);
 
     // Set stages
-    const stage = ["brainstorm", "transformer", "expand", "connections"];
+    const stage = ["connections"];
 
     // Set user message
-    let userMessage = query;
+    let userMessage = "Review all `directLink` and `relatedLink` connections and update the arrays.";
 
-    // Loop stages
+    // Construct response
     let response = "";
+    // Loop stages
     for (let i=0; i<stage.length; i++) {
 
         // Get instructions
-        const instructions = await getInstructionsTxt(stage[i]);
+        const instructions = await getInstructionsTxt(stage[i]) + 
+                             (i === 0 ? ("\n" + "Full brainstorm map is: " + mapStr) : "");
 
         // Set message
         const messages = [ 
@@ -59,12 +61,15 @@ async function kickOff(query) {
     const jsonResponse = parseJSON(response);
 
     // Update map 
-    newMap.title = jsonResponse.title;
-    newMap.nodes = jsonResponse.nodes;
-    await updateMap(newMap);
+    let resultMap = jsonResponse;
+    resultMap.projectId = map.projectId;
+    resultMap.title = map.title;
+    resultMap.lastUpdated = Date.now();
+    resultMap.userPrompt = map.userPrompt;
+    const updatedMap = await mapUpdate(resultMap);
 
     // Return
-    return newMap;
+    return updatedMap;
 }
 
-module.exports = kickOff;
+module.exports = mapRewire;

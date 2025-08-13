@@ -17,7 +17,7 @@ function removeUnwantedLines(rawContent) {
         return null;
     }
 
-    // Unwanted content
+    // Unwanted content (must update)
     const unwantedContent = [
         `---`,
         `Register domains and get reliable web hosting with Namecheap's affordable services.`,
