@@ -6,6 +6,10 @@
   <title>Storm Trooper - Brainstorm Canvas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="../style/canvas.css"/>
+  <script src="../../node_modules/dagre/dist/dagre.core.min.js"></script>
+  <script src="../../node_modules/cytoscape/dist/cytoscape.min.js"></script>
+  <script src="../../node_modules/cytoscape-dagre/cytoscape-dagre.js"></script>
+
 </head>
 <body>
   <!-- Overlaid Logo -->
@@ -63,23 +67,26 @@
         <div class="grid"></div>
       </main>
     </div>
+
     <!-- Bottom UI Command Bar -->
     <div class="command-bar">
-      <button class="cmd-btn"><i class="fas fa-plus"></i>&nbsp;Add</button>
-      <button class="cmd-btn"><i class="fas fa-expand"></i>&nbsp;Expand</button>
-      <button class="cmd-btn"><i class="fas fa-edit"></i>&nbsp;Edit</button>
-      <button class="cmd-btn"><i class="fas fa-sync-alt"></i>&nbsp;Rewrite</button>
-      <button class="cmd-btn"><i class="fas fa-check-circle"></i>&nbsp;Approve</button>
-      <button class="cmd-btn"><i class="fas fa-trash"></i>&nbsp;Delete</button>
-      <button class="cmd-btn"><i class="fas fa-link"></i>&nbsp;Connect</button>
-      <button class="cmd-btn"><i class="fas fa-unlink"></i>&nbsp;Disconnect</button>
-      <button class="cmd-btn"><i class="fas fa-redo"></i>&nbsp;Rewire All</button>
+      <button class="cmd-btn" id="add-node-btn"><i class="fas fa-plus"></i>&nbsp;Add</button>
+      <button class="cmd-btn" id="expand-node-btn"><i class="fas fa-expand"></i>&nbsp;Expand</button>
+      <button class="cmd-btn" id="edit-node-btn"><i class="fas fa-edit"></i>&nbsp;Edit</button>
+      <button class="cmd-btn" id="rewrite-node-btn"><i class="fas fa-sync-alt"></i>&nbsp;Rewrite</button>
+      <button class="cmd-btn" id="approve-node-btn"><i class="fas fa-check-circle"></i>&nbsp;Approve</button>
+      <button class="cmd-btn" id="delete-node-btn"><i class="fas fa-trash"></i>&nbsp;Delete</button>
+      <button class="cmd-btn" id="connect-node-btn"><i class="fas fa-link"></i>&nbsp;Connect</button>
+      <button class="cmd-btn" id="disconnect-node-btn"><i class="fas fa-unlink"></i>&nbsp;Disconnect</button>
+      <button class="cmd-btn" id="rewire-all-btn"><i class="fas fa-redo"></i>&nbsp;Rewire All</button>
     </div>
   </div>
+
   <!-- Expand Button (shown when sidebar is collapsed) -->
   <button class="expand-btn" id="expandBtn" style="display: none;">
     <i class="fas fa-chevron-right"></i>
   </button>
+
   <!-- User Menu Popup -->
   <div class="user-menu-popup" id="userMenuPopup">
     <a href="#" class="menu-item pro-plan"><i class="fas fa-crown"></i>&nbsp;Pro Plan</a>
@@ -87,6 +94,7 @@
     <a href="#" class="menu-item"><i class="fas fa-moon"></i>&nbsp;Dark Mode</a>
     <a href="#" class="menu-item"><i class="fas fa-sign-out-alt"></i>&nbsp;Log Out</a>
   </div>
+
   <!-- Map Menu Popup -->
   <div class="map-menu-popup" id="menu-1">
     <a href="#" class="menu-item" data-action="rename"><i class="fas fa-edit"></i> Rename</a>
@@ -100,17 +108,39 @@
     <a href="#" class="menu-item" data-action="download"><i class="fas fa-download"></i> Download</a>
     <a href="#" class="menu-item delete-item" data-action="delete"><i class="fas fa-trash"></i> Delete</a>
   </div>
-  <div class="map-menu-popup" id="menu-3">
-    <a href="#" class="menu-item" data-action="rename"><i class="fas fa-edit"></i> Rename</a>
-    <a href="#" class="menu-item" data-action="share"><i class="fas fa-share-alt"></i> Share</a>
-    <a href="#" class="menu-item" data-action="download"><i class="fas fa-download"></i> Download</a>
-    <a href="#" class="menu-item delete-item" data-action="delete"><i class="fas fa-trash"></i> Delete</a>
+
+  <!-- Add Node Modal -->
+  <div id="add-node-popup" class="modal">
+    <div class="modal-content">
+      <span id="close-add-node-popup" class="close-btn">&times;</span>
+      <h2>Add Node</h2>
+      <form>
+        <textarea id="add-node-text" placeholder="Enter node topic" rows="4" cols="50"></textarea>
+        <button class="popup-btn" type="submit" id="add-node-submit">Create</button>
+      </form>
+    </div>
   </div>
+
+  <!-- Edit Node Modal -->
+  <div id="edit-node-popup" class="modal">
+    <div class="modal-content">
+      <span id="close-edit-node-popup" class="close-btn">&times;</span>
+      <h2>Edit Node</h2>
+      <form>
+        <textarea id="edit-node-text" placeholder="Edit node content" rows="4" cols="50"></textarea>
+        <button class="popup-btn" type="submit" id="edit-node-submit">Save</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Zoom Controls -->
   <div class="zoom-controls">
     <button id="zoomIn"><i class="fas fa-plus"></i></button>
     <button id="zoomOut"><i class="fas fa-minus"></i></button>
   </div>
+
+  <!-- Scripts -->
   <script src="../scripts/canvas.js"></script>
+
 </body>
 </html>

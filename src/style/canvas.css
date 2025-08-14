@@ -11,12 +11,15 @@
   --menu-hover: #25374e;
   --delete-color: #e5428e;
   --gold-plan: #f9d440;
+  --background-modal: #25374e;
 }
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: 'Roboto', sans-serif;
   line-height: 1.6;
@@ -26,30 +29,34 @@ body {
   height: 100vh;
   position: relative;
 }
+
 .container {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100vh;
 }
+
 /* Overlaid Logo */
 .logo-overlay {
   position: absolute;
   top: 15px;
   left: 15px;
   background: none;
-  z-index: 1000;
+  z-index: 10000;
 }
 .logo-overlay img {
   width: 35px;
   height: 35px;
 }
+
 /* Panel (Top Section) */
 .panel {
   display: flex;
   flex: 1;
   position: relative;
 }
+
 /* Sidebar Navigation */
 .sidebar {
   width: 240px;
@@ -59,14 +66,14 @@ body {
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
-  z-index: 900;
-  /* Prevent popup clipping */
+  z-index: 9000;
   overflow-y: visible;
 }
 .sidebar.collapsed {
   width: 0;
   border-right: none;
 }
+
 /* Sidebar Header */
 .sidebar-header {
   padding: 1rem;
@@ -132,6 +139,7 @@ body {
   opacity: 0;
   visibility: hidden;
 }
+
 /* New Map Button */
 .new-map-btn {
   margin: 1rem;
@@ -158,6 +166,7 @@ body {
   opacity: 0;
   visibility: hidden;
 }
+
 /* Map List */
 .map-list {
   list-style: none;
@@ -175,6 +184,7 @@ body {
   opacity: 0;
   visibility: hidden;
 }
+
 /* Map Item */
 .map-item {
   position: relative;
@@ -198,6 +208,7 @@ body {
   border-left-color: var(--primary);
   font-weight: 400;
 }
+
 /* Map Menu Implementation */
 .map-menu-container {
   position: absolute;
@@ -231,6 +242,7 @@ body {
   opacity: 1;
   visibility: visible;
 }
+
 /* Map Menu Popup */
 .map-menu-popup {
   display: none;
@@ -240,7 +252,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   min-width: 180px;
-  z-index: 1500;
+  z-index: 9500;
   animation: fadeIn 0.2s ease;
   max-height: 200px;
   overflow-y: auto;
@@ -272,6 +284,7 @@ body {
 .delete-item:hover {
   background: rgba(229, 66, 142, 0.15);
 }
+
 /* User Menu Popup */
 .user-menu-popup {
   display: none;
@@ -283,7 +296,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   min-width: 180px;
-  z-index: 1500;
+  z-index: 9100;
   animation: fadeIn 0.2s ease;
 }
 .user-menu-popup.active {
@@ -310,6 +323,45 @@ body {
   background-size: 20px 20px;
   opacity: 0.2;
 }
+
+/* Mind Map Nodes */
+.mind-map-node {
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    background: var(--background-shadow);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 2000;
+}
+.mind-map-node:hover {
+    background: var(--primary);
+}
+.mind-map-node.selected {
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 8px rgba(84, 195, 235, 0.5);
+}
+.mind-map-node.approved {
+    border-color: var(--gold-plan);
+    background: rgba(249, 212, 64, 0.2);
+}
+
+/* Connection Lines */
+.mind-map-connection {
+  z-index: 1000;
+}
+.mind-map-connection.weak {
+  stroke-dasharray: 5, 5;
+}
+
 /* Command Bar (Bottom UI) */
 .command-bar {
   height: 50px;
@@ -341,12 +393,88 @@ body {
 .cmd-btn i {
   color: var(--accent);
 }
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 11000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.6);
+}
+
+/* Modals */
+.modal-content {
+    background-color: var(--background);
+    color: var(--text);
+    margin: 10% auto;
+    padding: 1.5rem;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    position: relative;
+}
+
+.close-btn {
+    color: var(--primary);
+    float: right;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover,
+.close-btn:focus {
+    color: var(--accent);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-content textarea {
+    padding: 0.6rem;
+    border: 1px solid var(--primary);   
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: var(--background-shadow);
+    color: var(--text);
+}
+
+.modal-content button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--background);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.modal-content button:hover {
+    background: linear-gradient(135deg, var(--accent), var(--secondary));
+}
+
 /* Expand Button (when sidebar is collapsed) */
 .expand-btn {
   position: absolute;
   top: 20px;
   left: 55px;
-  z-index: 1000;
+  z-index: 9000;
   width: 26px;
   height: 26px;
   border: none;
@@ -364,6 +492,7 @@ body {
 .expand-btn:hover {
   background: var(--primary);
 }
+
 /* Zoom Controls */
 .zoom-controls {
   position: absolute;
@@ -372,7 +501,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  z-index: 100;
+  z-index: 10900;
 }
 .zoom-controls button {
   width: 35px;
@@ -392,6 +521,7 @@ body {
   background: var(--primary);
   border-color: var(--primary);
 }
+
 /* Animations */
 @keyframes fadeIn {
   from {
@@ -403,6 +533,7 @@ body {
     transform: translateY(0);
   }
 }
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .user-plan {
