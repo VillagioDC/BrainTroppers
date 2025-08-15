@@ -1,3 +1,4 @@
+// CANVAS
 // ADD NODE SCRIPT
 
 // DOM Elements

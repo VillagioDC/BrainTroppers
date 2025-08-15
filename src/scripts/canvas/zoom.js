@@ -1,9 +1,12 @@
-// ZOOM SCRIPT FOR CYTOSCAPE
+// CANVAS
+// ZOOM SCRIPT
 
-zoomIn.addEventListener("click", () => {
-    mindMap.cy.zoom(mindMap.cy.zoom() + 0.1);
+// Zoom in 
+document.getElementById('zoom-in').addEventListener('click', () => {
+    mindMap.svg.transition().call(mindMap.zoom.scaleBy, 1.2);
 });
 
-zoomOut.addEventListener("click", () => {
-    mindMap.cy.zoom(mindMap.cy.zoom() - 0.1);
+// Zoom out
+document.getElementById('zoom-out').addEventListener('click', () => {
+    mindMap.svg.transition().call(mindMap.zoom.scaleBy, 0.8);
 });

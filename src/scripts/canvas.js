@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Canvas handling
     loadScript('../scripts/canvas/zoom.js'),
     // Node handling
-    loadScript('../scripts/canvas/mindmap2.js'),
+    loadScript('../scripts/canvas/mindmap.js'),
+    loadScript('../scripts/canvas/detail-node.js'),
     loadScript('../scripts/canvas/add-node.js'),
     loadScript('../scripts/canvas/edit-node.js'),
   ]).then(() => {

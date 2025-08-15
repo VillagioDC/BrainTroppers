@@ -6,9 +6,7 @@
   <title>Storm Trooper - Brainstorm Canvas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="../style/canvas.css"/>
-  <script src="../../node_modules/dagre/dist/dagre.core.min.js"></script>
-  <script src="../../node_modules/cytoscape/dist/cytoscape.min.js"></script>
-  <script src="../../node_modules/cytoscape-dagre/cytoscape-dagre.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 
 </head>
 <body>
@@ -63,13 +61,12 @@
         </ul>
       </nav>
       <!-- Canvas Area -->
-      <main class="canvas" id="canvas">
-        <div class="grid"></div>
-      </main>
+      <main class="canvas" id="canvas"></main>
     </div>
 
     <!-- Bottom UI Command Bar -->
     <div class="command-bar">
+      <button class="cmd-btn" id="detail-node-btn"><i class="fas fa-file-alt"></i>&nbsp;Detail</button>
       <button class="cmd-btn" id="add-node-btn"><i class="fas fa-plus"></i>&nbsp;Add</button>
       <button class="cmd-btn" id="expand-node-btn"><i class="fas fa-expand"></i>&nbsp;Expand</button>
       <button class="cmd-btn" id="edit-node-btn"><i class="fas fa-edit"></i>&nbsp;Edit</button>
@@ -109,6 +106,18 @@
     <a href="#" class="menu-item delete-item" data-action="delete"><i class="fas fa-trash"></i> Delete</a>
   </div>
 
+  <!-- Read Node Detail Modal -->
+  <div id="detail-node-popup" class="modal">
+    <div class="modal-content">
+      <span id="close-detail-node-popup" class="close-btn">&times;</span>
+      <h2>Detail</h2>
+      <form>
+        <textarea id="detail-node-text" rows="4" cols="50"></textarea>
+        <button class="popup-btn" type="submit" id="detail-node-submit">Save</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Add Node Modal -->
   <div id="add-node-popup" class="modal">
     <div class="modal-content">
@@ -135,8 +144,8 @@
 
   <!-- Zoom Controls -->
   <div class="zoom-controls">
-    <button id="zoomIn"><i class="fas fa-plus"></i></button>
-    <button id="zoomOut"><i class="fas fa-minus"></i></button>
+    <button id="zoom-in"><i class="fas fa-plus"></i></button>
+    <button id="zoom-out"><i class="fas fa-minus"></i></button>
   </div>
 
   <!-- Scripts -->
