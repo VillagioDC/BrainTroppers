@@ -1,78 +1,68 @@
 // CANVAS
-// EDIT NODE SCRIPT
+// EDIT NODE COMMAND
 
-// DOM Elements
-const editNodeBtn = document.getElementById('edit-node-btn');
-const editNodeModal = document.getElementById('edit-node-popup');
-const closeEditNode = document.getElementById('close-edit-node-popup');
-const editNodeSubmit = document.getElementById('edit-node-submit');
-const editNodeTextArea = document.getElementById('edit-node-text');
+(function () {
+  const editBtn = document.getElementById('edit-node-btn');
+  let modalLoaded = false;
 
-// Show modal, fetch node content, and focus on text area
-if (editNodeBtn) {
-    editNodeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const nodeContent = mapGetNode();
-        editNodeTextArea.value = nodeContent || '';
-        editNodeModal.style.display = 'block';
-        editNodeTextArea.focus();
-    });
-}
+  function loadModal() {
+    return fetch('./canvas/edit-node-popup.html')
+      .then(res => res.text())
+      .then(html => {
+        document.body.insertAdjacentHTML('beforeend', html);
+        modalLoaded = true;
+        bindEvents();
+      });
+  }
 
-// Close modal
-if (closeEditNode) {
-    closeEditNode.addEventListener('click', function() {
-        const nodeContent = editNodeTextArea.value.trim();
-        if (nodeContent) {
-            mapNodeUpdate(nodeContent);
-        } else {
-            mapNodeDelete();
-        }
-        editNodeModal.style.display = 'none';
-        editNodeTextArea.value = '';
-    });
-}
+  function bindEvents() {
+    const modal = document.getElementById('edit-node-popup');
+    const closeBtn = document.getElementById('close-edit-node-popup');
+    const submit = document.getElementById('edit-node-submit');
+    const textarea = document.getElementById('edit-node-text');
 
-// Submit edited node
-if (editNodeSubmit) {
-    editNodeSubmit.addEventListener('click', function() {
-        const nodeContent = editNodeTextArea.value.trim();
-        if (nodeContent) {
-            mapNodeUpdate(nodeContent);
-        } else {
-            mapNodeDelete();
-        }
-        editNodeModal.style.display = 'none';
-        editNodeTextArea.value = '';
-    });
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', function(event) {
-    if (event.target === editNodeModal) {
-        const nodeContent = editNodeTextArea.value.trim();
-        if (nodeContent) {
-            mapNodeUpdate(nodeContent);
-        } else {
-            mapNodeDelete();
-        }
-        editNodeModal.style.display = 'none';
-        editNodeTextArea.value = '';
+    function open() {
+      modal.style.display = 'block';
+      textarea.value = mindMapCanvas.getSelectedContent() || '';
+      textarea.focus();
     }
-});
+    function close(save = true) {
+      if (save) {
+        const val = textarea.value.trim();
+        if (val) mindMapCanvas.setSelectedContent(val);
+        else mindMapCanvas.deleteSelected();
+      }
+      modal.style.display = 'none';
+      textarea.value = '';
+    }
 
-function mapGetNode() {
-    // Placeholder function to get node content
-    console.log('mapGetNode called');
-    return 'Placeholder node content'; 
+    if (editBtn) editBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (!modalLoaded) {
+        loadModal().then(open);
+      } else {
+        open();
+      }
+    });
+    if (closeBtn) closeBtn.addEventListener('click', () => close(true));
+    if (submit) submit.addEventListener('click', () => close(true));
+
+    window.addEventListener('click', (ev) => { if (ev.target === modal) close(true); });
+  }
+
+  if (editBtn) {
+  editBtn.addEventListener('click', e => {
+    e.preventDefault();
+    if (!modalLoaded) {
+      loadModal().then(() => {
+        const modal = document.getElementById('edit-node-popup');
+        if (modal) modal.style.display = 'block';
+      });
+    } else {
+      const modal = document.getElementById('edit-node-popup');
+      if (modal) modal.style.display = 'block';
+    }
+  });
 }
 
-function mapNodeUpdate(content) {
-    // Placeholder function for updating a node
-    console.log('mapNodeUpdate called with content:', content);
-}
-
-function mapNodeDelete() {
-    // Placeholder function for deleting a node
-    console.log('mapNodeDelete called');
-}
+})();

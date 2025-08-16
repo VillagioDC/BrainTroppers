@@ -1,51 +1,70 @@
 // CANVAS
-// ADD NODE SCRIPT
+// ADD NODE COMMAND
 
-// DOM Elements
-const addNodeBtn = document.getElementById('add-node-btn');
-const addNodeModal = document.getElementById('add-node-popup');
-const closeAddNode = document.getElementById('close-add-node-popup');
-const addNodeSubmit = document.getElementById('add-node-submit');
-const addNodeTextArea = document.getElementById('add-node-text');
+(function () {
+  const addBtn = document.getElementById('add-node-btn');
+  let modalLoaded = false;
 
-// Show modal and focus on text area
-if (addNodeBtn) {
-    addNodeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        addNodeModal.style.display = 'block';
-        addNodeTextArea.focus();
-    });
-}
+  function loadModal() {
+    return fetch('./canvas/add-node-popup.html')
+      .then(res => res.text())
+      .then(html => {
+        document.body.insertAdjacentHTML('beforeend', html);
+        modalLoaded = true;
+        bindEvents();
+      });
+  }
 
-// Close modal
-if (closeAddNode) {
-    closeAddNode.addEventListener('click', function() {
-        addNodeModal.style.display = 'none';
-        addNodeTextArea.value = ''; // Clear text area
-    });
-}
+function bindEvents() {
+    const modal = document.getElementById('add-node-popup');
+    const closeBtn = document.getElementById('close-add-node-popup');
+    const submit = document.getElementById('add-node-submit');
+    const textarea = document.getElementById('add-node-text');
 
-// Submit node
-if (addNodeSubmit) {
-    addNodeSubmit.addEventListener('click', function() {
-        const nodeContent = addNodeTextArea.value.trim();
-        if (nodeContent) {
-            mapNodeAdd(nodeContent); // Call placeholder function
-        }
-        addNodeModal.style.display = 'none';
-        addNodeTextArea.value = ''; // Clear text area
-    });
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', function(event) {
-    if (event.target === addNodeModal) {
-        addNodeModal.style.display = 'none';
-        addNodeTextArea.value = ''; // Clear text area
+    function open() {
+      modal.style.display = 'block';
+      textarea.value = '';
+      textarea.focus();
     }
-});
+    function close() {
+      modal.style.display = 'none';
+      textarea.value = '';
+    }
 
-function mapNodeAdd(content) {
-    // Placeholder function for adding a node
-    console.log('mapNodeAdd called with content:', content);
-}
+    if (addBtn) addBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (!modalLoaded) {
+        loadModal().then(open);
+      } else {
+        open();
+      }
+    });
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (submit) submit.addEventListener('click', () => {
+      const content = textarea.value.trim();
+      if (content) {
+        const id = `node-${Date.now()}`;
+        const w = mindMapCanvas.canvas.offsetWidth, h = mindMapCanvas.canvas.offsetHeight;
+        mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
+      }
+      close();
+    });
+
+    window.addEventListener('click', (ev) => { if (ev.target === modal) close(); });
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (!modalLoaded) {
+        loadModal().then(() => {
+          const modal = document.getElementById('add-node-popup');
+          if (modal) modal.style.display = 'block';
+        });
+      } else {
+        const modal = document.getElementById('add-node-popup');
+        if (modal) modal.style.display = 'block';
+      }
+    });
+  }
+})();

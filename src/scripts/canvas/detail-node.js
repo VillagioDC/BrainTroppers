@@ -1,61 +1,67 @@
 // CANVAS
-// DETAIL NODE SCRIPT
+// DETAIL NODE COMMAND
 
-// DOM Elements
-const detailNodeBtn = document.getElementById('detail-node-btn');
-const detailNodeModal = document.getElementById('detail-node-popup');
-const closeDetailNode = document.getElementById('close-detail-node-popup');
-const detailNodeSubmit = document.getElementById('detail-node-submit');
-const detailNodeTextArea = document.getElementById('detail-node-text');
+(function () {
+  const detailBtn = document.getElementById('detail-node-btn');
+  let modalLoaded = false;
 
-// Show modal, fetch node content, and focus on text area
-if (detailNodeBtn) {
-    detailNodeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const nodeDetailContent = mapGetNodeDetail();
-        detailNodeTextArea.value = nodeDetailContent || '';
-        detailNodeModal.style.display = 'block';
-        detailNodeTextArea.focus();
-    });
-}
+  function loadModal() {
+    return fetch('./canvas/detail-node-popup.html')
+      .then(res => res.text())
+      .then(html => {
+        document.body.insertAdjacentHTML('beforeend', html);
+        modalLoaded = true;
+        bindEvents();
+      });
+  }
 
-// Close modal
-if (closeDetailNode) {
-    closeDetailNode.addEventListener('click', function() {
-        const nodeDetailContent = detailNodeTextArea.value.trim();
-        mapNodeDetailUpdate(nodeDetailContent);
-        detailNodeModal.style.display = 'none';
-        detailNodeTextArea.value = '';
-    });
-}
+  function bindEvents() {
+    const modal = document.getElementById('detail-node-popup');
+    const closeBtn = document.getElementById('close-detail-node-popup');
+    const submit = document.getElementById('detail-node-submit');
+    const textarea = document.getElementById('detail-node-text');
 
-// Submit edited node
-if (detailNodeSubmit) {
-    detailNodeSubmit.addEventListener('click', function() {
-        const nodeDetailContent = detailNodeTextArea.value.trim();
-        mapNodeDetailUpdate(nodeDetailContent);
-        detailNodeModal.style.display = 'none';
-        detailNodeTextArea.value = '';
-    });
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', function(event) {
-    if (event.target === detailNodeModal) {
-        const nodeDetailContent = detailNodeTextArea.value.trim();
-        mapNodeDetailUpdate(nodeDetailContent);
-        detailNodeModal.style.display = 'none';
-        detailNodeTextArea.value = '';
+    function open() {
+      modal.style.display = 'block';
+      textarea.value = mindMapCanvas.getSelectedDetail() || '';
+      textarea.focus();
     }
-});
+    function close(save) {
+      if (save) {
+        const detail = textarea.value.trim();
+        mindMapCanvas.setSelectedDetail(detail);
+      }
+      modal.style.display = 'none';
+      textarea.value = '';
+    }
 
-function mapGetNodeDetail() {
-    // Placeholder function to get node content
-    console.log('mapGetNodeDetail called');
-    return 'Placeholder node detail content'; 
-}
+    if (detailBtn) detailBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (!modalLoaded) {
+        loadModal().then(open);
+      } else {
+        open();
+      }
+    });
+    if (closeBtn) closeBtn.addEventListener('click', () => close(true));
+    if (submit) submit.addEventListener('click', () => close(true));
 
-function mapNodeDetailUpdate(content) {
-    // Placeholder function for updating a node
-    console.log('mapNodeDetailUpdate called with content:', content);
-}
+    window.addEventListener('click', (ev) => { if (ev.target === modal) close(true); });
+  }
+
+  if (detailBtn) {
+    detailBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (!modalLoaded) {
+        loadModal().then(() => {
+          const modal = document.getElementById('detail-node-popup');
+          if (modal) modal.style.display = 'block';
+        });
+      } else {
+        const modal = document.getElementById('detail-node-popup');
+        if (modal) modal.style.display = 'block';
+      }
+    });
+  }
+
+})();
