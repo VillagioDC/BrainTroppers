@@ -6,6 +6,7 @@
     --secondary: #e5428e;
     --text: #e0e0e0;
     --accent: #54c3eb;
+    --background-hero: #0d0f1e;
     --background-modal: #25374e;
 }
 
@@ -243,7 +244,7 @@ body {
 
 /* Hero Section */
 .hero {
-    background: var(--background-shadow);
+    background: var(--background-hero);
     padding: 4rem 0;
     position: relative;
 }
