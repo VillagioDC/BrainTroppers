@@ -15,44 +15,49 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Load UI + D3 (D3 is already included in HTML) + MindMap core + data + commands
+  // Load UI + D3 + MindMap core + data + commands
   // Order matters: core -> data -> commands
   Promise.all([
-    // Interface pieces (leave as-is if present in your project)
-    loadScript('../scripts/canvas/sidebar.js').catch(()=>{}),
-    loadScript('../scripts/canvas/map-menu.js').catch(()=>{}),
-    loadScript('../scripts/canvas/user-menu.js').catch(()=>{}),
-    loadScript('../scripts/canvas/theme.js').catch(()=>{}),
-    loadScript('../scripts/canvas/zoom.js').catch(()=>{}),
-
+    // Interface pieces
+    loadScript('./src/scripts/canvas/sidebar.js').catch(() => {}),
+    loadScript('./src/scripts/canvas/user-menu.js').catch(() => {}),
+    loadScript('./src/scripts/canvas/new-map.js').catch(() => {}),
+    loadScript('./src/scripts/canvas/map-menu-popup.js').catch(() => {}),
+    loadScript('./src/scripts/canvas/theme.js').catch(() => {}),
     // Core mind map canvas + initial nodes
-    loadScript('../scripts/canvas/mindmap-canvas.js'),
-    loadScript('../scripts/canvas/nodes.js'),
+    loadScript('./src/scripts/canvas/mindmap-canvas.js'),
+    loadScript('./src/scripts/canvas/nodes.js'),
+    loadScript('./src/scripts/canvas/zoom.js').catch(() => {}),
   ])
   .then(() => {
+    // Initialize UI scripts in context
+    if (typeof window.initSidebar === 'function') window.initSidebar();
+    if (typeof window.initUserMenu === 'function') window.initUserMenu();
+    if (typeof window.initNewMap === 'function') window.initNewMap();
+    if (typeof window.initMapMenu === 'function') window.initMapMenu();
+
     // Seed data
     if (window.NodeStore && window.mindMapCanvas) {
       const data = window.NodeStore.getInitialData();
       window.mindMapCanvas.setData(data);
     }
     // Load command scripts
-    return Promise.all([
-      loadScript('../scripts/canvas/add-node.js'),
-      loadScript('../scripts/canvas/detail-node.js'),
-      loadScript('../scripts/canvas/edit-node.js'),
-      loadScript('../scripts/canvas/expand-node.js'),
-      loadScript('../scripts/canvas/rewrite-node.js'),
-      loadScript('../scripts/canvas/approve-node.js'),
-      loadScript('../scripts/canvas/delete-node.js'),
-      loadScript('../scripts/canvas/connect-node.js'),
-      loadScript('../scripts/canvas/disconnect-node.js'),
-      loadScript('../scripts/canvas/rewire-all.js'),
-    ]);
+    Promise.all([
+      loadScript('./src/scripts/canvas/detail-node.js'),
+      loadScript('./src/scripts/canvas/add-node.js'),
+      loadScript('./src/scripts/canvas/expand-node.js'),
+      loadScript('./src/scripts/canvas/rewrite-node.js'),
+      loadScript('./src/scripts/canvas/approve-node.js'),
+      loadScript('./src/scripts/canvas/delete-node.js'),
+      loadScript('./src/scripts/canvas/connect-node.js'),
+      loadScript('./src/scripts/canvas/disconnect-node.js'),
+      loadScript('./src/scripts/canvas/rewire-all.js'),
+    ])
+    .then(() => {
+      console.log('Canvas loaded.');
+    })
+    .catch(error => {
+      console.error('Error loading user commands:', error);
+    });      
   })
-  .then(() => {
-    console.log('Canvas bootstrapped with modular scripts.');
-  })
-  .catch(error => {
-    console.error('Error loading canvas scripts:', error);
-  });
 });

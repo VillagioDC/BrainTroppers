@@ -1,6 +1,3 @@
-// MINDMAP CANVAS CORE
-// Provides: window.MindMapCanvas class and a singleton instance at window.mindMapCanvas
-
 (function () {
   class MindMapCanvas {
     constructor(canvasSelector) {
@@ -17,6 +14,7 @@
       this.gridSpacing = 50;
       this._initD3();
       this._bindCanvasClears();
+      this._handleResize(); // Initialize size and bind resize handler
     }
 
     // ---------- INIT ----------
@@ -27,8 +25,12 @@
       this.primary          = css.getPropertyValue('--primary').trim()          || '#4c8bff';
       this.accent           = css.getPropertyValue('--accent').trim()           || '#00d084';
       this.text             = css.getPropertyValue('--text').trim()             || '#eee';
+      this.highlight        = css.getPropertyValue('--secondary').trim()        || '#e5428e';
 
-      this.svg = d3.select(this.canvas).append('svg').attr('width', '100%').attr('height', '100%');
+      this.svg = d3.select(this.canvas)
+        .append('svg')
+        .attr('width', window.innerWidth)
+        .attr('height', window.innerHeight);
 
       // grid
       this.gridG = this.svg.append('g').attr('class', 'dot-grid');
@@ -50,7 +52,7 @@
       this.simulation = d3.forceSimulation()
         .force('link', d3.forceLink().id(d => d.id).distance(110))
         .force('charge', d3.forceManyBody().strength(-320))
-        .force('center', d3.forceCenter(this.canvas.offsetWidth / 2, this.canvas.offsetHeight / 2))
+        .force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
         .force('x', d3.forceX().strength(0.1))
         .force('y', d3.forceY().strength(0.1))
         .force('collide', d3.forceCollide(60).strength(0.5))
@@ -62,8 +64,8 @@
     }
 
     _updateDotGrid() {
-      const width = this.canvas.offsetWidth;
-      const height = this.canvas.offsetHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       const dots = [];
       for (let x = 0; x < width; x += this.gridSpacing) {
         for (let y = 0; y < height; y += this.gridSpacing) dots.push({ x, y });
@@ -77,6 +79,21 @@
         .style('fill', this.primary)
         .style('opacity', 0.1);
       dotSel.exit().remove();
+    }
+
+    _handleResize() {
+      const updateSize = () => {
+        this.svg
+          .attr('width', window.innerWidth)
+          .attr('height', window.innerHeight);
+        this.simulation
+          .force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
+          .alpha(0.1)
+          .restart();
+        this._updateDotGrid();
+      };
+      updateSize();
+      window.addEventListener('resize', updateSize);
     }
 
     _magneticForce(alpha) {
@@ -167,9 +184,14 @@
     // ---------- UI ACTIONS ----------
     selectNode(id) {
       this.nodesG.selectAll('.node').classed('selected', false);
+      this.edgesG.selectAll('.edge').classed('selected', false);
       this.selectedNode = this.nodes.find(n => n.id === id) || null;
       if (this.selectedNode) {
         this.nodesG.select(`#node-${id}`).classed('selected', true);
+        // Highlight edges connected to the selected node
+        this.edgesG.selectAll('.edge')
+          .filter(d => d.source.id === id || d.target.id === id)
+          .classed('selected', true);
       }
       this.connectMode = null;
       this.firstNode = null;
@@ -298,7 +320,13 @@
       nodesSel.select('text').text(d => d.content);
       nodesSel.select('rect')
         .style('fill', d => d.approved ? this.backgroundShadow : this.background)
-        .style('stroke', d => d.approved ? this.accent : this.primary);
+        .style('stroke', d => d.approved ? this.accent : this.primary)
+        .style('stroke-width', d => this.selectedNode && this.selectedNode.id === d.id ? 2 : 1);
+
+      // Apply highlighted style to selected nodes
+      nodesSel
+        .style('stroke', d => this.selectedNode && this.selectedNode.id === d.id ? this.highlight : (d.approved ? this.accent : this.primary))
+        .style('stroke-width', d => this.selectedNode && this.selectedNode.id === d.id ? 2 : 1);
 
       // Node click (bind on both enter and update)
       const setClick = sel => sel.on('click', (event, d) => {
@@ -318,6 +346,12 @@
         .attr('class', d => `edge mind-map-connection ${d.strength}`)
         .style('stroke', this.primary)
         .style('stroke-width', 2);
+
+      // Update edge styles
+      edgesSel
+        .style('stroke', d => (this.selectedNode && (d.source.id === this.selectedNode.id || d.target.id === this.selectedNode.id)) ? this.highlight : this.primary)
+        .style('stroke-width', d => (this.selectedNode && (d.source.id === this.selectedNode.id || d.target.id === this.selectedNode.id)) ? 2 : 2);
+
       edgesSel.exit().remove();
 
       // simulation data

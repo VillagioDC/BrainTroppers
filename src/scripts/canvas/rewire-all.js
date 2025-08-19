@@ -2,6 +2,17 @@
 // REWIRE ALL COMMAND
 
 (function () {
-  const btn = document.getElementById('rewire-all-btn');
-  if (btn) btn.addEventListener('click', () => mindMapCanvas.rewireAll());
+  // Elements
+  const rewireBtn = document.getElementById('rewire-all-btn');
+  // Event listeners
+  if (rewireBtn) rewireBtn.addEventListener('click', rewireBtnClick);
+
+  // Rewire all nodes
+  function rewireBtnClick() {
+    // Rewire all nodes on database
+    console.log('Rewire all nodes on database');
+    // Rewire all nodes on canvas
+    mindMapCanvas.rewireAll()
+  }
+
 })();

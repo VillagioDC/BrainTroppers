@@ -2,6 +2,16 @@
 // DISCONNECT NODE COMMAND
 
 (function () {
-  const btn = document.getElementById('disconnect-node-btn');
-  if (btn) btn.addEventListener('click', () => mindMapCanvas.startConnection('disconnect'));
+  // Elements
+  const disconnectBtn = document.getElementById('disconnect-node-btn');
+  // Event listeners
+  if (disconnectBtn) disconnectBtn.addEventListener('click', disconnectBtnClick)
+
+  function disconnectBtnClick() {
+    // Disconnect nodes on database
+    console.log('Disconnect nodes on database');
+    // Disconnect nodes on canvas
+    mindMapCanvas.disconnectSelected();
+  }
+
 })();

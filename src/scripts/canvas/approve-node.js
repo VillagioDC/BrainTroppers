@@ -2,6 +2,17 @@
 // APPROVE NODE COMMAND
 
 (function () {
-  const btn = document.getElementById('approve-node-btn');
-  if (btn) btn.addEventListener('click', () => mindMapCanvas.approveSelected());
+  // Elements
+  const approveBtn = document.getElementById('approve-node-btn');
+  // Event listeners
+  if (approveBtn) approveBtn.addEventListener('click', approveBtnClick);
+
+  // Approve node
+  function approveBtnClick() {
+    // Approve node on database
+    console.log('Approve node on database');
+    // Approve node on canvas
+    mindMapCanvas.approveSelected();
+  }
+
 })();

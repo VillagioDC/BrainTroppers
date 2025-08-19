@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Braintrooper - AI-Powered Brain Mapping</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" href="./src/style/canvas.css"/>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <!-- Overlaid Logo -->
+    <div class="logo-overlay" id="logo-overlay">
+        <img src="./src/images/logo.webp" alt="Stormtrooper" />
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-container">
+        <main class="canvas" id="canvas"></main>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+        <button id="zoom-in"><i class="fas fa-plus"></i></button>
+        <button id="zoom-out"><i class="fas fa-minus"></i></button>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+            <div class="user-section">
+                <!-- Collapse Button -->
+                <button class="collapse-btn" id="collapse-btn" aria-label="Toggle Sidebar">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <!-- User Icon -->
+                <div class="user-icon" id="user-icon" aria-haspopup="true" aria-expanded="false">
+                    <span>AB</span>
+                </div>
+                <!-- User Plan -->
+                <span class="user-plan">Free Plan</span>
+            </div>
+        </div>
+        <!-- New Map Button -->
+        <button id="new-map-btn" class="new-map-btn">
+            <i class="fas fa-plus"></i> New Map
+        </button>
+        <!-- Map List -->
+        <ul class="map-list">
+            <!-- Map Item -->
+            <li class="map-item active">
+                Product Roadmap 2025
+                <div class="map-menu-container">
+                    <button class="map-menu-btn">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <!-- Expand Button -->
+    <button class="expand-btn collapsed" id="expand-btn">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+
+    <!-- Floating Command Menu -->
+    <div class="command-bar">
+        <button class="cmd-btn" id="detail-node-btn"><i class="fas fa-file-alt"></i>&nbsp;Detail</button>
+        <button class="cmd-btn" id="add-node-btn"><i class="fas fa-plus"></i>&nbsp;Add</button>
+        <button class="cmd-btn" id="expand-node-btn"><i class="fas fa-sitemap"></i>&nbsp;Expand</button>
+        <button class="cmd-btn" id="rewrite-node-btn"><i class="fas fa-sync-alt"></i>&nbsp;Rewrite</button>
+        <button class="cmd-btn" id="approve-node-btn"><i class="fas fa-check-circle"></i>&nbsp;Approve</button>
+        <button class="cmd-btn" id="delete-node-btn"><i class="fas fa-trash"></i>&nbsp;Delete</button>
+        <button class="cmd-btn" id="connect-node-btn"><i class="fas fa-link"></i>&nbsp;Connect</button>
+        <button class="cmd-btn" id="disconnect-node-btn"><i class="fas fa-unlink"></i>&nbsp;Disconnect</button>
+        <button class="cmd-btn" id="rewire-all-btn"><i class="fas fa-redo"></i>&nbsp;Rewire All</button>
+    </div>    
+
+    <!-- Scripts -->
+    <script src="./src/scripts/canvas.js"></script>
+</body>
+</html>
