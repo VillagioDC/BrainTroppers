@@ -4,6 +4,7 @@
 (function () {
   // Elements
   const connectBtn = document.getElementById('connect-node-btn');
+
   // Event listeners
   if (connectBtn) connectBtn.addEventListener('click', connectBtnClick);
 

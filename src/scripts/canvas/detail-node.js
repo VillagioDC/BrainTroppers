@@ -13,14 +13,14 @@
   let detailChanged = false;
 
   // Event listeners
-  detailBtn.addEventListener('click', detailBtnClick);
+  if (detailBtn) detailBtn.addEventListener('click', detailBtnClick);
 
   // Detail button clicked
   async function detailBtnClick() {
     if (detailPopup) return;
     // Load detail popup
     await loadDetailPopup();
-    await loadDetailContent();
+    loadDetailContent();
     // Reset changed flags
     contentChanged = false;
     detailChanged = false;
@@ -54,7 +54,7 @@
   }
 
   // Load detail content
-  async function loadDetailContent() {
+  function loadDetailContent() {
     // Load content
     const content = mindMapCanvas.getSelectedContent();
     const detail = mindMapCanvas.getSelectedDetail();

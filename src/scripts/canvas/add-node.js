@@ -9,7 +9,7 @@
   let parentNodeId = null;
   
   // Event listeners
-  addBtn.addEventListener('click', addBtnClick);
+  if (addBtn) addBtn.addEventListener('click', addBtnClick);
 
   // Add button clicked
   async function addBtnClick() {
@@ -31,6 +31,7 @@
       });
   }
 
+  // Bind add popup events
   function bindAddPopupEvents() {
       // Elements
       const closeBtn = document.getElementById('close-add-node-popup');
@@ -38,7 +39,6 @@
       const submit = document.getElementById('add-node-submit');
       // Event listeners
       if (closeBtn) closeBtn.addEventListener('click', closeAddPopup);
-      if (query) query.addEventListener('input', () => query.value = query.value.trim());
       if (submit) submit.addEventListener('click', closeAddPopup);
       document.addEventListener('click', outsideClickHandler);
   }
@@ -154,8 +154,6 @@
     // Remove event listeners
     if (document.getElementById("close-add-node-popup"))
       document.getElementById("close-add-node-popup").removeEventListener("click", closeAddPopup);
-    if (document.getElementById("add-node-query"))
-      document.getElementById("add-node-query").removeEventListener("input", () => query.value = query.value.trim());
     if (document.getElementById("add-node-submit"))
       document.getElementById("add-node-submit").removeEventListener("click", closeAddPopup);
     document.removeEventListener('click', outsideClickHandler);

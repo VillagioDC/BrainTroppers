@@ -237,26 +237,6 @@
       }
     }
 
-    // Expand selected node
-    expandSelected() {
-      if (!this.selectedNode) return;
-      const newNodeId = `${this.selectedNode.id}-${Date.now()}`;
-      this.addNode({
-        id: newNodeId,
-        content: `Subnode of ${this.selectedNode.content}`,
-        detail: '',
-        x: this.selectedNode.x + 150,
-        y: this.selectedNode.y
-      });
-      this.addConnection(this.selectedNode.id, newNodeId, 'strong');
-    }
-
-    // Rewrite selected
-    rewriteSelected() {
-      if (!this.selectedNode) return;
-      this.updateNode(this.selectedNode.id, { content: `Rewritten: ${this.selectedNode.content}` });
-    }
-
     // Approve selected
     approveSelected() {
       if (!this.selectedNode) return;

@@ -25,7 +25,7 @@ async function mapNodeRewrite(map, nodeId, query) {
 
     // Set user message
     const nodeContent = map.nodes.find(n => n.nodeId === nodeId).content;
-    let userMessage = "Review node " + nodeId + " about " + nodeContent + ". " + (query || "") + ". ";
+    let userMessage = "Review node about " + nodeContent + ". " + (query || "") + ". ";
 
     // Construct response
     let response = "";
@@ -74,7 +74,7 @@ async function mapNodeRewrite(map, nodeId, query) {
     const updatedMap = await mapRewire(updatedNodeMap);
 
     // Return
-    return updatedMap;
+    return reviewNode;
 }
 
 module.exports = mapNodeRewrite;

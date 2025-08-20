@@ -11,11 +11,11 @@ const mapRewire = require('./mapRewire.jsx');
 const mapUpdate = require('./mapUpdate.jsx');
 
 /* PARAMETERES
-    input {object, string, string} - map, nodeId, user query
+    input {object, string, string} - map, parentNodeId, user query
     RETURN {object} - updated map
 */
 
-async function mapNodeExpand(map, nodeId, query) {
+async function mapNodeExpand(map, parentNodeId, query) {
 
     // Deconstruct map
     const mapStr = deconstructMap(map);
@@ -24,9 +24,9 @@ async function mapNodeExpand(map, nodeId, query) {
     let stage = ["expandNode", "transformNodes"];
 
     // Set user message
-    const nodeContent = map.nodes.find(n => n.nodeId === nodeId).content;
-    const nodeDetail = map.nodes.find(n => n.nodeId === nodeId).detail;
-    let userMessage = "Expand node " + nodeId + " about " + nodeContent + "and " + nodeDetail + ". " + (query || "") + ". ";
+    const nodeContent = map.nodes.find(n => n.nodeId === parentNodeId).content;
+    const nodeDetail = map.nodes.find(n => n.nodeId === parentNodeId).detail;
+    let userMessage = "Expand node about " + nodeContent + "and " + nodeDetail + ". " + (query || "") + ". ";
 
     // Loop stages
     let response = "";
@@ -65,19 +65,31 @@ async function mapNodeExpand(map, nodeId, query) {
     // New nodes
     const newNodes = jsonResponse.nodes || [];
 
+    console.log("New nodes: ", newNodes.length);
+    console.log("New nodes: ", newNodes);
+
     // Update map with new nodes
+    let node = {};
+    let expandedNodes = [];
     for (let i=0; i<newNodes.length; i++) {
-        map.nodes.push(newNodes[i]);
+        // Create new node
+        node = {};
+        node.nodeId = newNodes[i].nodeId;
+        node.content = newNodes[i].content;
+        node.detail = newNodes[i].detail;
+        node.status = 'pending';
+        node.directLink = [parentNodeId];
+        node.relatedLink = [];
+        // Push node
+        map.nodes.push(node);
+        expandedNodes.push(node);
     }
 
-    // Reconnect map
-    const updatedMap = await mapRewire(map);
-
     // Update map
-    await mapUpdate(newMap);
+    await mapUpdate(map);
 
     // Return
-    return updatedMap;
+    return expandedNodes;
 }
 
 module.exports = mapNodeExpand;
