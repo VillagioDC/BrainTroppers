@@ -12,7 +12,10 @@
   "type": "commonjs",
   "dependencies": {
     "@langchain/core": "^0.3.57",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "lambda-rate-limiter": "^4.0.2",
     "langchain-llm7": "^2025.4.291003",
     "mongodb": "^6.16.0",
     "relaxed-json": "^1.0.3"

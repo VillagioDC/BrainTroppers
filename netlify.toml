@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"  # Optional: build command for frontend (e.g., for React)
+  publish = "public"         # Directory for static frontend files
+  functions = "functions"    # Directory for serverless functions
+
+[dev]
+  port = 8888               # Default port for Netlify Dev
+  targetPort = 5500         # frontend port

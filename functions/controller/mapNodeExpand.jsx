@@ -25,7 +25,8 @@ async function mapNodeExpand(map, nodeId, query) {
 
     // Set user message
     const nodeContent = map.nodes.find(n => n.nodeId === nodeId).content;
-    let userMessage = "Expand node " + nodeId + " about " + nodeContent + ". " + (query || "") + ". ";
+    const nodeDetail = map.nodes.find(n => n.nodeId === nodeId).detail;
+    let userMessage = "Expand node " + nodeId + " about " + nodeContent + "and " + nodeDetail + ". " + (query || "") + ". ";
 
     // Loop stages
     let response = "";

@@ -13,7 +13,7 @@ async function loadMapSchema() {
 
     try {
         // File name
-        const filename = path.join(__dirname, '../data/schema.json');
+        const filename = path.join(__dirname, '../data/mapSchema.json');
 
         // Load map schema
         const mapStr = fs.readFileSync(filename, 'utf8');

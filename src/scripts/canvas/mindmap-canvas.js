@@ -8,6 +8,7 @@
       this.connectMode = null; // 'strong' | 'weak' | 'disconnect'
       this.firstNode = null;
 
+      this.projectId = null;  // project id
       this.nodes = []; // {id, content, detail?, x, y, approved?}
       this.edges = []; // {id, source, target, strength}
 
@@ -134,19 +135,22 @@
     }
 
     // ---------- DATA ----------
-    setData({ nodes = [], edges = [] }) {
+    setData({ projectId, nodes = [], edges = [] }) {
       // shallow clone
+      this.projectId = projectId;
       this.nodes = nodes.map(n => Object.assign({ detail: n.detail || '' }, n));
       this.edges = edges.slice();
       this._updateSimulation();
     }
 
     // ---------- CRUD ----------
+    // Add new node
     addNode({ id, content, detail = '', x, y }) {
       this.nodes.push({ id, content, detail, x, y });
       this._updateSimulation();
     }
 
+    // Update node
     updateNode(id, { content, detail, approved }) {
       const n = this.nodes.find(n => n.id === id);
       if (!n) return;
@@ -156,6 +160,15 @@
       this._updateSimulation();
     }
 
+    // Update node id
+    updateNodeId(id, newId) {
+      const n = this.nodes.find(n => n.id === id);
+      if (!n) return;
+      n.id = newId;
+      this._updateSimulation();
+    }
+
+    // Delete node
     deleteNode(id) {
       this.nodes = this.nodes.filter(n => n.id !== id);
       this.edges = this.edges.filter(e => e.source.id !== id && e.target.id !== id && e.source !== id && e.target !== id);
@@ -166,6 +179,7 @@
       this._updateSimulation();
     }
 
+    // Add connection
     addConnection(fromId, toId, strength = 'strong') {
       const edgeId = `edge-${fromId}-${toId}`;
       // prevent dupes (both directions)
@@ -174,6 +188,7 @@
       this._updateSimulation();
     }
 
+    // Remove connection
     removeConnection(fromId, toId) {
       const e1 = `edge-${fromId}-${toId}`;
       const e2 = `edge-${toId}-${fromId}`;
@@ -182,6 +197,7 @@
     }
 
     // ---------- UI ACTIONS ----------
+    // Select node by id
     selectNode(id) {
       this.nodesG.selectAll('.node').classed('selected', false);
       this.edgesG.selectAll('.edge').classed('selected', false);
@@ -198,6 +214,7 @@
       this.canvas.style.cursor = 'default';
     }
 
+    // Start a connection
     startConnection(mode) {
       if (!this.selectedNode) {
         alert('Please select a node first.');
@@ -208,6 +225,7 @@
       this.canvas.style.cursor = 'crosshair';
     }
 
+    // Handle a connection click
     handleConnectionClick(targetId) {
       if (this.firstNode && targetId !== this.firstNode.id) {
         if (this.connectMode === 'disconnect') this.removeConnection(this.firstNode.id, targetId);
@@ -219,6 +237,7 @@
       }
     }
 
+    // Expand selected node
     expandSelected() {
       if (!this.selectedNode) return;
       const newNodeId = `${this.selectedNode.id}-${Date.now()}`;
@@ -232,16 +251,19 @@
       this.addConnection(this.selectedNode.id, newNodeId, 'strong');
     }
 
+    // Rewrite selected
     rewriteSelected() {
       if (!this.selectedNode) return;
       this.updateNode(this.selectedNode.id, { content: `Rewritten: ${this.selectedNode.content}` });
     }
 
+    // Approve selected
     approveSelected() {
       if (!this.selectedNode) return;
       this.updateNode(this.selectedNode.id, { approved: true });
     }
 
+    // Rewire all
     rewireAll() {
       if (!this.nodes.length) return;
       const root = this.nodes[0];
@@ -253,20 +275,35 @@
     }
 
     // ---------- Accessors used by command scripts ----------
+    // Get selected node content
     getSelectedContent() {
       return this.selectedNode ? (this.selectedNode.content || '') : '';
     }
+    // Get selected node detail
     getSelectedDetail() {
       return this.selectedNode ? (this.selectedNode.detail || '') : '';
     }
+    // Set selected node content
     setSelectedContent(content) {
       if (!this.selectedNode) return;
       this.updateNode(this.selectedNode.id, { content });
     }
+    // Set selected node detail
     setSelectedDetail(detail) {
       if (!this.selectedNode) return;
       this.updateNode(this.selectedNode.id, { detail });
     }
+    // Get project Id
+    getProjectId() {
+      if (!this) return null;
+      return this.projectId;
+    }
+    // Get selected node id
+    getSelectedNodeId() {
+      if (!this.selectedNode) return null;
+      return this.selectedNode.id;
+    }
+    // Delete selected node
     deleteSelected() {
       if (!this.selectedNode) return;
       this.deleteNode(this.selectedNode.id);
@@ -355,6 +392,7 @@
       edgesSel.exit().remove();
 
       // simulation data
+      this.projectId = this.projectId;
       this.simulation.nodes(this.nodes);
       this.simulation.force('link').links(this.edges);
       this.simulation.alpha(1).restart();

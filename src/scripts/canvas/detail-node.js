@@ -5,6 +5,10 @@
   // Elements
   const detailBtn = document.getElementById('detail-node-btn');
   let detailPopup = document.getElementById('detail-node-popup');
+  let projectId = null;
+  let nodeId = null;
+  let prevContent = null;
+  let prevDetail = null;
   let contentChanged = false;
   let detailChanged = false;
 
@@ -30,6 +34,7 @@
         document.body.insertAdjacentHTML('beforeend', html);
         detailPopup = document.getElementById('detail-node-popup');
         bindDetailPopupEvents();
+        projectId = mindMapCanvas.getProjectId();
       });
   }
 
@@ -51,14 +56,17 @@
   // Load detail content
   async function loadDetailContent() {
     // Load content
-    const content = await mindMapCanvas.getSelectedContent();
-    const detail = await mindMapCanvas.getSelectedDetail();
-    // Node title
+    const content = mindMapCanvas.getSelectedContent();
+    const detail = mindMapCanvas.getSelectedDetail();
+    // Popup node content
     const contentEl = document.getElementById('detail-node-content');
     if (contentEl) contentEl.innerText = content;
-    // Node detail
+    // Popup node detail
     const detailEl = document.getElementById('detail-node-detail');
     if (detailEl) detailEl.innerText = detail;
+    // Previous node content and detail
+    prevContent = content;
+    prevDetail = detail;
   }
 
   // Edit element (h2 or p turns into textarea)
@@ -90,34 +98,140 @@
   }
 
   // Close detail popup
-  function closeDetailPopup() {
-    // Submit detail to canvas and database
-    submitDetail();
-    // Remove detail popup
-    removeDetailPopup();
+  async function closeDetailPopup() {
+    // Check changes
+    if (contentChanged || detailChanged) {
+      // Get node id
+      nodeId = mindMapCanvas.getSelectedNodeId();
+      // Get content and details
+      const contentEl = document.getElementById('detail-node-content');
+      const detailEl = document.getElementById('detail-node-detail');
+      // Sanitize inputs
+      let content = '';
+      if (contentEl && contentEl.value) content = contentEl.value;
+      if (contentEl && contentEl.innerText) content = contentEl.innerText;
+      content = sanitizeInput(content);
+      let detail = '';
+      if (detailEl && detailEl.value) detail = detailEl.value;
+      if (detailEl && detailEl.innerText) detail = detailEl.innerText;
+      detail = sanitizeInput(detail);
+      // Remove detail popup
+      removeDetailPopup();
+      // Update node
+      if (content && content.trim() !== '') {
+        // Set temp message
+        mindMapCanvas.setSelectedContent('Updating node...');
+        // Update node
+        const result = await mapNodeUpdate(nodeId, content, detail);
+        // Restore previous node
+        if (!result) {
+          mindMapCanvas.updateNode(nodeId, { content: prevContent, detail: prevDetail });
+        }
+        // Update node
+        if (result) {
+          // Update canvas node
+          mindMapCanvas.setSelectedContent(content);
+          mindMapCanvas.setSelectedDetail(detail);
+        }
+      } else {
+        // Delete node on canvas
+        mindMapCanvas.deleteNode(nodeId);
+        // Delete node on database
+        deleteMapNode(nodeId);
+      }
+    } else {
+      // Remove detail popup
+      removeDetailPopup();
+    }
+    // Clean variables
+    projectId = null;
+    prevContent = null;
+    prevDetail = null;
+    contentChanged = false;
+    detailChanged = false;
   }
 
-  // Submit detail
-  function submitDetail() {
-    // Update content if changed
-    if (contentChanged) {
-      const contentEl = document.getElementById('detail-node-content');
-      if (contentEl) {
-        // Update database
-        console.log('Update content: ', contentEl.innerText);
-        // Update canvas
-        mindMapCanvas.setSelectedContent(contentEl.innerText);
-      }
+  // Sanitizing input
+  function sanitizeInput(input) {
+    // Sanitize input
+    if (!input || input.trim() === '') return '';
+    return input.replace(/[^\w\s@.-]/gi, '').trim();
+  }
+
+  // Update map node 
+  async function mapNodeUpdate(nodeId, content, detail) {
+    try {
+      // Set parameters
+      const token = "ABC123";
+      const body = { projectId, nodeId, content, detail };
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+      };
+      //const url = `${process.env.API_URL}/mapUpdateNode`;
+        const url = `http://localhost:8888/.netlify/functions`+`/mapUpdateNode`;
+      // Make request
+      const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+      });
+      // Check response
+        if (!response.ok) {
+            if (response.status === 401) {
+                showNotification('Session expired. Please log in again.', 'error');
+                setTimeout(() => {
+                    window.location.href = './index.html';
+                }, 2000);
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Get updated node
+      const updatedNode = await response.json();
+      return updatedNode;
+
+    // Catch error
+    } catch (error) {
+        console.error('Error updating node:', error);
+        return false;
     }
-    // Update detail if changed
-    if (detailChanged) {
-      const detailEl = document.getElementById('detail-node-detail');
-      if (detailEl) {
-        // Update database
-        console.log('Update detail: ', detailEl.innerText);
-        // Update canvas
-        mindMapCanvas.setSelectedDetail(detailEl.innerText);
+  }
+
+  // Delete map node 
+  async function deleteMapNode(nodeId) {
+    try {
+      // Set parameters
+      const token = "ABC123";
+      const body = { projectId, nodeId };
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
       }
+      //const url = `${process.env.API_URL}/mapDeleteNode`;
+      const url = `http://localhost:8888/.netlify/functions`+`/mapDeleteNode`;
+      // Make request
+      const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+      });
+      // Check response
+        if (!response.ok) {
+            if (response.status === 401) {
+                showNotification('Session expired. Please log in again.', 'error');
+                setTimeout(() => {
+                    window.location.href = './index.html';
+                }, 2000);
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    // Return
+    return true;
+
+    // Catch errors
+    } catch (error) {
+      console.error('Error adding node:', error);
+      return false;
     }
   }
 

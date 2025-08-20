@@ -5,7 +5,8 @@
   // Elements
   const addBtn = document.getElementById('add-node-btn');
   let addPopup = document.getElementById('add-node-popup');
-  let parentNode = null;
+  let projectId = null;
+  let parentNodeId = null;
   
   // Event listeners
   addBtn.addEventListener('click', addBtnClick);
@@ -25,7 +26,8 @@
         document.body.insertAdjacentHTML('beforeend', html);
         addPopup = document.getElementById('add-node-popup');
         bindAddPopupEvents();
-        getParentNode();
+        parentNodeId = mindMapCanvas.getSelectedNodeId();
+        projectId = mindMapCanvas.getProjectId();
       });
   }
 
@@ -41,38 +43,110 @@
       document.addEventListener('click', outsideClickHandler);
   }
 
-  // Get parent node
-  function getParentNode() {
-    parentNode = window.mindMapCanvas.selectedNode;
-  }
-
   // Close add popup
-  function closeAddPopup() {
-    // Submit query to add node
-    submitAdd();
-    // Remove add popup
-    removeAddPopup();
+  async function closeAddPopup() {
+    // Check query
+    const query = checkQuery();
+    if (query) {
+      // Add node with temp id
+      const nodeId = addTempNode();
+      // Remove add popup
+      removeAddPopup();
+      // Submit query to add node
+      const result = await mapNodeAdd(query);
+      // Remove temp node
+      if (!result)
+        mindMapCanvas.deleteNode(nodeId);
+      // Update node
+      if (result) {
+        // Add node
+        addNode(nodeId, result);
+      }
+    } else {
+      // Remove add popup
+      removeAddPopup();
+    }
+    // Clean variables
+    parentNodeId = null;
+    projectId = null;
   }
 
-  // Submit query to add node
-  function submitAdd() {
+  // Check query
+  function checkQuery() {
     // Check content
+    if (!document.getElementById('add-node-query')) return null;
     const query = document.getElementById('add-node-query');
-    // Add node and connection to database
-    console.log('Add to database: ', query.value);
-    // Add node and connection to canvas
-    if (query && query.value) {
-        // Add node
-        const id = `node-${Date.now()}`;
-        const w = mindMapCanvas.canvas.offsetWidth;
-        const h = mindMapCanvas.canvas.offsetHeight;
-        const content = query.value;
-        mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
-        // Add connection
-        if (parentNode && parentNode.id && mindMapCanvas.nodes.find(n => n.id === parentNode.id)) {
-        mindMapCanvas.addConnection(parentNode.id, id, 'strong');
+    if (!query || !query.value || query.value.trim() === '') return null;
+    // Return sanitized query
+    return sanitizeInput(query.value);
+  }
+
+  // Sanitizing input
+  function sanitizeInput(input) {
+    // Sanitize input
+    if (!input || input.trim() === '') return '';
+    return input.replace(/[^\w\s@.-]/gi, '').trim();
+  }
+
+  // Add node with temp id
+  function addTempNode() {
+    // Add temp node    
+    const id = `node-${Date.now()}`;
+    const w = mindMapCanvas.canvas.offsetWidth;
+    const h = mindMapCanvas.canvas.offsetHeight;
+    const content = "Processing...";
+    mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
+    // Add connection
+    if (parentNodeId && mindMapCanvas.nodes.find(n => n.id === parentNodeId)) {
+    mindMapCanvas.addConnection(parentNodeId, id, 'strong');
+    }
+    // Return new node id
+    return id;
+  }
+
+  // API call to add new node
+  async function mapNodeAdd(query) {
+      try {
+        // Set parameters
+        const token = "ABC123";
+        const body = { projectId, parentNodeId, query };
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        };
+        //const url = `${process.env.API_URL}/mapAddNode`;
+        const url = `http://localhost:8888/.netlify/functions`+`/mapAddNode`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+        });
+        // Check response
+        if (!response.ok) {
+            if (response.status === 401) {
+                showNotification('Session expired. Please log in again.', 'error');
+                setTimeout(() => {
+                    window.location.href = './index.html';
+                }, 2000);
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-      }
+        // Get updated node
+        const updatedNode = await response.json();
+        return updatedNode;
+    // Catch errors
+    } catch (error) {
+        console.error('Error adding node:', error);
+        return false;
+    }
+  }
+
+  // Add node
+  function addNode(nodeId, result) {
+    // Update node 
+    mindMapCanvas.updateNode(nodeId, { content: result.content, detail: result.detail, approved: false });
+    // Update node id
+    mindMapCanvas.updateNodeId(nodeId, result.id);
   }
 
   // Remove add popup

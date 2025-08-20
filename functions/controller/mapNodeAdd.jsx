@@ -16,8 +16,6 @@ async function mapNodeAdd(map, node) {
     // Add new node to map
     map.nodes.push(node);
 
-    console.log("After pushing node", map.title, map.nodes.length);
-
     // Add new node on database
     const result = await executeDB({ collectionName: 'maps',
                                      type: 'updateOne',
