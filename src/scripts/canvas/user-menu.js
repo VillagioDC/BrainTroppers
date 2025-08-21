@@ -1,26 +1,32 @@
 // CANVAS
 // USER MENU SCRIPT
 
-// Initialize user menu
-window.initUserMenu = function() {
+(function() {
     // Elements
     const userIcon = document.getElementById("user-icon");
     let userMenuPopup = document.getElementById("user-menu-popup");
     let isUserMenuLoaded = false;
 
     // Toggle user menu
-    userIcon.addEventListener("click", async (e) => {
+    if (userIcon) userIcon.addEventListener("click", toggleUserMenu);
+
+    // Toggle user menu
+    async function toggleUserMenu(e) {
         e.stopPropagation();
         // Toggle user menu
         isUserMenuLoaded = !isUserMenuLoaded;
         // Show menu
         if (isUserMenuLoaded) {
+            // Load user menu
             await loadUserMenu();
-            addUserMenuListeners();
+            // Add event listeners
+            bindUserMenuEvents();
+        // Remove menu
         } else {
-            await removeUserMenu();
+            // Remove user menu
+            removeUserMenu();
         }
-    });
+    };
 
     // Fetch and load user menu HTML
     async function loadUserMenu() {
@@ -36,35 +42,42 @@ window.initUserMenu = function() {
         }
     }
 
-    // Add event listeners to user menu items
-    function addUserMenuListeners() {
+    // Bind event listeners to user menu items
+    function bindUserMenuEvents() {
         // Add event listeners to user menu items
-        document.getElementById("go-pro-plan").addEventListener("click", goProPlan);
-        document.getElementById("user-account").addEventListener("click", userAccount);
-        document.getElementById("theme-toggle").addEventListener("click", themeToggle);
-        document.getElementById("log-out").addEventListener("click", logOut);
+        if (document.getElementById("go-pro-plan"))
+            document.getElementById("go-pro-plan").addEventListener("click", goProPlan);
+        if (document.getElementById("user-account"))
+            document.getElementById("user-account").addEventListener("click", userAccount);
+        if (document.getElementById("theme-toggle"))
+            document.getElementById("theme-toggle").addEventListener("click", themeToggle);
+        if (document.getElementById("log-out"))
+            document.getElementById("log-out").addEventListener("click", logOut);
+        document.addEventListener('click', outsideClickHandler);
     }
 
     // Remove user menu HTML
-    async function removeUserMenu() {
+    function removeUserMenu() {
         // Remove event listeners from user menu items
-        document.getElementById("go-pro-plan").removeEventListener("click", goProPlan);
-        document.getElementById("user-account").removeEventListener("click", userAccount);
-        document.getElementById("theme-toggle").removeEventListener("click", themeToggle);
-        document.getElementById("log-out").removeEventListener("click", logOut);
+        if (document.getElementById("go-pro-plan"))
+            document.getElementById("go-pro-plan").removeEventListener("click", goProPlan);
+        if (document.getElementById("user-account"))
+            document.getElementById("user-account").removeEventListener("click", userAccount);
+        if (document.getElementById("theme-toggle"))
+            document.getElementById("theme-toggle").removeEventListener("click", themeToggle);
+        if (document.getElementById("log-out"))
+            document.getElementById("log-out").removeEventListener("click", logOut);
+        document.removeEventListener('click', outsideClickHandler);
         // Remove popup container
         userMenuPopup.remove();
         userMenuPopup = null;
         isUserMenuLoaded = false;
     }
 
-    // Remove popups if clicked outside
-    document.addEventListener("click", (e) => {
-        if ( document.getElementById("user-menu-popup") &&
-             !userMenuPopup.contains(e.target)) {
-                removeUserMenu();
-            }
-    });
+    // Outside click handler
+    function outsideClickHandler(e) {
+        if (e.target.id === "user-menu-popup") removeUserMenu();
+    }
 
     // Go to Pro Plan page
     function goProPlan() {
@@ -93,4 +106,4 @@ window.initUserMenu = function() {
         console.log("Log out clicked");
         removeUserMenu();
     }
-}
+})();

@@ -135,11 +135,59 @@
     }
 
     // ---------- DATA ----------
-    setData({ projectId, nodes = [], edges = [] }) {
-      // shallow clone
+    // Set data
+    setData({ projectId, nodes = [] }) {
       this.projectId = projectId;
-      this.nodes = nodes.map(n => Object.assign({ detail: n.detail || '' }, n));
-      this.edges = edges.slice();
+      this.nodes = nodes.map(n => ({
+        id: n.nodeId,
+        content: n.content,
+        detail: n.detail || '',
+        approved: n.status === 'approved',
+        // x and y are optional; if present in future schema updates, include them here (e.g., x: n.x, y: n.y)
+      }));
+
+      // Derive edges from schema links (unidirectional in schema, but deduped as undirected pairs)
+      const edgeMap = new Map(); // key: `${minId}-${maxId}`, value: strength (prefer 'strong' if any)
+      nodes.forEach(n => {
+        n.directLink.forEach(t => {
+          if (n.nodeId !== t) { // Prevent self-loops
+            const min = Math.min(n.nodeId, t);
+            const max = Math.max(n.nodeId, t);
+            const key = `${min}-${max}`;
+            edgeMap.set(key, 'strong'); // Set/override to strong
+          }
+        });
+        n.relatedLink.forEach(t => {
+          if (n.nodeId !== t) { // Prevent self-loops
+            const min = Math.min(n.nodeId, t);
+            const max = Math.max(n.nodeId, t);
+            const key = `${min}-${max}`;
+            if (!edgeMap.has(key)) {
+              edgeMap.set(key, 'weak'); // Set only if not already strong
+            }
+          }
+        });
+      });
+
+      // Build edges array
+      this.edges = Array.from(edgeMap, ([key, strength]) => {
+        const [source, target] = key.split('-');
+        return {
+          id: `edge-${source}-${target}`,
+          source,
+          target,
+          strength
+        };
+      });
+
+      this._updateSimulation();
+    }
+    
+    // Remove map
+    removeMap() {
+      this.projectId = null;
+      this.nodes = [];
+      this.edges = [];
       this._updateSimulation();
     }
 

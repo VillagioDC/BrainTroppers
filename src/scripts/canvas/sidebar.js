@@ -1,7 +1,7 @@
 // CANVA
 // SIDEBAR SCRIPT
 
-window.initSidebar = function() {
+(function() {
   // Elements
   const sidebar = document.getElementById("sidebar");
   const collapseBtn = document.getElementById("collapse-btn");
@@ -28,4 +28,4 @@ window.initSidebar = function() {
       expandBtn.classList.remove("collapsed");
     }
   }
-};
+})();

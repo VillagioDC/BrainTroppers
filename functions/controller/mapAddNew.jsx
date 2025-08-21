@@ -29,7 +29,9 @@ async function mapAddNew(query) {
     map.lastUpdated = Date.now();
 
     // Insert new map on MongoDB
-    const result = await executeDB({ collectionName: 'maps', type: 'insertOne', document: map });
+    const result = await executeDB({ collectionName: 'maps',
+                                     type: 'insertOne',
+                                     document: map });
 
     // Return
     return map;

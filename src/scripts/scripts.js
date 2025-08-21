@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadScript('./src/scripts/index/uiux.js'),
         loadScript('./src/scripts/index/brainstorm.js'),
         // Authentication scripts
-        loadScript('./src/scripts/auth/modals.js'),
-        loadScript('./src/scripts/auth/auth.js')
+        loadScript('./src/scripts/index/sign-in-up.js'),
     ]).then(() => {
         // Scripts loaded successfully
         console.log('Page loaded successfully');

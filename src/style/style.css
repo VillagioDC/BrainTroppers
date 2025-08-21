@@ -112,7 +112,7 @@ body {
 
 /* Modal Styles */
 .modal {
-    display: none;
+    display: block;
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -165,11 +165,16 @@ body {
 .modal-content input[type="email"],
 .modal-content input[type="password"] {
     padding: 0.6rem;
-    border: 1px solid var(--primary);   
+    border: 1px solid var(--background-shadow);   
     border-radius: 4px;
     font-size: 1rem;
     background-color: var(--background-shadow);
     color: var(--text);
+    outline: none
+}
+.modal-content input[type="email"]:focus,
+.modal-content input[type="password"]:focus {
+    border-color: var(--accent);
 }
 
 .password-hint {
@@ -204,42 +209,50 @@ body {
     flex-wrap: wrap;
     gap: 0.5rem;
 }
-.form-links a {
+.form-links p {
     color: var(--accent);
     text-decoration: none;
     font-size: 0.9rem;
 }
-.form-links a:hover {
+.form-links p:hover {
     text-decoration: underline;
+    cursor: pointer;
 }
 
-/* Notification Modal Styles */
-.notification-modal .modal-content {
-    margin: 5% auto;
-    padding: 1rem;
-    width: 80%;
-    max-width: 400px;
+/* Notification */
+.notification-popup {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 15rem;
+    height: 2rem;
+    padding: 0.2rem 0.8rem;
     text-align: center;
+    background: var(--background-modal);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    border-left: 6px solid #27ae60;
+    box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.4);
+    z-index: 12000;
 }
-
-.notification-content {
-    border-left: 4px solid transparent;
+.notification-popup p {
+    font-size: 0.9rem;
+    color: var(--text);
 }
-
-.notification-content p {
-    margin: 0;
+.notification-popup.success {
+    border-left: 4px solid #27ae60;
 }
-
-.notification-content.success {
-    border-left-color: #27ae60;
+.notification-popup.error {
+    border-left: 4px solid #e74c3c;
 }
-
-.notification-content.error {
-    border-left-color: #e74c3c;
-}
-
-.notification-content.info {
-    border-left-color: #3498db;
+.notification-popup.info {
+    border-left: 4px solid #3498db;
 }
 
 /* Hero Section */
