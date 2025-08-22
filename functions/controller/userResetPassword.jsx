@@ -3,6 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
+const generateToken = require('../utils/generateToken.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -26,15 +27,18 @@ async function userResetPassword(query) {
         };
     }
 
+    // Generate new auth token
+    const authToken = generateToken();
+
     // Update reset token
     const userUpdate = await executeDB({ collectionName: 'users',
                                           type: 'updateOne',
                                           filter: {email: user.email},
-                                          update: {$set: {authToken: null,
+                                          update: {$set: {authToken: authToken,
                                                           expires: null}}})
     // Handle error
     if (!userUpdate || userUpdate.modifiedCount === 0) {
-        log('SERVER ERROR', 'Unable to update user', email);
+        log('SERVER ERROR', 'Unable to update user', user.userId);
         return {
             statusCode: 500,
             body: JSON.stringify({error: 'Internal server error'})
@@ -44,7 +48,7 @@ async function userResetPassword(query) {
     // Return
     return {
         statusCode: 200,
-        body: JSON.stringify({success: 'Password reset successful'})
+        body: {success: 'Password reset successful', authToken: authToken }
     };
 
 }

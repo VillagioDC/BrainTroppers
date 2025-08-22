@@ -7,6 +7,7 @@
     let signInModal = document.getElementById('sign-in-modal');
     let signUpModal = document.getElementById('sign-up-modal');
     let forgotPasswordModal = document.getElementById('forgot-password-modal');
+    let newPasswordModal = document.getElementById('new-password-modal');
 
     // Event listeners
     if (signInBtn) signInBtn.addEventListener('click', signInBtnClick);
@@ -287,6 +288,9 @@
         if (forgotPasswordModal && !forgotPasswordModal.querySelector('.modal-content').contains(e.target)) {
             removeForgotPasswordModal();
         }
+        if (newPasswordModal && !newPasswordModal.querySelector('.modal-content').contains(e.target)) {
+            removeNewPasswordModal();
+        }
     }
 
     // Google authentication
@@ -460,21 +464,29 @@
         const confirmPassword = confirmPasswordInput.value;
         if (!email || !password || !confirmPassword) {
             await showNotification('Missing credentials', 'error');
+            console.log('Missing credentials');
+            return;
         }
         if (!validateEmail(email)) {
             await showNotification('Invalid email address', 'error');
+            console.log('Invalid email address');
+            return;
         }
         if (password !== confirmPassword) {
             await showNotification('Passwords do not match', 'error');
+            console.log('Passwords do not match');
+            return;
         }
         if (!validatePassword(password)) {
             await showNotification('Invalid password', 'error');
+            console.log('Invalid password');
+            return;
         }
         // Sign up
         await showNotification('Creating account', 'info', 'wait');
         // Call API
         const result = await apiSignUp(email, password);
-        // If error on API
+        // Handle result
         if (!result) {
             await showNotification('Sign up error', 'error');
             console.log('Sign up error');
@@ -522,38 +534,38 @@
 
     // Handle forgot password
     async function handleForgotPassword() {
-        try {
-            // Get form values
-            const emailInput = document.getElementById('reset-email');
-            if (!emailInput) {
-                throw new Error('Form element missing');
-            }
-            // Validate
-            const email = normalizeEmail(emailInput.value);
-            if (!email) {
-                throw new Error('Missing email address');
-            }
-            if (!validateEmail(email)) {
-                throw new Error('Invalid email address');
-            }
-            // Call API
-            await showNotification('Reseting access', 'info', 'wait');
-            const result = await apiForgotPassword(email);
-            // Handle result
-            if (!result) {
-                // Error
-                await showNotification('Password reset failed', 'error');
-            } else {
-                // Pending
-                await showNotification('Verification email sent', 'success');
-            }
-            // Remove modal
-            removeForgotPasswordModal();
-        // Catch errors
-        } catch (error) {
-            await showNotification('Password reset failed', 'error');
-            console.error('Password reset error:', error);
+        // Get form values
+        const emailInput = document.getElementById('reset-email');
+        if (!emailInput) {
+            throw new Error('Form element missing');
         }
+        // Validate
+        const email = normalizeEmail(emailInput.value);
+        if (!email) {
+            await showNotification('Missing email address', 'error');
+            console.log('Missing email address');
+            return;
+        }
+        if (!validateEmail(email)) {
+            await showNotification('Invalid email address', 'error');
+            console.log('Invalid email address');
+            return;
+        }
+        // Call API
+        await showNotification('Reseting access', 'info', 'wait');
+        const result = await apiForgotPassword(email);
+        // Handle result
+        if (!result) {
+            // Error
+            await showNotification('Password reset failed', 'error');
+        } else if (result && result.error) {
+            await showNotification(result.error, 'error');
+        } else {
+            // Pending
+            await showNotification('Verification email sent', 'success');
+        }
+        // Remove modal
+        removeForgotPasswordModal();
     }
 
     // API call to forgot password
@@ -583,5 +595,177 @@
         }
     }
 
+    // Check reset password url parameter
+    async function checkNewPasswordUrlParameter() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const newPassword = urlParams.get('newPassword');
+        const authToken = urlParams.get('authToken');
+        if (newPassword && authToken) {
+            // Clean url
+            const cleanedUrl = window.location.origin;
+            window.history.replaceState({}, document.title, cleanedUrl);
+            // Show reset password modal
+            await showNewPasswordModal(authToken);
+        }
+    }
+
+    // Show reset password modal
+    async function showNewPasswordModal(authToken) {
+        // Remove opened modals
+        if (forgotPasswordModal) removeForgotPasswordModal();
+        if (signInModal) removeSignInModal();
+        if (signUpModal) removeSignUpModal();
+        // Load reset password modal
+        await loadNewPasswordModal(authToken);
+        if (!newPasswordModal) return;
+        // Bind events
+        bindNewPasswordModalEvents();
+    }
+    // Load reset password modal
+    async function loadNewPasswordModal(authToken) {
+        try {
+            // Load reset password modal
+            const res = await fetch('./src/snippets/new-password-modal.html');
+            let html = await res.text();
+            if (!html) return;
+            // Replace auth token
+            html = html.replace('{{authToken}}', authToken);
+            document.body.insertAdjacentHTML('beforeend', html);
+            newPasswordModal = document.getElementById('new-password-modal');
+        // Catch error
+        } catch (error) {
+            console.error('Failed to load new-password modal:', error);
+        }
+    }
+
+    // Bind reset password modal events
+    function bindNewPasswordModalEvents() {
+        // Elements
+        const closeNewPassword = document.getElementById('close-new-password');
+        const switchToSignIn = document.getElementById('switch-to-sign-in');
+        const newPasswordForm = document.getElementById('new-password-form');
+        const passwordInput = document.getElementById('new-password');
+        // Event listeners
+        if (closeNewPassword) closeNewPassword.addEventListener('click', closeNewPasswordClick);
+        if (switchToSignIn) switchToSignIn.addEventListener('click', switchToSignInClick);
+        if (newPasswordForm) newPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleNewPassword();
+        });
+        if (passwordInput) passwordInput.addEventListener('input', validatePasswordInput);
+        document.addEventListener('click', outsideClickHandler);
+    }
+
+    // Close new password modal
+    function closeNewPasswordClick() {
+        if (newPasswordModal) removeNewPasswordModal();
+    }
+
+    // Handle new password
+    async function handleNewPassword() {
+        // Get form values
+        const emailInput = document.getElementById('new-password-email');
+        const passwordInput = document.getElementById('new-password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const authToken = document.querySelector('#new-password-form').getAttribute('data-auth-token');
+        if (!emailInput || !passwordInput || !confirmPasswordInput || !authToken) {
+            throw new Error('Form element missing');
+        }
+        // Validate
+        const email = normalizeEmail(emailInput.value);
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (!email || !password || !confirmPassword) {
+            await showNotification('Missing credentials', 'error');
+            console.log('Missing credentials');
+            return;
+        }
+        if (!validateEmail(email)) {
+            await showNotification('Invalid email address', 'error');
+            console.log('Invalid email address');
+            return;
+        }
+        if (password !== confirmPassword) {
+            await showNotification('Passwords do not match', 'error');
+            console.log('Passwords do not match');
+            return;
+        }
+        if (!validatePassword(password)) {
+            await showNotification('Invalid password', 'error');
+            console.log('Invalid password');
+            return;
+        }
+        // Sign up
+        await showNotification('Updating password', 'info', 'wait');
+        // Call API
+        const result = await apiNewPassword(email, password, authToken);
+        // Handle result
+        if (!result) {
+            await showNotification('Password update failed', 'error');
+            console.log('Reset password error');
+        } else if (result && result.error) {
+            // If wrong request or wrong credentials
+            await showNotification(result.error, 'error');
+        // Handle success
+        } else {
+            // Show notification
+            await showNotification('Password updated', 'success');
+            // Show sign in modal
+            setTimeout(() => {
+                switchToSignInClick();
+            }, 2000);
+        }
+        // Remove new password modal
+        removeNewPasswordModal();
+    }
+
+    // Handle new password
+    async function apiNewPassword(email, password) {
+        try {
+            // Set Parameters
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const body = { credentials: { email, password }};
+            //const url = `${process.env.API_URL}/setNewPassword`;
+            const url = 'http://localhost:8888/.netlify/functions/setNewPassword';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+            });
+            // Check response
+            if (!response) {
+                throw new Error(await response.text());
+            }
+            // Return response
+            return await response.json();
+        // Catch error
+        } catch (error) {
+            throw new Error('Password update error:', error);
+        }
+    }
+
+    // Remove new password modal
+    function removeNewPasswordModal() {
+        // Remove event listeners
+        if (document.getElementById('close-new-password'))
+            document.getElementById('close-new-password').removeEventListener('click', closeNewPasswordClick);
+        if (document.getElementById('switch-to-sign-in'))
+            document.getElementById('switch-to-sign-in').removeEventListener('click', switchToSignInClick);
+        if (document.getElementById('new-password-form'))
+            document.getElementById('new-password-form').removeEventListener('submit', handleNewPassword);
+        if (document.getElementById('new-password'))
+            document.getElementById('new-password').removeEventListener('input', validatePasswordInput);
+        document.removeEventListener('click', outsideClickHandler);
+        // Remove modal
+        if (newPasswordModal) {
+            newPasswordModal.remove();
+            newPasswordModal = null;
+        }
+    }
+
+    // On load
+    checkNewPasswordUrlParameter();
 
 })();

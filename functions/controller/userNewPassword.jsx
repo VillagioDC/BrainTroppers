@@ -13,7 +13,7 @@ const log = require('../utils/log.jsx');
     RETURN {object} - message: success || error
 */
 
-async function userSignUp(credentials) {
+async function userNewPassword(credentials) {
 
     // Check credentials
     if (!credentials || !credentials.email || !credentials.password) {
@@ -29,56 +29,34 @@ async function userSignUp(credentials) {
                                    filter: {email: credentials.email}
     });
     // Check user
-    if (user) {
-        log('SERVER WARNING', 'User already exists', credentials.email);
+    if (!user) {
+        log('SERVER WARNING', 'User not found', credentials.email);
         return {
                 statusCode: 409,
-                body: JSON.stringify({ error: 'User already exists' })
+                body: JSON.stringify({ error: 'User not found' })
         };
     }
 
-    // Generate user ID
-    const userId = generateToken();
-    // Temp name
-    const tempName = credentials.email.split('@')[0];
-    // Generate user icon
-    const icon = generateUserIcon();
-    // Generate session token
-    const authToken = generateToken();
-    // Set expires
-    const expires = setSessionExpires(userId);
-    // Construct new user
-    const newUser = {
-        userId: userId,
-        email: credentials.email,
-        password: credentials.password,
-        authToken: authToken,
-        name: tempName,
-        icon: icon,
-        plan: "Free Plan",
-        maps: [],
-        sessionToken: "",
-        expires: expires
-    }
-
-    // Insert new user on MongoDB
+    // Insert update user password on MongoDB
     const result = await executeDB({ collectionName: 'users',
-                                     type: 'insertOne',
-                                     document: newUser });
+                                     type: 'updateOne',
+                                     filter: {email: credentials.email},
+                                     update: {$set: {password: credentials.password,
+                                                     authToken: null }}});
     // Check insert error
     if (!result) {
-        log('SERVER ERROR', 'Unable to sign up user @userSignUp.');
+        log('SERVER ERROR', 'Unable to update user password @userNewPassword.');
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Unable to sign up user' })
+            body: JSON.stringify({ error: 'Password update error' })
         };
     }
 
     // Return
     return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'Signed up successfully' })
+            body: JSON.stringify({ message: 'Password updated' })
     };
 }
 
-module.exports = userSignUp;
+module.exports = userNewPassword;
