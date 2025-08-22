@@ -64,6 +64,9 @@ async function mapCreateNew(query) {
     newMap.nodes = jsonResponse.nodes;
     await mapUpdate(newMap);
 
+    // Update user projects with new map
+    await userAddNewMap(newMap, newMap.owner);
+
     // Return
     return newMap;
 }

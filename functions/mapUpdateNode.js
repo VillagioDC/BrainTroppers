@@ -4,60 +4,49 @@
 // Dependencies
 
 // Functions
+const loadCORSHeaders = require('./utils/loadCORSHeaders.jsx');
+const handlePreflight = require('./utils/handlePreflight.jsx');
+const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
+const handlePostRequest = require('./utils/handlePostRequest.jsx');
+const handleJsonParse = require('./utils/handleJsonParse.jsx');
+const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
 const mapNodeUpdate = require('./controller/mapNodeUpdate.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {projectId, nodeId, content, detail}} - API call
-    RETURN {object} - map data or null
+    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, nodeId, content, detail}} - API call
+    RETURN {object} - body: updatedMap || error
 */
 
 exports.handler = async (event) => {
 
   // Define CORS headers
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
+  const corsHeaders = loadCORSHeaders();
 
   // Handle preflight OPTIONS request
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: ''
-    };
-  }
+  const preflight = handlePreflight(event, corsHeaders);
+  if (preflight) return preflight;
 
   // Refuse non-POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
+  const nonPostRequest = refuseNonPostRequest(event, corsHeaders);
+  if (nonPostRequest) return nonPostRequest;
 
   // Handle POST request
   try {
-    // Parse request
-    const { headers, body } = event;
-    if (!body) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-      return {
-        statusCode: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid request body' })
-      };
-    }
+    // Handle POST request
+    const postRequest = handlePostRequest(event, corsHeaders);
+    if (!postRequest || postRequest.statusCode === 400) return postRequest;
+    const { headers, body } = postRequest;
 
     // Parse body
-    const parsedBody = JSON.parse(body);
-    const { projectId, nodeId, content, detail } = parsedBody;
+    const parsedBody = handleJsonParse(body, corsHeaders);
+    if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
+    const { userId, projectId, nodeId, content, detail } = parsedBody;
 
-    if (!projectId || projectId.trim().length === 0 ||
+    // Check required fields
+    if (!userId || userId.trim().length === 0 ||
+        !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0 || 
         !content || content.trim().length === 0 ||
         !detail || detail.trim().length === 0) {          
@@ -82,7 +71,8 @@ exports.handler = async (event) => {
     }
 
     // Anti-malicious checks
-    if (typeof projectId !== 'string' || projectId.length > 50 ||
+    if (typeof userId !== 'string' || userId.length > 50 ||
+        typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50 ||
         typeof content !== 'string' || content.length > 500 ||
         typeof detail !== 'string' || detail.length > 500) {
@@ -93,6 +83,9 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ error: 'Invalid request' })
             };
     }
+
+    // Set session expires
+    await setSessionExpires(userId);
 
     // Read map
     const map = await mapRead(projectId);
@@ -135,7 +128,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(map)
+      body: JSON.stringify(updatedMap)
     };
 
   // Catch error

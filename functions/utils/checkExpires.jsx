@@ -2,20 +2,21 @@
 // No dependencies
 
 // Functions
-// No functions
+const setSessionExpires = require('./setExpires.jsx');
+const log = require('./log.jsx');
 
 /* PARAMETERS
   input {datetime} - expires
   RETURN {bool} - true || false
 */
 
-function checkExpires(expires) {
-
-    // Set expires
-    const now = new Date(Date.now());
+async function checkSessionExpired(userId, expires) {
 
     // Check expires
+    const now = new Date(Date.now());
     if (expires < now) {
+        // Renew
+        await setSessionExpires(userId);
         // Valid
         return true;
     }
@@ -25,4 +26,4 @@ function checkExpires(expires) {
 
 }
 
-module.exports = setExpires;
+module.exports = checkSessionExpired;

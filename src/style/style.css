@@ -99,7 +99,7 @@ body {
 .sign-button {
     padding: 0.5rem 0.8rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: var(--background);
+    color: var(--text);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -254,6 +254,13 @@ body {
 .notification-popup.info {
     border-left: 4px solid #3498db;
 }
+.notification-popup .spinning {
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 /* Hero Section */
 .hero {
@@ -327,7 +334,7 @@ body {
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: var(--background);
+    color: var(--text);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -416,7 +423,7 @@ body {
 .site-footer {
     background: var(--background);
     color: var(--text);
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 
 .footer-content {
@@ -431,11 +438,18 @@ body {
 }
 
 .footer-logo {
+    display: flex;
+    flex-direction: column;
+}
+.footer-logo h3 {
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--primary);
 }
-
+.footer-logo p {
+    font-size: 0.8rem;
+    color: var(--text);
+}
 .footer-links {
     display: flex;
     gap: 1.8rem;

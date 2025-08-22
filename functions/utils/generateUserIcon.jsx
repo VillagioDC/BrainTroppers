@@ -26,9 +26,12 @@ function generateUserIcon(email) {
     if (dotIndex !== -1 && dotIndex < atIndex) {
         // Case a: Use first letter and letter after dot
         userIcon = email[0] + email[dotIndex + 1];
-    } else {
+    } else if (beforeAt.length >= 2) {
         // Case b: Use first two letters
-        userIcon = beforeAt.length >= 2 ? beforeAt.substring(0, 2) : beforeAt[0] || '';
+        userIcon = beforeAt.substring(0, 2);
+    } else {
+        // Case c: Use first letter
+        userIcon = email[0];
     }
     
     // Return user icon in uppercase

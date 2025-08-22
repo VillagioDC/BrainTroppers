@@ -156,6 +156,13 @@ body {
   flex-shrink: 0;
   transition: all 0.3s ease;
 }
+.user-icon:hover {
+  background: var(--accent);
+}
+.user-icon i {
+  font-size: 16px;
+}
+
 .user-plan {
   font-size: 0.85rem;
   color: var(--accent);
@@ -167,6 +174,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
 }
+.user-plan i {
+  color: var(--gold-plan);
+}
+
 /* EXPAND BUTTON */
 .expand-btn {
   position: fixed;
@@ -200,7 +211,7 @@ body {
   margin: 1rem;
   padding: 0.65rem;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  color: var(--text);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -322,7 +333,7 @@ body {
   transition: all 0.3s;
 }
 .map-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--menu-hover)
 }
 .map-item.active {
   background: rgba(86, 161, 192, 0.2);
@@ -393,6 +404,49 @@ body {
 }
 .delete-item:hover {
   background: rgba(229, 66, 142, 0.15);
+}
+
+/* MAP ITEM RENAME TITLE */
+.rename-title {
+  position: fixed;
+  top: 0; /* JS SET POSITION */
+  left: 0;
+  margin: 0.75rem 6px;
+  width: calc(240px - 2 * 0.75rem);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  background: var(--menu-hover);
+  border: none;
+  z-index: 12000;
+}
+.rename-title-input,
+.rename-title-input:active,
+.rename-title-input:focus {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  background: none;
+  outline: none;
+  border: none;
+  color: var(--text);
+  font-weight: 400;
+  cursor: text;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+.rename-title-btn {
+  width: 20px;
+  height: 20px;
+  background: none;
+  color: var(--text);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.rename-title-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* NEW MAP FORM */
@@ -533,27 +587,32 @@ body {
     padding: 0.6rem;
     border: 1px solid var(--background-shadow);   
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.9rem;
+    font-weight: 300;
     color: var(--text);
     cursor: pointer;
 }
 
-.popup-content textarea {
+.popup-content textarea,
+.popup-content textarea:focus {
     width: 100%;
     padding: 0.6rem;
-    border: 1px solid var(--primary);   
+    border: 1px solid transparent;
     border-radius: 4px;
-    font-size: 1rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 300;
     background-color: var(--background-shadow);
     color: var(--text);
     cursor: text;
+    outline: none;
 }
 
 .popup-content button {
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: var(--background);
+    color: var(--text);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -561,6 +620,49 @@ body {
 }
 .popup-content button:hover {
     background: linear-gradient(135deg, var(--accent), var(--secondary));
+}
+
+/* Notification */
+.notification-popup {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 15rem;
+    height: 2rem;
+    padding: 0.2rem 0.8rem;
+    text-align: center;
+    background: var(--background-modal);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    border-left: 6px solid #27ae60;
+    box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.4);
+    z-index: 12000;
+}
+.notification-popup p {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+.notification-popup.success {
+    border-left: 4px solid #27ae60;
+}
+.notification-popup.error {
+    border-left: 4px solid #e74c3c;
+}
+.notification-popup.info {
+    border-left: 4px solid #3498db;
+}
+.notification-popup .spinning {
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* ANIMATIONS */

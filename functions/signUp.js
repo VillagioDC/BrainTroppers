@@ -4,58 +4,45 @@
 // Dependencies
 
 // Functions
+const loadCORSHeaders = require('./utils/loadCORSHeaders.jsx');
+const handlePreflight = require('./utils/handlePreflight.jsx');
+const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
+const handlePostRequest = require('./utils/handlePostRequest.jsx');
+const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const userSignUp = require('./controller/userSignUp.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
     input {headers: {Authorization: Bearer <token>}, body: {credentials: {email, password}}} - API call
-    RETURN {object} - {auth} || error
+    RETURN {object} - body: message || error
 */
 
 exports.handler = async (event) => {
 
   // Define CORS headers
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
+  const corsHeaders = loadCORSHeaders();
 
   // Handle preflight OPTIONS request
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: ''
-    };
-  }
+  const preflight = handlePreflight(event, corsHeaders);
+  if (preflight) return preflight;
 
   // Refuse non-POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
+  const nonPostRequest = refuseNonPostRequest(event, corsHeaders);
+  if (nonPostRequest) return nonPostRequest;
 
   // Handle POST request
   try {
-    // Parse request
-    const { headers, body } = event;
-    if (!body) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-      return {
-        statusCode: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid request body' })
-      };
-    }
+    // Handle POST request
+    const postRequest = handlePostRequest(event, corsHeaders);
+    if (!postRequest || postRequest.statusCode === 400) return postRequest;
+    const { headers, body } = postRequest;
 
     // Parse body
-    const parsedBody = JSON.parse(body);
+    const parsedBody = handleJsonParse(body, corsHeaders);
+    if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
     const { credentials } = parsedBody;
 
+    // Check required fields
     if (!credentials || 
         !credentials.email || credentials.email.trim().length === 0 ||
         !credentials.password || credentials.password.trim().length === 0) {
@@ -64,18 +51,6 @@ exports.handler = async (event) => {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Missing required fields' })
-      };
-    }
-
-    // Check token
-    const authHeader = headers.Authorization || headers.authorization;
-    const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
-    if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
-      return {
-        statusCode: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' })
       };
     }
 
@@ -91,9 +66,9 @@ exports.handler = async (event) => {
     }
 
     // Sign up user
-    const auth = await userSignUp(credentials);
+    const signedUp = await userSignUp(credentials);
     // Check auth
-    if (!auth || !auth.statusCode) {
+    if (!signedUp || !signedUp.statusCode) {
       log('SERVER WARNING', 'User sign up failed');
       return {
         statusCode: 404,
@@ -101,12 +76,12 @@ exports.handler = async (event) => {
         body: JSON.stringify({ error: 'Sign up failed' })
       };
     }
-    if (auth.statusCode !== 200) {
+    if (signedUp.statusCode !== 200) {
       log('SERVER WARNING', 'User sign up failed');
       return {
-        statusCode: auth.statusCode,
+        statusCode: signedUp.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: auth.body
+        body: signedUp.body
       };
     }
 
@@ -114,12 +89,12 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: auth.body
+      body: signedUp.body
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in userSignIn endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in userSignUp endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

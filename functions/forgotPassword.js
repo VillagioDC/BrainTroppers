@@ -1,5 +1,5 @@
-// ENDPOINT TO CREATE NEW MAP
-// Serverless handler for creating a new map
+// ENDPOINT TO FORGOT PASSWORD
+// Serverless handler for triggering password reset
 
 // Dependencies
 
@@ -9,13 +9,12 @@ const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
-const mapCreateNew = require('./controller/mapCreateNew.jsx');
+const userSendReset = require('./controller/userSendReset.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, query}} - API call
-    RETURN {object} - body: newMap || error
+    input {headers: {Authorization: Bearer <token>}, body: {credentials: {email}} - API call
+    RETURN {object} - body: message || error
 */
 
 exports.handler = async (event) => {
@@ -41,34 +40,21 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, query } = parsedBody;
+    const { credentials } = parsedBody;
 
     // Check required fields
-    if (!userId || userId.trim().length === 0 ||
-        !query || query.trim().length === 0) {
-        log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-        return {
-          statusCode: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Missing required fields' })
-        };
-    }
-
-    // Check token
-    const authHeader = headers.Authorization || headers.authorization;
-    const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
-    if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+    if (!credentials || 
+        !credentials.email || credentials.email.trim().length === 0 ) {
+      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
       return {
-        statusCode: 401,
+        statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized' })
+        body: JSON.stringify({ error: 'Missing email address' })
       };
     }
 
     // Anti-malicious checks
-    if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof query !== 'string' || query.length > 500) {
+    if (typeof credentials.email !== 'string' || credentials.email.length > 50) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -77,30 +63,28 @@ exports.handler = async (event) => {
             };
     }
 
-    // Set session expires
-    await setSessionExpires(userId);
-
-    // Create new map
-    const newMap = await mapCreateNew(query);
-    if (!newMap) {
-      log('SERVER WARNING', 'Unable to create map');
+    // Send reset email
+    const response = await userSendReset(credentials.email);
+    // Check response
+    if (!response) {
+      log('SERVER ERROR', 'Failed sending password reset email');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to create map' })
+        body: JSON.stringify({ error: 'Fail sending reset email' })
       };
     }
 
     // Return success
     return {
-      statusCode: 200,
+      statusCode: response.statusCode,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(newMap)
+      body: response.body
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in forgotPassword endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

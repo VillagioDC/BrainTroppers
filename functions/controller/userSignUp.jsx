@@ -5,7 +5,7 @@
 const executeDB = require('../mongoDB/executeDB.jsx');
 const generateToken = require('../utils/generateToken.jsx');
 const generateUserIcon = require('../utils/generateUserIcon.jsx');
-const setExpires = require('../utils/setExpires.jsx')
+const setSessionExpires = require('../utils/setExpires.jsx')
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -18,7 +18,10 @@ async function userSignUp(credentials) {
     // Check credentials
     if (!credentials || !credentials.email || !credentials.password) {
         log('SERVER WARNING', 'Missing credentials', credentials);
-        return null;
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Missing credentials' })
+        };
     }
     // Check user
     const user = await executeDB({ collectionName: 'users',
@@ -28,7 +31,10 @@ async function userSignUp(credentials) {
     // Check user
     if (user) {
         log('SERVER WARNING', 'User already exists', credentials.email);
-        return null;
+        return {
+                statusCode: 409,
+                body: JSON.stringify({ error: 'User already exists' })
+        };
     }
 
     // Generate user ID
@@ -38,29 +44,41 @@ async function userSignUp(credentials) {
     // Generate user icon
     const icon = generateUserIcon();
     // Generate session token
-    const sessionToken = generateToken();
+    const authToken = generateToken();
     // Set expires
-    const expires = setExpires();
+    const expires = setSessionExpires(userId);
     // Construct new user
     const newUser = {
         userId: userId,
         email: credentials.email,
         password: credentials.password,
+        authToken: authToken,
         name: tempName,
         icon: icon,
-        plan: "Free plan",
+        plan: "Free Plan",
         maps: [],
-        sessionToken: sessionToken,
+        sessionToken: "",
         expires: expires
     }
 
     // Insert new user on MongoDB
-    await executeDB({ collectionName: 'users',
-                      type: 'insertOne',
-                      document: newUser });
+    const result = await executeDB({ collectionName: 'users',
+                                     type: 'insertOne',
+                                     document: newUser });
+    // Check insert error
+    if (!result) {
+        log('SERVER ERROR', 'Unable to sign up user @userSignUp.');
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Unable to sign up user' })
+        };
+    }
 
     // Return
-    return newUser;
+    return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Signed up successfully' })
+    };
 }
 
 module.exports = userSignUp;

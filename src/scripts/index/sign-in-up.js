@@ -14,9 +14,11 @@
 
     // Open sign in modal
     async function signInBtnClick() {
+        // Remove opened modals
         if (signInModal) return;
         if (signUpModal) removeSignUpModal();
         if (forgotPasswordModal) removeForgotPasswordModal();
+        // Load sign in modal
         await loadSignInModal();
         bindSignInModalEvents();
         document.getElementById('sign-in-email').focus();
@@ -24,9 +26,11 @@
 
     // Open sign up modal
     async function signUpBtnClick() {
+        // Remove opened modals
         if (signUpModal) return;
         if (signInModal) removeSignInModal();
         if (forgotPasswordModal) removeForgotPasswordModal();
+        // Load sign up modal
         await loadSignUpModal();
         bindSignUpModalEvents();
         document.getElementById('sign-up-email').focus();
@@ -34,9 +38,11 @@
 
     // Open forgot password modal
     async function forgotPasswordClick() {
+        // Remove opened modals
         if (forgotPasswordModal) return;
         if (signInModal) removeSignInModal();
         if (signUpModal) removeSignUpModal();
+        // Load forgot password modal
         await loadForgotPasswordModal();
         bindForgotPasswordModalEvents();
         document.getElementById('reset-email').focus();
@@ -44,7 +50,9 @@
 
     // Switch to sign up modal
     async function switchToSignUpClick() {
+        // Remove sign in modal
         if (signInModal) removeSignInModal();
+        // Load sign up modal
         await loadSignUpModal();
         bindSignUpModalEvents();
         document.getElementById('sign-up-email').focus();
@@ -52,7 +60,9 @@
 
     // Switch to sign in modal
     async function switchToSignInClick() {
+        // Remove sign up modal
         if (signUpModal) removeSignUpModal();
+        // Load sign in modal
         await loadSignInModal();
         bindSignInModalEvents();
         document.getElementById('sign-in-email').focus();
@@ -60,7 +70,9 @@
 
     // Back to sign in
     async function backToSignInLinkClick() {
+        // Remove forgot password modal
         if (forgotPasswordModal) removeForgotPasswordModal();
+        // Load sign in modal
         await loadSignInModal();
         bindSignInModalEvents();
         document.getElementById('sign-in-email').focus();
@@ -69,10 +81,12 @@
     // Load sign in modal
     async function loadSignInModal() {
         try {
+            // Load sign in modal
             const res = await fetch('./src/snippets/sign-in-modal.html');
             const html = await res.text();
             document.body.insertAdjacentHTML('beforeend', html);
             signInModal = document.getElementById('sign-in-modal');
+        // Catch error
         } catch (error) {
             console.error('Failed to load sign-in modal:', error);
         }
@@ -81,10 +95,12 @@
     // Load sign up modal
     async function loadSignUpModal() {
         try {
+            // Load sign up modal
             const res = await fetch('./src/snippets/sign-up-modal.html');
             const html = await res.text();
             document.body.insertAdjacentHTML('beforeend', html);
             signUpModal = document.getElementById('sign-up-modal');
+        // Catch error
         } catch (error) {
             console.error('Failed to load sign-up modal:', error);
         }
@@ -93,10 +109,12 @@
     // Load forgot password modal
     async function loadForgotPasswordModal() {
         try {
+            // Load forgot password modal
             const res = await fetch('./src/snippets/forgot-password-modal.html');
             const html = await res.text();
             document.body.insertAdjacentHTML('beforeend', html);
             forgotPasswordModal = document.getElementById('forgot-password-modal');
+        // Catch error
         } catch (error) {
             console.error('Failed to load forgot-password modal:', error);
         }
@@ -104,11 +122,13 @@
 
     // Bind sign in modal events
     function bindSignInModalEvents() {
+        // Elements
         const closeSignIn = document.getElementById('close-sign-in');
         const forgotPassword = document.getElementById('show-forgot-password');
         const switchToSignUp = document.getElementById('switch-to-sign-up');
         const signInForm = document.getElementById('sign-in-form');
         const googleSignIn = document.getElementById('google-sign-in');
+        // Event listeners
         if (closeSignIn) closeSignIn.addEventListener('click', closeSignInClick);
         if (forgotPassword) forgotPassword.addEventListener('click', forgotPasswordClick);
         if (switchToSignUp) switchToSignUp.addEventListener('click', switchToSignUpClick);
@@ -125,11 +145,13 @@
 
     // Bind sign up modal events
     function bindSignUpModalEvents() {
+        // Elements
         const closeSignUp = document.getElementById('close-sign-up');
         const switchToSignIn = document.getElementById('switch-to-sign-in');
         const signUpForm = document.getElementById('sign-up-form');
         const googleSignUp = document.getElementById('google-sign-up');
         const passwordInput = document.getElementById('sign-up-password');
+        // Event listeners
         if (closeSignUp) closeSignUp.addEventListener('click', closeSignUpClick);
         if (switchToSignIn) switchToSignIn.addEventListener('click', switchToSignInClick);
         if (signUpForm) signUpForm.addEventListener('submit', async (e) => {
@@ -146,9 +168,11 @@
 
     // Bind forgot password modal events
     function bindForgotPasswordModalEvents() {
+        // Elements
         const closeForgotPassword = document.getElementById('close-forgot-password');
         const backToSignInLink = document.getElementById('back-to-sign-in');
         const forgotPasswordForm = document.getElementById('forgot-password-form');
+        // Event listeners
         if (closeForgotPassword) closeForgotPassword.addEventListener('click', closeForgotPasswordClick);
         if (backToSignInLink) backToSignInLink.addEventListener('click', backToSignInLinkClick);
         if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => {
@@ -192,17 +216,20 @@
 
     // Remove sign in modal
     function removeSignInModal() {
+        // Elements
         const closeSignIn = document.getElementById('close-sign-in');
         const forgotPassword = document.getElementById('show-forgot-password');
         const switchToSignUp = document.getElementById('switch-to-sign-up');
         const signInForm = document.getElementById('sign-in-form');
         const googleSignIn = document.getElementById('google-sign-in');
+        // Event listeners
         if (closeSignIn) closeSignIn.removeEventListener('click', closeSignInClick);
         if (forgotPassword) forgotPassword.removeEventListener('click', forgotPasswordClick);
         if (switchToSignUp) switchToSignUp.removeEventListener('click', switchToSignUpClick);
         if (signInForm) signInForm.removeEventListener('submit', handleSignIn);
         if (googleSignIn) googleSignIn.removeEventListener('click', initiateGoogleAuth);
         document.removeEventListener('click', outsideClickHandler);
+        // Remove modal
         if (signInModal) {
             signInModal.remove();
             signInModal = null;
@@ -211,17 +238,20 @@
 
     // Remove sign up modal
     function removeSignUpModal() {
+        // Elements
         const closeSignUp = document.getElementById('close-sign-up');
         const switchToSignIn = document.getElementById('switch-to-sign-in');
         const signUpForm = document.getElementById('sign-up-form');
         const googleSignUp = document.getElementById('google-sign-up');
         const passwordInput = document.getElementById('sign-up-password');
+        // Event listeners
         if (closeSignUp) closeSignUp.removeEventListener('click', closeSignUpClick);
         if (switchToSignIn) switchToSignIn.removeEventListener('click', switchToSignInClick);
         if (signUpForm) signUpForm.removeEventListener('submit', handleSignUp);
         if (googleSignUp) googleSignUp.removeEventListener('click', initiateGoogleAuth);
         if (passwordInput) passwordInput.removeEventListener('input', validatePasswordInput);
         document.removeEventListener('click', outsideClickHandler);
+        // Remove modal
         if (signUpModal) {
             signUpModal.remove();
             signUpModal = null;
@@ -230,13 +260,16 @@
 
     // Remove forgot password modal
     function removeForgotPasswordModal() {
+        // Elements
         const closeForgotPassword = document.getElementById('close-forgot-password');
         const backToSignInLink = document.getElementById('back-to-sign-in');
         const forgotPasswordForm = document.getElementById('forgot-password-form');
+        // Event listeners
         if (closeForgotPassword) closeForgotPassword.removeEventListener('click', closeForgotPasswordClick);
         if (backToSignInLink) backToSignInLink.removeEventListener('click', backToSignInLinkClick);
         if (forgotPasswordForm) forgotPasswordForm.removeEventListener('submit', handleForgotPassword);
         document.removeEventListener('click', outsideClickHandler);
+        // Remove modal
         if (forgotPasswordModal) {
             forgotPasswordModal.remove();
             forgotPasswordModal = null;
@@ -245,92 +278,19 @@
 
     // Close modal on outside click
     function outsideClickHandler(e) {
-        if ((signInModal && !signInModal.contains(e.target)) ||
-            (signUpModal && !signUpModal.contains(e.target)) ||
-            (forgotPasswordModal && !forgotPasswordModal.contains(e.target))) {
-            closeSignInClick();
-            closeSignUpClick();
-            closeForgotPasswordClick();
+        if (signInModal && !signInModal.querySelector('.modal-content').contains(e.target)) {
+            removeSignInModal();
+        }
+        if (signUpModal && !signUpModal.querySelector('.modal-content').contains(e.target)) {
+            removeSignUpModal();
+        }
+        if (forgotPasswordModal && !forgotPasswordModal.querySelector('.modal-content').contains(e.target)) {
+            removeForgotPasswordModal();
         }
     }
 
-    // Validation and API functions (moved from auth.js)
-    function validatePassword(password) {
-        const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
-        return passwordRegex.test(password);
-    }
-
-    function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    function sanitizeInput(input) {
-        return input.replace(/[^\w\s@.-]/gi, '').trim();
-    }
-
-    async function apiSignIn(email, password) {
-        try {
-            const credentials = { email, password };
-            const url = 'http://localhost:8888/.netlify/functions';
-            const response = await fetch(`${url}/auth/signin`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-                credentials: 'include'
-            });
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            return await response.json();
-        } catch (error) {
-            throw new Error(`Sign-in failed: ${error.message}`);
-        }
-    }
-
-    async function apiSignUp(email, password) {
-        try {
-            const credentials = { email, password };
-            const url = 'http://localhost:8888/.netlify/functions';
-            const response = await fetch(`${url}/auth/signup`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-                credentials: 'include'
-            });
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            return await response.json();
-        } catch (error) {
-            throw new Error(`Sign-up failed: ${error.message}`);
-        }
-    }
-
-    async function apiForgotPassword(email) {
-        try {
-            const url = 'http://localhost:8888/.netlify/functions';
-            const response = await fetch(`${url}/auth/forgot-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
-                credentials: 'include'
-            });
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            return await response.json();
-        } catch (error) {
-            throw new Error(`Password reset failed: ${error.message}`);
-        }
-    }
-
+    // Google authentication
+    // Pending
     async function apiGoogleAuth(type) {
         try {
             const url = 'http://localhost:8888/.netlify/functions';
@@ -347,6 +307,8 @@
         }
     }
 
+    // Initiate Google authentication
+    // Pending
     async function initiateGoogleAuth(type) {
         try {
             await showNotification(`Initiating Google ${type === 'sign-in' ? 'Sign In' : 'Sign Up'}...`, 'info', 'wait');
@@ -365,130 +327,261 @@
         }
     }
 
+    // Handle sign in
     async function handleSignIn() {
-        try {
-            const emailInput = document.getElementById('sign-in-email');
-            const passwordInput = document.getElementById('sign-in-password');
-            if (!emailInput || !passwordInput) {
-                throw new Error('Form elements not found');
+        // Get form values
+        const emailInput = document.getElementById('sign-in-email');
+        const passwordInput = document.getElementById('sign-in-password');
+        // Validate
+        if (!emailInput || !passwordInput) {
+            throw new Error('Form element missing');
+        }
+        // Normalize
+        const email = normalizeEmail(emailInput.value);
+        const password = passwordInput.value;
+        // Validate
+        if (!email || !password) {
+            await showNotification('Invalid credentials', 'error');
+            console.log('Invalid credentials');
+            return;
+        }
+        // Validate email
+        if (!validateEmail(email)) {
+            await showNotification('Invalid email', 'error');
+            console.log('Invalid email');
+            return;
+        }
+        // Validate password
+        if (!validatePassword(password)) {
+            await showNotification('Invalid password', 'error');
+            console.log('Invalid password');
+            return;
+        }
+        // Sign in
+        await showNotification('Signing in', 'info', 'wait');
+        const result = await apiSignIn(email, password);
+        // Handle result
+        if (!result) {
+            // If error on API
+            await showNotification('Sign in error', 'error');
+            console.log('Sign in error');
+            return;
+        } else if (result && result.error) {
+            // If wrong request or wrong credentials
+            await showNotification(result.error, 'error');
+            console.log(result.error);
+            return;
+        // Handle success
+        } else {
+            // Set user and session
+            setLocalStorageUser(result.auth);
+            // Navigate to canvas
+            if (localStorage.getItem('user')) {
+                // Show notification
+                await showNotification('Signing in', 'success');
+                // Redirect
+                setTimeout(() => {
+                    window.location.href = './canvas.html';
+                }, 2000);                    
             }
-            const email = sanitizeInput(emailInput.value);
-            const password = passwordInput.value;
-            if (!email || !password) {
-                throw new Error('Please fill in email and password');
-            }
-            if (!validateEmail(email)) {
-                throw new Error('Please enter a valid email address');
-            }
-            await showNotification('Signing in...', 'info', 'wait');
-            const result = await apiSignIn(email, password);
-            await showNotification('Sign in successful!', 'success');
-            setTimeout(() => {
-                window.location.href = './canvas.html';
-            }, 2000);
-        } catch (error) {
-            await showNotification(error.message, 'error');
-            console.error('Sign in error:', error);
         }
     }
 
+    // Normalize email
+    function normalizeEmail(input) {
+        return input.trim().toLowerCase();
+    }
+
+    // Validate email
+    function validateEmail(email) {
+        if (email.length > 254) return false;
+        const dangerousChars = /['";<>\(\)]/;
+        if (dangerousChars.test(email)) return false;
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if (!emailRegex.test(email)) return false;
+        return true;
+    }
+
+    // Validate password
+    function validatePassword(password) {
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+        return passwordRegex.test(password);
+    }
+
+    // API call to sign in
+    async function apiSignIn(email, password) {
+        try {
+            // Set Parameters
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const body = { credentials: { email, password }};
+            //const url = `${process.env.API_URL}/signIn`;
+            const url = 'http://localhost:8888/.netlify/functions/signIn';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+            });
+            // Check response
+            if (!response) {
+                throw new Error(await response.text());
+            }
+            return await response.json();
+        // Catch error
+        } catch (error) {
+            throw new Error('Sign-in error:', error);
+        }
+    }
+
+    // Set local storage user
+    function setLocalStorageUser(user) {
+        // Validate user object
+        if (!user || typeof user !== 'object') {
+            console.error('Invalid user object for local storage');
+            return;
+        }
+        // Store user object in local storage
+        localStorage.setItem('user', JSON.stringify(user));
+    } 
+
+    // Handle sign up
     async function handleSignUp() {
-        try {
-            const emailInput = document.getElementById('sign-up-email');
-            const passwordInput = document.getElementById('sign-up-password');
-            const confirmPasswordInput = document.getElementById('confirm-password');
-            if (!emailInput || !passwordInput || !confirmPasswordInput) {
-                throw new Error('Form elements not found');
-            }
-            const email = sanitizeInput(emailInput.value);
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-            if (!email || !password || !confirmPassword) {
-                throw new Error('Please fill in all fields');
-            }
-            if (!validateEmail(email)) {
-                throw new Error('Please enter a valid email address');
-            }
-            if (password !== confirmPassword) {
-                throw new Error('Passwords do not match');
-            }
-            if (!validatePassword(password)) {
-                throw new Error('Password must be at least 8 characters, include an uppercase letter, a number, and a special character');
-            }
-            await showNotification('Creating account...', 'info', 'wait');
-            await apiSignUp(email, password);
-            await showNotification('Account created successfully! Please check your email for a confirmation link.', 'success');
-        } catch (error) {
-            await showNotification(error.message, 'error');
-            console.error('Sign up error:', error);
+        // Get form values
+        const emailInput = document.getElementById('sign-up-email');
+        const passwordInput = document.getElementById('sign-up-password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        if (!emailInput || !passwordInput || !confirmPasswordInput) {
+            throw new Error('Form element missing');
+        }
+        // Validate
+        const email = normalizeEmail(emailInput.value);
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (!email || !password || !confirmPassword) {
+            await showNotification('Missing credentials', 'error');
+        }
+        if (!validateEmail(email)) {
+            await showNotification('Invalid email address', 'error');
+        }
+        if (password !== confirmPassword) {
+            await showNotification('Passwords do not match', 'error');
+        }
+        if (!validatePassword(password)) {
+            await showNotification('Invalid password', 'error');
+        }
+        // Sign up
+        await showNotification('Creating account', 'info', 'wait');
+        // Call API
+        const result = await apiSignUp(email, password);
+        // If error on API
+        if (!result) {
+            await showNotification('Sign up error', 'error');
+            console.log('Sign up error');
+        } else if (result && result.error) {
+            // If wrong request or wrong credentials
+            await showNotification(result.error, 'error');
+            console.log(result.error);
+        // Handle success
+        } else {
+            // Show notification
+            await showNotification('Verification email sent', 'success');
+            // Show sign in modal
+            setTimeout(() => {
+                switchToSignInClick();
+            }, 2000);
         }
     }
 
+    // API call to sign up
+    async function apiSignUp(email, password) {
+        try {
+            // Set Parameters
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const body = { credentials: { email, password }};
+            //const url = `${process.env.API_URL}/signUp`;
+            const url = 'http://localhost:8888/.netlify/functions/signUp';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+            });
+            // Check response
+            if (!response) {
+                throw new Error(await response.text());
+            }
+            // Return response
+            return await response.json();
+        // Catch error
+        } catch (error) {
+            throw new Error('Sign-up error:', error);
+        }
+    }
+
+    // Handle forgot password
     async function handleForgotPassword() {
         try {
+            // Get form values
             const emailInput = document.getElementById('reset-email');
             if (!emailInput) {
-                throw new Error('Form element not found');
+                throw new Error('Form element missing');
             }
-            const email = sanitizeInput(emailInput.value);
+            // Validate
+            const email = normalizeEmail(emailInput.value);
             if (!email) {
-                throw new Error('Please enter your email address');
+                throw new Error('Missing email address');
             }
             if (!validateEmail(email)) {
-                throw new Error('Please enter a valid email address');
+                throw new Error('Invalid email address');
             }
-            await showNotification('Sending reset link...', 'info', 'wait');
-            await apiForgotPassword(email);
-            await showNotification('A password reset link has been sent to your email.', 'success');
-        } catch (error) {
-            await showNotification(error.message, 'error');
-            console.error('Forgot password error:', error);
-        }
-    }
-
-    async function showNotification(message, type = 'success', action = null) {
-        try {
-            if (!document.getElementById('notification-popup')) {
-                await loadNotificationModal();
-            }
-            const popup = document.getElementById('notification-popup');
-            const msg = document.getElementById('notification-message');
-            const icon = document.getElementById('notification-icon');
-            if (!popup || !msg || !icon) {
-                throw new Error('Notification elements not found');
-            }
-            msg.textContent = message;
-            popup.classList.remove('success', 'error', 'info');
-            popup.classList.add(type);
-            icon.classList.remove('fa-spinner', 'fa-check-circle', 'fa-exclamation-circle', 'fa-info-circle');
-            if (action === 'wait') {
-                icon.classList.add('fa-spinner');
+            // Call API
+            await showNotification('Reseting access', 'info', 'wait');
+            const result = await apiForgotPassword(email);
+            // Handle result
+            if (!result) {
+                // Error
+                await showNotification('Password reset failed', 'error');
             } else {
-                icon.classList.add(
-                    type === 'success' ? 'fa-check-circle' :
-                    type === 'error' ? 'fa-exclamation-circle' :
-                    'fa-info-circle'
-                );
+                // Pending
+                await showNotification('Verification email sent', 'success');
             }
-            setTimeout(() => {
-                popup.remove();
-            }, 3000);
+            // Remove modal
+            removeForgotPasswordModal();
+        // Catch errors
         } catch (error) {
-            console.error('Notification error:', error);
+            await showNotification('Password reset failed', 'error');
+            console.error('Password reset error:', error);
         }
     }
 
-    async function loadNotificationModal() {
+    // API call to forgot password
+    async function apiForgotPassword(email) {
         try {
-            const res = await fetch('./src/snippets/notification-popup.html');
-            if (!res.ok) {
-                throw new Error('Failed to fetch notification modal');
+            // Set Parameters
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const body = { credentials: { email }};
+            //const url = `${process.env.API_URL}/forgotPassword`;
+            const url = 'http://localhost:8888/.netlify/functions/forgotPassword';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+            });
+            // Check response
+            if (!response) {
+                throw new Error(await response.text());
             }
-            const html = await res.text();
-            document.body.insertAdjacentHTML('beforeend', html);
+            // Return response
+            return await response.json();
+        // Catch error
         } catch (error) {
-            console.error('Failed to load notification popup:', error);
-            throw error;
+            throw new Error('Password reset error:', error);
         }
     }
+
+
 })();

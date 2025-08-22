@@ -112,14 +112,14 @@
   async function mapNodeRewrite(query) {
       try {
         // Set parameters
-        const token = "ABC123";
-        const body = { projectId, nodeId, query };
+        const { userId, token } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         };
+        const body = { userId, projectId, nodeId, query };
         //const url = `${process.env.API_URL}/mapRewriteNode`;
-        const url = `http://localhost:8888/.netlify/functions`+`/mapRewriteNode`;
+        const url = `http://localhost:8888/.netlify/functions/mapRewriteNode`;
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -128,7 +128,7 @@
         // Check response
         if (!response.ok) {
             if (response.status === 401) {
-                showNotification('Session expired. Please log in again.', 'error');
+                showNotification('Session expired.', 'error');
                 setTimeout(() => {
                     window.location.href = './index.html';
                 }, 2000);

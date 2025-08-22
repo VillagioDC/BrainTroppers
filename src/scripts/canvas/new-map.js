@@ -14,6 +14,8 @@
         if (newMapContainer) return;
         // Load new map container
         await loadNewMapContainer();
+        // Replace user name
+        replaceUserNameOnNewMap();
         // Focus on text area
         document.getElementById('map-new-query').focus();
     }
@@ -45,6 +47,18 @@
                 newMapContainer = document.getElementById('new-map-container');
                 bindNewMapEvents();
             });
+    }
+
+    // Replace user name
+    function replaceUserNameOnNewMap() {
+        // Element
+        const headline = newMapContainer.querySelector('h2');
+        if (!headline) return;
+        // Get user name
+        const user = getLocalStorageUser();
+        const userName = user.name;
+        // Replace user name
+        headline.textContent = headline.textContent.replace('{{username}}', userName);
     }
 
     // Bind new map events
@@ -121,14 +135,14 @@
     async function createMap(query) {
         try {
             // Set parameters
-            const token = "ABC123";
-            const body = { query };
+            const { userId, token } = getLocalStorageCredentials();
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             };
+            const body = { userId, query };
             //const url = `${process.env.API_URL}/mapNew`;
-            const url = `http://localhost:8888/.netlify/functions`+`/mapNew`;
+            const url = `http://localhost:8888/.netlify/functions/mapNew`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers,
@@ -137,7 +151,7 @@
             // Check response
             if (!response.ok) {
                 if (response.status === 401) {
-                    showNotification('Session expired. Please log in again.', 'error');
+                    showNotification('Session expired.', 'error');
                     setTimeout(() => {
                         window.location.href = './index.html';
                     }, 2000);

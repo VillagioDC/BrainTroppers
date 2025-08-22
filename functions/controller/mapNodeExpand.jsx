@@ -8,7 +8,6 @@ const constructConversation = require('../ai/constructConversation.jsx');
 const askAIBridge = require('../ai/askAIBridge.jsx');
 const parseJSON = require('../utils/parseJSON.jsx');
 const mapRewire = require('./mapRewire.jsx');
-const mapUpdate = require('./mapUpdate.jsx');
 
 /* PARAMETERES
     input {object, string, string} - map, parentNodeId, user query
@@ -65,12 +64,8 @@ async function mapNodeExpand(map, parentNodeId, query) {
     // New nodes
     const newNodes = jsonResponse.nodes || [];
 
-    console.log("New nodes: ", newNodes.length);
-    console.log("New nodes: ", newNodes);
-
     // Update map with new nodes
     let node = {};
-    let expandedNodes = [];
     for (let i=0; i<newNodes.length; i++) {
         // Create new node
         node = {};
@@ -82,14 +77,13 @@ async function mapNodeExpand(map, parentNodeId, query) {
         node.relatedLink = [];
         // Push node
         map.nodes.push(node);
-        expandedNodes.push(node);
     }
 
-    // Update map
-    await mapUpdate(map);
+    // Rewire map
+    const updatedMap = await mapRewire(map);
 
     // Return
-    return expandedNodes;
+    return updatedMap;
 }
 
 module.exports = mapNodeExpand;

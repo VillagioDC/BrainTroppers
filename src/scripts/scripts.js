@@ -8,9 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
         loadScript('./src/scripts/index/getstarted.js'),
         loadScript('./src/scripts/index/uiux.js'),
         loadScript('./src/scripts/index/brainstorm.js'),
+        loadScript('./src/scripts/notifications.js'),
         // Authentication scripts
         loadScript('./src/scripts/index/sign-in-up.js'),
     ]).then(() => {
+        // Clean local storage
+        if (localStorage.getItem('user')) localStorage.removeItem('user');
+        if (localStorage.getItem('map')) localStorage.removeItem('map');
         // Scripts loaded successfully
         console.log('Page loaded successfully');
     }).catch(error => {

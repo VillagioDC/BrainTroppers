@@ -40,24 +40,23 @@
   async function aproveMapNode(nodeId) {
     try {
       // Set parameters
-      const token = "ABC123";
-      const body = { projectId, nodeId };
+      const { userId, token } = getLocalStorageCredentials();
       const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-      }
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+      };
+      const body = { userId, projectId, nodeId };
       //const url = `${process.env.API_URL}/mapApproveNode`;
-      const url = `http://localhost:8888/.netlify/functions`+`/mapApproveNode`;
-      // Make request
-      const response = await fetch(url, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(body),
-      });
+      const url = `http://localhost:8888/.netlify/functions/mapApproveNode`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+        });
       // Check response
         if (!response.ok) {
             if (response.status === 401) {
-                showNotification('Session expired. Please log in again.', 'error');
+                showNotification('Session expired.', 'error');
                 setTimeout(() => {
                     window.location.href = './index.html';
                 }, 2000);

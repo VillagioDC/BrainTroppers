@@ -1,5 +1,5 @@
-// ENDPOINT TO CREATE NEW MAP
-// Serverless handler for creating a new map
+// ENDPOINT TO DELETE MAP
+// Serverless handler for deleting a map
 
 // Dependencies
 
@@ -10,12 +10,13 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
-const mapCreateNew = require('./controller/mapCreateNew.jsx');
+const mapDelete = require('./controller/mapDelete.jsx');
+const userDeleteMap = require('./controller/userDeleteMap.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, query}} - API call
-    RETURN {object} - body: newMap || error
+    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId}} - API call
+    RETURN {object} - success || error
 */
 
 exports.handler = async (event) => {
@@ -41,17 +42,17 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, query } = parsedBody;
+    const { userId, projectId } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
-        !query || query.trim().length === 0) {
-        log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-        return {
-          statusCode: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Missing required fields' })
-        };
+        !projectId || projectId.trim().length === 0 ) {          
+          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+          return {
+            statusCode: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Missing required fields' })
+          };
     }
 
     // Check token
@@ -68,7 +69,7 @@ exports.handler = async (event) => {
 
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof query !== 'string' || query.length > 500) {
+        typeof projectId !== 'string' || projectId.length > 50 ) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -80,27 +81,30 @@ exports.handler = async (event) => {
     // Set session expires
     await setSessionExpires(userId);
 
-    // Create new map
-    const newMap = await mapCreateNew(query);
-    if (!newMap) {
-      log('SERVER WARNING', 'Unable to create map');
+    // Delete map
+    const deletedMap = await mapDelete(projectId);
+    if (!deletedMap) {
+      log('SERVER WARNING', 'Project not deleted on maps');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to create map' })
+        body: JSON.stringify({ error: 'Project not deleted' })
       };
     }
+
+    // Delete map from user list
+    await userDeleteMap(userId, projectId);
 
     // Return success
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(newMap)
+      body: JSON.stringify({message: 'Map deleted'})
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapUpdateNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

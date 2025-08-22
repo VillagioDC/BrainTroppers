@@ -120,14 +120,14 @@
   async function mapNodeExpand(query) {
       try {
         // Set parameters
-        const token = "ABC123";
-        const body = { projectId, parentNodeId, query };
+      const { userId, token } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         };
+        const body = { userId, projectId, parentNodeId, query };
         //const url = `${process.env.API_URL}/mapExpandNode`;
-        const url = `http://localhost:8888/.netlify/functions`+`/mapExpandNode`;
+        const url = `http://localhost:8888/.netlify/functions/mapExpandNode`;
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -136,7 +136,7 @@
         // Check response
         if (!response.ok) {
             if (response.status === 401) {
-                showNotification('Session expired. Please log in again.', 'error');
+                showNotification('Session expired.', 'error');
                 setTimeout(() => {
                     window.location.href = './index.html';
                 }, 2000);

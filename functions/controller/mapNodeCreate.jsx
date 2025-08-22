@@ -95,7 +95,7 @@ async function mapNodeCreate(map, parentNodeId, query) {
     const updatedMap = await mapLastUpdate(map);
 
     // Return
-    return newNode;
+    return updatedMap;
 
 }
 

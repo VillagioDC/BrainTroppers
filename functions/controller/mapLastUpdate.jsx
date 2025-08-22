@@ -3,6 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
+const userLastUpdate = require('./userLastUpdate.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -25,9 +26,11 @@ async function mapLastUpdate(map) {
         log("SERVER ERROR", "Unable to update last change on map @mapLastUpdate.");
     }
 
+    // Update user maps
+    await userLastUpdate(map);
+
     // Return
     return map;
-
 }
 
 module.exports = mapLastUpdate;

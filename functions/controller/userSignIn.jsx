@@ -4,7 +4,7 @@
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
 const generateToken = require('../utils/generateToken.jsx');
-const setExpires = require('../utils/setExpires.jsx')
+const setSessionExpires = require('../utils/setExpires.jsx')
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -34,6 +34,14 @@ async function userSignIn(credentials) {
             body: JSON.stringify({ error: 'User not found' })
         }
     }
+    // Check confirmation pending
+    if (user.authToken !== null) {
+        log('SERVER WARNING', 'User not confirmed', credentials.email);
+        return {
+            statusCode: 401,
+            body: JSON.stringify({ error: 'Verify your email' })
+        }
+    }
     // Check password
     if (user.password !== credentials.password) {
         log('SERVER WARNING', 'Incorrect password', credentials.email);
@@ -45,7 +53,7 @@ async function userSignIn(credentials) {
     // Generate session token
     const sessionToken = generateToken();
     // Set expires
-    const expires = setExpires();
+    const expires = await setSessionExpires(user.userId);
     // Construct authorization
     const auth = {
         userId: user.userId,
@@ -60,7 +68,7 @@ async function userSignIn(credentials) {
 
     return {
         statusCode: 200,
-        body: JSON.stringify(auth)
+        body: JSON.stringify({message: 'Sign in success', auth})
     }
 }
 

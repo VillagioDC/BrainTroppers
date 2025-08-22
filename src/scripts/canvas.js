@@ -3,43 +3,52 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Load UI + D3 + MindMap core + data + commands
+    // Load all scripts in order
     Promise.all([
-      // Interface pieces
-      loadScript('./src/scripts/canvas/sidebar.js').catch(() => {}),
-      loadScript('./src/scripts/canvas/user-menu.js').catch(() => {}),
-      loadScript('./src/scripts/canvas/new-map.js').catch(() => {}),
-      loadScript('./src/scripts/canvas/map-menu-popup.js').catch(() => {}),
-      loadScript('./src/scripts/canvas/theme.js').catch(() => {}),
-      // Core mind map canvas + initial nodes
-      loadScript('./src/scripts/canvas/mindmap-canvas.js'),
-      loadScript('./src/scripts/canvas/zoom.js').catch(() => {}),
+      // Local storage
+      loadScript('./src/scripts/canvas/local-storage.js').catch(() => {}),
     ])
-    .then(() => {
-      if (typeof window.initMapMenu === 'function') window.initMapMenu();
-      // Load command scripts
+    .then (() => {
       Promise.all([
-        loadScript('./src/scripts/canvas/detail-node.js'),
-        loadScript('./src/scripts/canvas/add-node.js'),
-        loadScript('./src/scripts/canvas/expand-node.js'),
-        loadScript('./src/scripts/canvas/rewrite-node.js'),
-        loadScript('./src/scripts/canvas/approve-node.js'),
-        loadScript('./src/scripts/canvas/delete-node.js'),
-        loadScript('./src/scripts/canvas/connect-node.js'),
-        loadScript('./src/scripts/canvas/disconnect-node.js'),
-        loadScript('./src/scripts/canvas/rewire-all.js'),
+        // Interface pieces
+        loadScript('./src/scripts/canvas/sidebar.js').catch(() => {}),
+        loadScript('./src/scripts/canvas/user-menu.js').catch(() => {}),
+        loadScript('./src/scripts/canvas/new-map.js').catch(() => {}),
+        loadScript('./src/scripts/canvas/map-list.js').catch(() => {}),
+        loadScript('./src/scripts/canvas/theme.js').catch(() => {}),
+        loadScript('./src/scripts/notifications.js').catch(() => {}),
+        // Core mind map canvas + initial nodes
+        loadScript('./src/scripts/canvas/mindmap-canvas.js'),
+        loadScript('./src/scripts/canvas/zoom.js').catch(() => {}),
       ])
       .then(() => {
-        console.log('Canvas loaded.');
+        Promise.all([
+          // Map menu popup
+          loadScript('./src/scripts/canvas/map-menu-popup.js').catch(() => {}),
+          // Load command scripts
+          loadScript('./src/scripts/canvas/detail-node.js'),
+          loadScript('./src/scripts/canvas/add-node.js'),
+          loadScript('./src/scripts/canvas/expand-node.js'),
+          loadScript('./src/scripts/canvas/rewrite-node.js'),
+          loadScript('./src/scripts/canvas/approve-node.js'),
+          loadScript('./src/scripts/canvas/delete-node.js'),
+          loadScript('./src/scripts/canvas/connect-node.js'),
+          loadScript('./src/scripts/canvas/disconnect-node.js'),
+          loadScript('./src/scripts/canvas/rewire-all.js'),
+        ])
+        .then(() => {
+          console.log('Canvas loaded.');
+        })
+        .catch(error => {
+          console.error('Error loading user commands:', error);
+        });
       })
       .catch(error => {
-        console.error('Error loading user commands:', error);
-        showNotification('Failed to load canvas components.', 'error');
+        console.error('Error loading initial scripts:', error);
       });
     })
     .catch(error => {
-      console.error('Error loading initial scripts:', error);
-      showNotification('Failed to initialize canvas.', 'error');
+      console.error('Error loading base scripts:', error);
     });
 
     // Helper: dynamic script loader
@@ -54,6 +63,5 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(s);
       });
     }
-
 
 });

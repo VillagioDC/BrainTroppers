@@ -2,21 +2,27 @@
 // No dependencies
 
 // Functions
-// No functions
+const executeDB = require('../mongoDB/executeDB.jsx');
 
 /* PARAMETERS
   no input
   RETURN {datetime} - expires
 */
 
-function setExpires() {
+async function setSessionExpires(userId) {
 
     // Set expires
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const newExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // Update database
+    await executeDB({ collectionName: 'users',
+                      type: 'updateOne',
+                      filter: { userId: userId },
+                      update: { $set: { expires: newExpires } } });
 
     // Return expires
-    return expires;
+    return newExpires;
 
 }
 
-module.exports = setExpires;
+module.exports = setSessionExpires;

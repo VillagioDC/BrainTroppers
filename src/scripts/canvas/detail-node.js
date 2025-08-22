@@ -162,12 +162,12 @@
   async function mapNodeUpdate(nodeId, content, detail) {
     try {
       // Set parameters
-      const token = "ABC123";
-      const body = { projectId, nodeId, content, detail };
+      const { userId, token } = getLocalStorageCredentials();
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
       };
+      const body = { userId, projectId, nodeId, content, detail };
       //const url = `${process.env.API_URL}/mapUpdateNode`;
         const url = `http://localhost:8888/.netlify/functions`+`/mapUpdateNode`;
       // Make request
@@ -179,7 +179,7 @@
       // Check response
         if (!response.ok) {
             if (response.status === 401) {
-                showNotification('Session expired. Please log in again.', 'error');
+                showNotification('Session expired.', 'error');
                 setTimeout(() => {
                     window.location.href = './index.html';
                 }, 2000);
@@ -201,14 +201,14 @@
   async function deleteMapNode(nodeId) {
     try {
       // Set parameters
-      const token = "ABC123";
-      const body = { projectId, nodeId };
+      const { userId, token } = getLocalStorageCredentials();
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
       }
+      const body = { userId, projectId, nodeId };
       //const url = `${process.env.API_URL}/mapDeleteNode`;
-      const url = `http://localhost:8888/.netlify/functions`+`/mapDeleteNode`;
+      const url = `http://localhost:8888/.netlify/functions/mapDeleteNode`;
       // Make request
       const response = await fetch(url, {
           method: 'POST',
@@ -218,7 +218,7 @@
       // Check response
         if (!response.ok) {
             if (response.status === 401) {
-                showNotification('Session expired. Please log in again.', 'error');
+                showNotification('Session expired.', 'error');
                 setTimeout(() => {
                     window.location.href = './index.html';
                 }, 2000);

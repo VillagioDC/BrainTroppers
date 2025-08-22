@@ -1,5 +1,5 @@
-// ENDPOINT TO CREATE NEW MAP
-// Serverless handler for creating a new map
+// ENDPOINT TO UPDATE MAP TITLE
+// Serverless handler for updating map title
 
 // Dependencies
 
@@ -10,12 +10,13 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
-const mapCreateNew = require('./controller/mapCreateNew.jsx');
+const mapRead = require('./controller/mapRead.jsx');
+const mapTitleUpdate = require('./controller/mapTitleUpdate.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, query}} - API call
-    RETURN {object} - body: newMap || error
+    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, newTitle}} - API call
+    RETURN {object} - body: updatedMap || error
 */
 
 exports.handler = async (event) => {
@@ -41,17 +42,18 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, query } = parsedBody;
+    const { userId, projectId, newTitle } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
-        !query || query.trim().length === 0) {
-        log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-        return {
-          statusCode: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Missing required fields' })
-        };
+        !projectId || projectId.trim().length === 0 ||
+        !newTitle || newTitle.trim().length === 0 ) {          
+          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+          return {
+            statusCode: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Missing required fields' })
+          };
     }
 
     // Check token
@@ -68,7 +70,8 @@ exports.handler = async (event) => {
 
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof query !== 'string' || query.length > 500) {
+        typeof projectId !== 'string' || projectId.length > 50 ||
+        typeof newTitle !== 'string' || newTitle.length > 50 ) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -80,14 +83,25 @@ exports.handler = async (event) => {
     // Set session expires
     await setSessionExpires(userId);
 
-    // Create new map
-    const newMap = await mapCreateNew(query);
-    if (!newMap) {
-      log('SERVER WARNING', 'Unable to create map');
+    // Read map
+    const map = await mapRead(projectId);
+    if (!map) {
+      log('SERVER WARNING', 'Project not found');
+      return {
+        statusCode: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Project not found' })
+      };
+    }
+
+    // Update map title
+    const updatedMap = await mapTitleUpdate(map, newTitle);
+    if (!updatedMap) {
+      log('SERVER ERROR', 'Unable to update node on map');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to create map' })
+        body: JSON.stringify({ error: 'Unable to update node' })
       };
     }
 
@@ -95,12 +109,12 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(newMap)
+      body: JSON.stringify(updatedMap)
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapUpdateNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

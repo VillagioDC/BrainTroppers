@@ -74,7 +74,7 @@ async function mapNodeRewrite(map, nodeId, query) {
     const updatedMap = await mapRewire(updatedNodeMap);
 
     // Return
-    return reviewNode;
+    return updatedMap;
 }
 
 module.exports = mapNodeRewrite;

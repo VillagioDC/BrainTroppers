@@ -35,7 +35,6 @@
   function bindAddPopupEvents() {
       // Elements
       const closeBtn = document.getElementById('close-add-node-popup');
-      const query = document.getElementById('add-node-query');
       const submit = document.getElementById('add-node-submit');
       // Event listeners
       if (closeBtn) closeBtn.addEventListener('click', closeAddPopup);
@@ -108,14 +107,14 @@
   async function mapNodeAdd(query) {
       try {
         // Set parameters
-        const token = "ABC123";
-        const body = { projectId, parentNodeId, query };
+        const { userId, token } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         };
+        const body = { userId, projectId, parentNodeId, query };
         //const url = `${process.env.API_URL}/mapAddNode`;
-        const url = `http://localhost:8888/.netlify/functions`+`/mapAddNode`;
+        const url = `http://localhost:8888/.netlify/functions/mapAddNode`;
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -124,7 +123,7 @@
         // Check response
         if (!response.ok) {
             if (response.status === 401) {
-                showNotification('Session expired. Please log in again.', 'error');
+                showNotification('Session expired.', 'error');
                 setTimeout(() => {
                     window.location.href = './index.html';
                 }, 2000);

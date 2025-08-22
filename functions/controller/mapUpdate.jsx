@@ -3,10 +3,11 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
+const userLastUpdate = require('./userLastUpdate.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
-    input {string, object} - projectID, map
+    input {string, object} - map
     RETURN {map} - map
 */
 
@@ -24,6 +25,9 @@ async function mapUpdate(map) {
     if (!result || result.modifiedCount === 0) {
         log("SERVER ERROR", "Unable to update map @updateMap.");
     }
+
+    // Update user maps
+    await userLastUpdate(map);
 
     // Return
     return map;

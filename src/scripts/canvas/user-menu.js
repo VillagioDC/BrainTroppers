@@ -7,8 +7,24 @@
     let userMenuPopup = document.getElementById("user-menu-popup");
     let isUserMenuLoaded = false;
 
-    // Toggle user menu
-    if (userIcon) userIcon.addEventListener("click", toggleUserMenu);
+    // Set user icon
+    function setUserIcon() {
+        // Add event listeners
+        if (userIcon) userIcon.addEventListener("click", toggleUserMenu);
+        // Set user icon
+        const user = getLocalStorageUser();
+        if (user && user.icon) userIcon.innerHTML = user.icon
+        else userIcon.innerHTML = '<i class="fas fa-user-alt"></i>';
+    }
+
+    function setUserPlan() {
+        // Set user plan
+        const user = getLocalStorageUser();
+        if (user && user.plan && user.plan === "Pro Plan") {
+            const userPlan = document.getElementById("user-plan");
+            userPlan.innerHTML = `Pro Plan&nbsp;<i class="fas fa-crown"></i>`;
+        }
+    }
 
     // Toggle user menu
     async function toggleUserMenu(e) {
@@ -102,8 +118,16 @@
 
     // Log out
     function logOut() {
-        // Implement log out functionality
-        console.log("Log out clicked");
+        // Remove user menu
         removeUserMenu();
+        // Redirect to sign in page
+        window.location.href = "./index.html";
+        // Remove local storage data
+        removeLocalStorageData();
     }
+
+    // On load
+    setUserIcon();
+    setUserPlan();
+
 })();
