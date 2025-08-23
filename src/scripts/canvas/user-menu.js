@@ -85,21 +85,102 @@
             document.getElementById("log-out").removeEventListener("click", logOut);
         document.removeEventListener('click', outsideClickHandler);
         // Remove popup container
-        userMenuPopup.remove();
+        if (userMenuPopup) userMenuPopup.remove();
         userMenuPopup = null;
         isUserMenuLoaded = false;
     }
 
     // Outside click handler
     function outsideClickHandler(e) {
-        if (e.target.id === "user-menu-popup") removeUserMenu();
+        if (e.target.id !== "user-menu-popup") removeUserMenu();
     }
 
     // Go to Pro Plan page
-    function goProPlan() {
-        // Implement Pro Plan functionality
-        console.log("Go to Pro Plan clicked");
+    async function goProPlan() {
+        // Load pro plan popup
+        await loadProPlanPopup();
+        // Bind event listeners
+        bindProPlanPopupEvents();
+        // Remove user menu
         removeUserMenu();
+    }
+
+    // Load pro plan popup
+    async function loadProPlanPopup() {
+        try {
+            const response = await fetch('./src/snippets/pro-plan.html');
+            if (!response.ok) throw new Error('Failed to load pro-plan.html');
+            const html = await response.text();
+            document.body.insertAdjacentHTML('beforeend', html);
+        } catch (error) {
+            console.error('Error loading pro plan popup:', error);
+        }
+    }
+
+    // Bind event listeners to pro plan popup
+    function bindProPlanPopupEvents() {
+        // Add event listeners to pro plan popup
+        if (document.getElementById("pro-plan-form"))
+            document.getElementById("pro-plan-form").addEventListener("submit", proPlanFormSubmit);
+        if (document.getElementById("pro-plan-close"))
+            document.getElementById("pro-plan-close").addEventListener("click", removeProPlanPopup);
+    }
+
+    // Submit pro plan form
+    async function proPlanFormSubmit(e) {
+        e.preventDefault();
+        // Call API
+        const result = await registerUserWaitlist();
+        // Handle result
+        if (!result || result.error) {
+            // Error
+            await showNotification('Failed to register', 'error');
+        } else {
+            // Registered
+            await showNotification('Done', 'success');
+        }
+        removeProPlanPopup();
+    }
+
+    // Register user waitlist
+    async function registerUserWaitlist() {
+        try {
+            // Set parameters
+            const { userId, sessionToken } = getLocalStorageCredentials();
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionToken}`,
+            };
+            const body = { userId };
+            //const url = `${process.env.API_URL}/userWaitlist`;
+            const url = `http://localhost:8888/.netlify/functions/userWaitlist`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
+            });
+            // Check response
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Get response
+            return response.json();
+        // Catch errors
+        } catch (error) {
+            console.error('Error registering user waitlist:', error);
+            return false;
+        }
+    }
+
+    // Remove pro plan popup
+    function removeProPlanPopup() {
+        // Remove event listeners
+        if (document.getElementById("pro-plan-form"))
+            document.getElementById("pro-plan-form").removeEventListener("submit", proPlanFormSubmit);
+        if (document.getElementById("pro-plan-close"))
+            document.getElementById("pro-plan-close").removeEventListener("click", removeProPlanPopup);
+        // Remove pro plan popup
+        document.getElementById("pro-plan-modal").remove();
     }
 
     // Go to User Account page

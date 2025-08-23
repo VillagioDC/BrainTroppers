@@ -56,9 +56,11 @@
         if (!headline) return;
         // Get user name
         const user = getLocalStorageUser();
-        const userName = user.name;
+        let userName = '';
+        if (!user || !user.name) userName = '';
+        else userName = ` ${user.name}`;
         // Replace user name
-        headline.textContent = headline.textContent.replace('{{username}}', userName);
+        headline.textContent = headline.textContent.replace(' {{username}}', userName);
     }
 
     // Bind new map events
@@ -91,17 +93,25 @@
             const tempNodeId = addTempNode();
             // Close new map container
             removeNewMapContainer();
+            // Show notification
+            await showNotification('Processing...', 'info', 'wait');
             // Create map
             const newMap = await createMap(query);
             // Remove temp node
             mindMapCanvas.deleteNode(tempNodeId);
             // Place new map
             if (newMap) {
-                // Load new map on canvas
-                mindMapCanvas.setData(newMap.projectId, newMap.nodes);
+                // Set local storage
+                setLocalStorageMap(newMap);
+                // Set data
+                mindMapCanvas.setData();
                 // Create map item
                 await createMapItem(newMap);
+                // Set new map item as active
+                setActiveMapItem(newMap.projectId);
             }
+            // Remove notification
+            removeNotification();
         }
     }
 
@@ -127,18 +137,18 @@
         const id = `node-${Date.now()}`;
         const w = mindMapCanvas.canvas.offsetWidth;
         const h = mindMapCanvas.canvas.offsetHeight;
-        const content = "Creating new map...";
-        mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
+        const content = "Creating...";
+        mindMapCanvas.addNode({ id, content, x: w, y: h});
     }
 
     // Create map
     async function createMap(query) {
         try {
             // Set parameters
-            const { userId, token } = getLocalStorageCredentials();
+            const { userId, sessionToken } = getLocalStorageCredentials();
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${sessionToken}`,
             };
             const body = { userId, query };
             //const url = `${process.env.API_URL}/mapNew`;
@@ -179,6 +189,17 @@
         // Insert HTML on sidebar map ul
         const mapList = document.getElementById('map-list');
         mapList.insertAdjacentHTML('afterbegin', html);
+    }
+
+    // Set map item as active
+    function setActiveMapItem(projectId) {
+        // Remove all active map items
+        const activeMaps = document.querySelectorAll('.map-item.active');
+        if (activeMaps) return;
+            activeMaps.forEach(mapItem => mapItem.classList.remove('active'));
+        // Set active map item
+        const mapItem = document.querySelector(`[data-project-id="${projectId}"]`);
+        if (mapItem) mapItem.classList.add('active');
     }
 
     // Close new map container

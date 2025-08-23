@@ -1,5 +1,5 @@
-// ENDPOINT TO UPDATE MAP TITLE
-// Serverless handler for updating map title
+// ENDPOINT TO REWIRE MAP
+// Serverless handler for rewiring a map
 
 // Dependencies
 
@@ -11,11 +11,11 @@ const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
-const mapTitleUpdate = require('./controller/mapTitleUpdate.jsx');
+const mapRewire = require('./controller/mapRewire.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, newTitle}} - API call
+    input {headers: {Authorization: Bearer <token>}, body: {projectId}} - API call
     RETURN {object} - body: updatedMap || error
 */
 
@@ -42,18 +42,16 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, newTitle } = parsedBody;
+    const { projectId } = parsedBody;
 
     // Check required fields
-    if (!userId || userId.trim().length === 0 ||
-        !projectId || projectId.trim().length === 0 ||
-        !newTitle || newTitle.trim().length === 0 ) {          
-          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-          return {
-            statusCode: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Missing required fields' })
-          };
+    if (!projectId || projectId.trim().length === 0 ) {
+      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      return {
+        statusCode: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Missing required fields' })
+      };
     }
 
     // Check token
@@ -69,9 +67,7 @@ exports.handler = async (event) => {
     }
 
     // Anti-malicious checks
-    if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof projectId !== 'string' || projectId.length > 50 ||
-        typeof newTitle !== 'string' || newTitle.length > 50 ) {
+    if (typeof projectId !== 'string' || projectId.length > 50 ) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -94,14 +90,14 @@ exports.handler = async (event) => {
       };
     }
 
-    // Update map title
-    const updatedMap = await mapTitleUpdate(map, newTitle);
+    // Rewire map
+    const updatedMap = await mapRewire(map);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update node on map');
+      log('SERVER ERROR', 'Unable to rewire map');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to update node' })
+        body: JSON.stringify({ error: 'Internal server error' })
       };
     }
 
@@ -114,7 +110,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapTitleUpdate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapRewire endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

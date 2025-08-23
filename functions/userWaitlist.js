@@ -1,5 +1,5 @@
-// ENDPOINT TO UPDATE MAP TITLE
-// Serverless handler for updating map title
+// ENDPOINT TO REGISTER USER WAITLIST
+// Serverless handler for registering user waitlist and allow trial access
 
 // Dependencies
 
@@ -9,14 +9,12 @@ const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
-const mapRead = require('./controller/mapRead.jsx');
-const mapTitleUpdate = require('./controller/mapTitleUpdate.jsx');
+const userRegisterWaitlist = require('./controller/userRegisterWaitlist.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, newTitle}} - API call
-    RETURN {object} - body: updatedMap || error
+    input {headers: {Authorization: Bearer <token>}, body: {userId} - API call
+    RETURN {object} - body: message || error
 */
 
 exports.handler = async (event) => {
@@ -42,18 +40,16 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, newTitle } = parsedBody;
+    const { userId } = parsedBody;
 
     // Check required fields
-    if (!userId || userId.trim().length === 0 ||
-        !projectId || projectId.trim().length === 0 ||
-        !newTitle || newTitle.trim().length === 0 ) {          
-          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-          return {
-            statusCode: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Missing required fields' })
-          };
+    if (!userId || userId.trim().length === 0 ) {
+      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      return {
+        statusCode: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Missing required fields' })
+      };
     }
 
     // Check token
@@ -68,53 +64,38 @@ exports.handler = async (event) => {
       };
     }
 
+
     // Anti-malicious checks
-    if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof projectId !== 'string' || projectId.length > 50 ||
-        typeof newTitle !== 'string' || newTitle.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
-            return {
-                statusCode: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ error: 'Invalid request' })
-            };
+    if (typeof userId !== 'string' || userId.length > 50 ) {
+        log('SERVER WARNING', 'Request blocked by anti-malicious check');
+        return {
+            statusCode: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Invalid request' })
+        };
     }
 
-    // Set session expires
-    await setSessionExpires(userId);
-
-    // Read map
-    const map = await mapRead(projectId);
-    if (!map) {
-      log('SERVER WARNING', 'Project not found');
-      return {
-        statusCode: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Project not found' })
-      };
-    }
-
-    // Update map title
-    const updatedMap = await mapTitleUpdate(map, newTitle);
-    if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update node on map');
+    // Register use in waitlist and allow free trial
+    const registered = await userRegisterWaitlist(userId);
+    // Check auth
+    if (!registered) {
+      log('SERVER ERROR', 'Error registering user at waitlist');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to update node' })
+        body: JSON.stringify({ error: 'Waitlist register failed' })
       };
     }
-
     // Return success
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedMap)
+      body: JSON.stringify({ message: 'User registered at waitlist' })
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapTitleUpdate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in userWaitlist endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

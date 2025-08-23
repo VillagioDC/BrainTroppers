@@ -1,5 +1,5 @@
-// ENDPOINT TO UPDATE MAP TITLE
-// Serverless handler for updating map title
+// ENDPOINT TO CONNECT NODE
+// Serverless handler for connecting a node
 
 // Dependencies
 
@@ -11,11 +11,11 @@ const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
-const mapTitleUpdate = require('./controller/mapTitleUpdate.jsx');
+const mapLinkConnect = require('./controller/mapLinkConnect.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, newTitle}} - API call
+    input {headers: {Authorization: Bearer <token>}, body: {projectId, nodeFrom, nodeTo}} - API call
     RETURN {object} - body: updatedMap || error
 */
 
@@ -42,12 +42,12 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, newTitle } = parsedBody;
+    const { projectId, nodeFrom, nodeTo } = parsedBody;
 
     // Check required fields
-    if (!userId || userId.trim().length === 0 ||
-        !projectId || projectId.trim().length === 0 ||
-        !newTitle || newTitle.trim().length === 0 ) {          
+    if (!projectId || projectId.trim().length === 0 ||
+        !nodeFrom || nodeFrom.trim().length === 0 ||
+        !nodeTo || nodeTo.trim().length === 0) {
           log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
           return {
             statusCode: 400,
@@ -69,9 +69,9 @@ exports.handler = async (event) => {
     }
 
     // Anti-malicious checks
-    if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof projectId !== 'string' || projectId.length > 50 ||
-        typeof newTitle !== 'string' || newTitle.length > 50 ) {
+    if (typeof projectId !== 'string' || projectId.length > 50 ||
+        typeof nodeFrom !== 'string' || nodeFrom.length > 50 ||
+        typeof nodeTo !== 'string' || nodeTo.length > 50) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -94,14 +94,14 @@ exports.handler = async (event) => {
       };
     }
 
-    // Update map title
-    const updatedMap = await mapTitleUpdate(map, newTitle);
+    // Connect nodes on map
+    const updatedMap = await mapLinkConnect(map, nodeFrom, nodeTo);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update node on map');
+      log('SERVER ERROR', 'Unable to conect nodes on map');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to update node' })
+        body: JSON.stringify({ error: 'Internal server error' })
       };
     }
 
@@ -114,7 +114,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapTitleUpdate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapLinkConnect endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -20,16 +20,22 @@
     projectId = mindMapCanvas.getProjectId();
     // Node content
     prevContent = mindMapCanvas.getSelectedContent();
+    // Show notification
+    await showNotification('Processing...', 'info', 'wait');
     // Set temp message
     mindMapCanvas.setSelectedContent('Approving node...');
     // Approve node
-    const result = await aproveMapNode(nodeId);
-    if (result) {
-      // Approve node on canvas
-      mindMapCanvas.approveSelected();
+    const updatedMap = await aproveMapNode(nodeId);
+    if (updatedMap) {
+      // Set local storage map
+      setLocalStorageMap(updatedMap);
+      // Set data
+      mindMapCanvas.setData();
     }
     // Restore node content
     mindMapCanvas.updateNode(nodeId, { content: prevContent });
+    // Remove notification
+    removeNotification();
     // Clean variables
     projectId = null;
     nodeId = null;
@@ -40,10 +46,10 @@
   async function aproveMapNode(nodeId) {
     try {
       // Set parameters
-      const { userId, token } = getLocalStorageCredentials();
+      const { userId, sessionToken } = getLocalStorageCredentials();
       const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${sessionToken}`,
       };
       const body = { userId, projectId, nodeId };
       //const url = `${process.env.API_URL}/mapApproveNode`;
@@ -63,9 +69,9 @@
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-    // Return
-    return true;
-
+        // Get updated map with approved node
+        const updatedMap = await response.json();
+        return updatedMap;
     // Catch errors
     } catch (error) {
       console.error('Error adding node:', error);

@@ -64,16 +64,22 @@
     if (query) {
       // Add node with temp ip
       const tempNodeId = addTempNode();
+      // Show notification
+      await showNotification('Processing...', 'info', 'wait');
       // Remove expand popup
       removeExpandPopup();
       // Submit query to expand node
-      const result = await mapNodeExpand(query);
+      const updateMap = await mapNodeExpand(query);
+      if (updateMap) {
+        // Set local storage map
+        setLocalStorageMap(updateMap);
+        // Set data
+        mindMapCanvas.setData();
+      }
       // Remove temp node
       mindMapCanvas.deleteNode(tempNodeId);
-      // Create new nodes
-      if (result) {
-        createExpandedNodes(result);
-      }
+      // Remove notification
+      removeNotification();
     } else {
       // Remove expand popup
       removeExpandPopup();
@@ -120,10 +126,10 @@
   async function mapNodeExpand(query) {
       try {
         // Set parameters
-      const { userId, token } = getLocalStorageCredentials();
+      const { userId, sessionToken } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${sessionToken}`,
         };
         const body = { userId, projectId, parentNodeId, query };
         //const url = `${process.env.API_URL}/mapExpandNode`;
@@ -143,9 +149,9 @@
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        // Get expanded nodes
-        const expandedNodes = await response.json();
-        return expandedNodes;
+        // Get updated map with new nodes
+        const updatedMap = await response.json();
+        return updatedMap;
     // Catch errors
     } catch (error) {
         console.error('Error expanding node:', error);

@@ -34,9 +34,12 @@ async function showNotification(message, type = 'success', action = null) {
             notificationTimeout = null;
         }
         // Set timeout
-        notificationTimeout = setTimeout(() => {
-            popup.remove();
-        }, 3000);
+        if (action !== 'wait') {
+            notificationTimeout = setTimeout(() => {
+                popup.remove();
+            }, 3000);
+        }
+    // Catch errors
     } catch (error) {
         console.error('Notification error:', error);
     }
@@ -53,5 +56,12 @@ async function loadNotificationModal() {
     } catch (error) {
         console.error('Failed to load notification popup:', error);
         throw error;
+    }
+}
+
+function removeNotification() {
+    const popup = document.getElementById('notification-popup');
+    if (popup) {
+        popup.remove();
     }
 }

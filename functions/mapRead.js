@@ -99,7 +99,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapUpdateNode endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapRead endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

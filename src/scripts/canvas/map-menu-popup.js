@@ -134,14 +134,22 @@
             if (!input) return;
             const newTitle = input.value.trim();
             if (newTitle) {
+                // Show notification
+                await showNotification('Processing...', 'info', 'wait');
                 // Update title on database
-                const result = await renameUpdate(newTitle);
+                const updatedMap = await renameUpdate(newTitle);
                 // Update title on canvas
-                if (result) {
+                if (updatedMap) {
+                    // Set local storage map
+                    setLocalStorageMap(updatedMap);
+                    // Update map title
                     const titleElement = currentMapItem.querySelector('.map-title');
                         if (titleElement) {
                             titleElement.textContent = newTitle;
-                }}}
+                }}
+                // Remove notification
+                removeNotification();
+            }
             // Remove popups
             removeRename();
         }
@@ -150,11 +158,11 @@
     async function renameUpdate(newTitle) {
         try {
             // Set parameters
-            const { userId, token } = getLocalStorageCredentials();
+            const { userId, sessionToken } = getLocalStorageCredentials();
             const body = { userId, projectId, newTitle };
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${sessionToken}`,
             };
             //const url = `${process.env.API_URL}/mapTitleUpdate`;
             const url = `http://localhost:8888/.netlify/functions/mapTitleUpdate`;
@@ -173,8 +181,9 @@
                 }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            // Confirm result
-            return true;
+            // Get updated map renamed
+            const updatedMap = await response.json();
+            return updatedMap;
         // Catch errors
         } catch (error) {
             console.error('Error renaming map:', error);
@@ -264,11 +273,11 @@
     async function deleteMapOnDatabase(projectId) {
         try {
             // Set parameters
-            const { userId, token } = getLocalStorageCredentials();
+            const { userId, sessionToken } = getLocalStorageCredentials();
             const body = { userId, projectId };
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${sessionToken}`,
             };
             //const url = `${process.env.API_URL}/mapDelete`;
             const url = `http://localhost:8888/.netlify/functions/mapDelete`;

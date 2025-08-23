@@ -56,6 +56,8 @@ async function userSignUp(credentials) {
         name: tempName,
         icon: icon,
         plan: "Free Plan",
+        waitlist: false,
+        proPlanTrial: null,
         maps: [],
         sessionToken: "",
         expires: expires

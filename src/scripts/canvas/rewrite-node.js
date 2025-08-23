@@ -70,17 +70,22 @@
       mindMapCanvas.setSelectedContent('Rewriting node...');
       // Remove rewrite popup
       removeRewritePopup();
+      // Show notification
+      await showNotification('Processing...', 'info', 'wait');
       // Submit query to expand node
-      const result = await mapNodeRewrite(query);
+      const updatedMap = await mapNodeRewrite(query);
       // Reset temp node
-      if (!result) {
+      if (!updatedMap) {
         mindMapCanvas.setSelectedContent(prevContent);
       }
-      if (result) {
-        // Update canvas node
-        mindMapCanvas.setSelectedContent(result.content);
-        mindMapCanvas.setSelectedDetail(result.detail);
+      if (updatedMap) {
+        // Set local storage map
+        setLocalStorageMap(updatedMap);
+        // Set data
+        mindMapCanvas.setData();
       }
+      // Remove notification
+      removeNotification();
     } else {
       // Remove rewrite popup
       removeRewritePopup();
@@ -112,10 +117,10 @@
   async function mapNodeRewrite(query) {
       try {
         // Set parameters
-        const { userId, token } = getLocalStorageCredentials();
+        const { userId, sessionToken } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${sessionToken}`,
         };
         const body = { userId, projectId, nodeId, query };
         //const url = `${process.env.API_URL}/mapRewriteNode`;
@@ -135,9 +140,9 @@
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        // Get updated node
-        const updatedNode = await response.json();
-        return updatedNode;
+        // Get updated map with node recreated
+        const updatedMap = await response.json();
+        return updatedMap;
     // Catch errors
     } catch (error) {
         console.error('Error rewriting node:', error);

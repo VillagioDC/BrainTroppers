@@ -47,20 +47,26 @@
     // Check query
     const query = checkQuery();
     if (query) {
+      // Show notification
+      await showNotification('Processing...', 'info', 'wait');
       // Add node with temp id
       const nodeId = addTempNode();
       // Remove add popup
       removeAddPopup();
       // Submit query to add node
-      const result = await mapNodeAdd(query);
+      const updatedMap = await mapNodeAdd(query);
       // Remove temp node
-      if (!result)
+      if (!updatedMap)
         mindMapCanvas.deleteNode(nodeId);
       // Update node
-      if (result) {
-        // Add node
-        addNode(nodeId, result);
+      if (updatedMap) {
+        // Set local storage map
+        setLocalStorageMap(updatedMap);
+        // Set data
+        mindMapCanvas.setData();
       }
+      // Remove notification
+      removeNotification();
     } else {
       // Remove add popup
       removeAddPopup();
@@ -93,7 +99,7 @@
     const id = `node-${Date.now()}`;
     const w = mindMapCanvas.canvas.offsetWidth;
     const h = mindMapCanvas.canvas.offsetHeight;
-    const content = "Processing...";
+    const content = "Creating...";
     mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
     // Add connection
     if (parentNodeId && mindMapCanvas.nodes.find(n => n.id === parentNodeId)) {
@@ -107,10 +113,10 @@
   async function mapNodeAdd(query) {
       try {
         // Set parameters
-        const { userId, token } = getLocalStorageCredentials();
+        const { userId, sessionToken } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${sessionToken}`,
         };
         const body = { userId, projectId, parentNodeId, query };
         //const url = `${process.env.API_URL}/mapAddNode`;
@@ -130,9 +136,9 @@
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        // Get updated node
-        const updatedNode = await response.json();
-        return updatedNode;
+        // Get updated map with new node
+        const updatedMap = await response.json();
+        return updatedMap;
     // Catch errors
     } catch (error) {
         console.error('Error adding node:', error);

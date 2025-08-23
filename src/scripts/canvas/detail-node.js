@@ -117,32 +117,49 @@
       detail = sanitizeInput(detail);
       // Remove detail popup
       removeDetailPopup();
+      // Show notification
+      await showNotification('Processing...', 'info', 'wait');
       // Update node
       if (content && content.trim() !== '') {
         // Set temp message
-        mindMapCanvas.setSelectedContent('Updating node...');
-        // Update node
-        const result = await mapNodeUpdate(nodeId, content, detail);
+        mindMapCanvas.setSelectedContent('Saving...');
+        // Update map
+        const updatedMap = await mapNodeUpdate(nodeId, content, detail);
         // Restore previous node
-        if (!result) {
+        if (!updatedMap) {
           mindMapCanvas.updateNode(nodeId, { content: prevContent, detail: prevDetail });
         }
-        // Update node
-        if (result) {
-          // Update canvas node
-          mindMapCanvas.setSelectedContent(content);
-          mindMapCanvas.setSelectedDetail(detail);
+        // Updated map
+        if (updatedMap) {
+          // Set local storage map
+          setLocalStorageMap(updatedMap);
+          // Set data
+          mindMapCanvas.setData();
         }
+      // Delete empty node
       } else {
-        // Delete node on canvas
-        mindMapCanvas.deleteNode(nodeId);
-        // Delete node on database
-        deleteMapNode(nodeId);
+        // Set temp message
+        mindMapCanvas.setSelectedContent('Deleting...');
+        // Delete map
+        const updatedMap = await deleteMapNode(nodeId);
+        // Restore previous node
+        if (!updatedMap) {
+          mindMapCanvas.updateNode(nodeId, { content: prevContent, detail: prevDetail });
+        }
+        // Updated map
+        if (updatedMap) {
+          // Set local storage map
+          setLocalStorageMap(updatedMap);
+          // Set data
+          mindMapCanvas.setData();
+        }
       }
     } else {
       // Remove detail popup
       removeDetailPopup();
     }
+    // Remove notification
+    removeNotification();
     // Clean variables
     projectId = null;
     prevContent = null;
@@ -162,10 +179,10 @@
   async function mapNodeUpdate(nodeId, content, detail) {
     try {
       // Set parameters
-      const { userId, token } = getLocalStorageCredentials();
+      const { userId, sessionToken } = getLocalStorageCredentials();
       const headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${sessionToken}`,
       };
       const body = { userId, projectId, nodeId, content, detail };
       //const url = `${process.env.API_URL}/mapUpdateNode`;
@@ -177,18 +194,18 @@
           body: JSON.stringify(body),
       });
       // Check response
-        if (!response.ok) {
-            if (response.status === 401) {
-                showNotification('Session expired.', 'error');
-                setTimeout(() => {
-                    window.location.href = './index.html';
-                }, 2000);
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        // Get updated node
-      const updatedNode = await response.json();
-      return updatedNode;
+      if (!response.ok) {
+          if (response.status === 401) {
+              showNotification('Session expired.', 'error');
+              setTimeout(() => {
+                  window.location.href = './index.html';
+              }, 2000);
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      // Get updated map with updated node
+      const updatedMap = await response.json();
+      return updatedMap;
 
     // Catch error
     } catch (error) {
@@ -201,10 +218,10 @@
   async function deleteMapNode(nodeId) {
     try {
       // Set parameters
-      const { userId, token } = getLocalStorageCredentials();
+      const { userId, sessionToken } = getLocalStorageCredentials();
       const headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${sessionToken}`,
       }
       const body = { userId, projectId, nodeId };
       //const url = `${process.env.API_URL}/mapDeleteNode`;
@@ -225,8 +242,9 @@
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-    // Return
-    return true;
+      // Get updated map with deleted node
+      const updatedMap = await response.json();
+      return updatedMap;
 
     // Catch errors
     } catch (error) {

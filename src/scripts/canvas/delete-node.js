@@ -20,18 +20,24 @@
     projectId = mindMapCanvas.getProjectId();
     // Node content
     prevContent = mindMapCanvas.getSelectedContent();
+    // Show notification
+    await showNotification('Processing...', 'info', 'wait');
     // Set temp message
-    mindMapCanvas.setSelectedContent('Deleting node...');
+    mindMapCanvas.setSelectedContent('Deleting...');
     // Delete node
-    const result = await deleteMapNode(nodeId);
+    const updatedMap = await deleteMapNode(nodeId);
     // Restore previous node
-    if (!result) {
+    if (!updatedMap) {
       mindMapCanvas.updateNode(nodeId, { content: prevContent });
     }
-    if (result) {
-      // Delete node on canvas
-      mindMapCanvas.deleteSelected()
+    if (updatedMap) {
+      // Set local storage map
+      setLocalStorageMap(updatedMap);
+      // Set data
+      mindMapCanvas.setData();
     }
+    // Remove notification
+    removeNotification();
     // Clean variables
     projectId = null;
     nodeId = null;
@@ -42,10 +48,10 @@
   async function deleteMapNode(nodeId) {
     try {
       // Set parameters
-      const { userId, token } = getLocalStorageCredentials();
+      const { userId, sessionToken } = getLocalStorageCredentials();
       const headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${sessionToken}`,
       }
       const body = { userId, projectId, nodeId };
       //const url = `${process.env.API_URL}/mapDeleteNode`;
@@ -66,8 +72,9 @@
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-    // Return
-    return true;
+      // Get updated map with deleted node
+      const updatedMap = await response.json();
+      return updatedMap;
 
     // Catch errors
     } catch (error) {

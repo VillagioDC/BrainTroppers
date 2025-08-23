@@ -33,13 +33,30 @@
     function placeMapItem(maps, html) {
         // Parent element <ul>
         const mapUL = document.getElementById('map-list');
-        maps.forEach(map => {
+        // Sort maps by lastUpdate (most recent first)
+        const sortedMaps = maps.sort((a, b) => {
+            // Handle missing or invalid lastUpdate
+            const dateA = a.lastUpdate ? new Date(a.lastUpdate) : new Date(0);
+            const dateB = b.lastUpdate ? new Date(b.lastUpdate) : new Date(0);
+            // Check if dates are valid
+            if (isNaN(dateA.getTime())) dateA.setTime(0);
+            if (isNaN(dateB.getTime())) dateB.setTime(0);            
+            // Sort in descending order (most recent first)
+            return dateB.getTime() - dateA.getTime();
+        });
+        // Place sorted maps
+        sortedMaps.forEach(map => {
+            // Check for required properties
+            if (!map.title || !map.projectId) {
+                console.warn('Map item missing title or projectId:', map);
+                return;
+            }
             // Replace map title
             let mapItemHtml = html.replace('{{Title}}', map.title);
             // Replace map id
             mapItemHtml = mapItemHtml.replace('{{projectId}}', map.projectId);
             // Insert HTML
-            mapUL.insertAdjacentHTML('afterbegin', mapItemHtml);            
+            mapUL.insertAdjacentHTML('beforeend', mapItemHtml);
         });
     }
 

@@ -10,9 +10,9 @@ function getLocalStorageUser() {
 // Get local storage userId
 function getLocalStorageCredentials() {
     const user = getLocalStorageUser();
-    if (!user || !user.id || !user.sessionToken) return;
+    if (!user || !user.userId || !user.sessionToken) return;
     return {
-        userId: user.id,
+        userId: user.userId,
         sessionToken: user.sessionToken
     };
 }

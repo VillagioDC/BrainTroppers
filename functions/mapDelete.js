@@ -95,16 +95,28 @@ exports.handler = async (event) => {
     // Delete map from user list
     await userDeleteMap(userId, projectId);
 
+    // Read map to check if deleted
+    const updatedMap = await mapRead(projectId);
+    if (!updatedMap) {
+      log('SERVER ERROR', 'Unable to read map on mapDelete');
+      return {
+        statusCode: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Internal server error' })
+      };
+    }
+
+
     // Return success
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({message: 'Map deleted'})
+      body: JSON.stringify(updatedMap)
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapUpdateNode endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapDelete endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
