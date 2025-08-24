@@ -1,6 +1,14 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // HANDLE NEW PASSWORD MODULE
 
+// Import modules
+import { normalizeEmail, validateEmail } from '../common/validateEmail.js';
+import { validatePassword } from './validatePassword.js';
+import { apiNewPassword } from './newPasswordApi.js'
+import { switchToSignInClick } from './signUpModal.js';
+import { removeNewPasswordModal } from './newPasswordModal.js';
+import { showNotification } from '../common/notifications.js';
+
 // Handle new password
 export async function handleNewPassword() {
     // Get form values

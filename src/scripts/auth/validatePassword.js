@@ -1,6 +1,9 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH PASSWORD UTILS MODULE
 
+// Import modules
+// No modules
+
 // Validate password
 export function validatePassword(password) {
     const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;

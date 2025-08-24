@@ -1,6 +1,9 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH SIGN UP API MODULE
 
+// Import modules
+import { setApiUrl } from './setApiUrl.js';
+
 // API call to sign up
 export async function apiSignUp(email, password) {
     try {

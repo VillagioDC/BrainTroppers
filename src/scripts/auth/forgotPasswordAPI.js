@@ -1,6 +1,9 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH FORGOT PASSWORD API MODULE
 
+// Import modules
+import { setApiUrl } from './setApiUrl.js';
+
 // API call to forgot password
 export async function apiForgotPassword(email) {
     try {

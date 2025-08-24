@@ -34,7 +34,6 @@ export function setApiUrl(api) {
             url = '';
             throw new Error('Invalid API call.');
     }
-
     // Return URL
     return url;
 }

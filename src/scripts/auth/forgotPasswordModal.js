@@ -1,13 +1,24 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH FORGOT PASSWORD MODAL MODULE
 
-let forgotPasswordModal = null;
+// Import modules
+import { removeSignInModal, signInBtnClick } from './signInModal.js';
+import { removeSignUpModal } from './signUpModal.js';
+import { handleForgotPassword } from './forgotPasswordHandler.js';
+
+let forgotPasswordModal, signInModal, signUpModal;
 
 // Open forgot password modal
 export async function forgotPasswordClick() {
+    // Elements
+    forgotPasswordModal = document.getElementById('forgot-password-modal');
+    signInModal = document.getElementById('sign-in-modal');
+    signUpModal = document.getElementById('sign-up-modal');
+    // Remove opened modals
     if (forgotPasswordModal) return;
     if (signInModal) removeSignInModal();
     if (signUpModal) removeSignUpModal();
+    // Load forgot password modal
     forgotPasswordModal = await loadForgotPasswordModal();
     bindForgotPasswordModalEvents();
     document.getElementById('reset-email').focus();
@@ -44,9 +55,7 @@ export function bindForgotPasswordModalEvents() {
 // Back to sign in link
 export async function backToSignInLinkClick() {
     if (forgotPasswordModal) removeForgotPasswordModal();
-    signInModal = await loadSignInModal();
-    bindSignInModalEvents();
-    document.getElementById('sign-in-email').focus();
+    await signInBtnClick();
 }
 
 // Close forgot password modal
@@ -56,7 +65,7 @@ export function closeForgotPasswordClick() {
 
 // Outside click handler
 export function outsideClickHandler(e) {
-    if (e.target === forgotPasswordModal) removeForgotPasswordModal();
+    if (forgotPasswordModal && e.target.contains(forgotPasswordModal)) removeForgotPasswordModal();
 }
 
 // Remove forgot password modal

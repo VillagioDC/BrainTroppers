@@ -2,7 +2,7 @@
 // CHECK NEW PASSWORD URL PARAMETER MODULE
 
 // Import modules
-import { showNewPasswordModal } from './src/scripts/auth/newPasswordModal.js';
+import { showNewPasswordModal } from './newPasswordModal.js';
 
 // Check reset password url parameter
 export async function checkNewPasswordUrlParameter() {
@@ -18,4 +18,5 @@ export async function checkNewPasswordUrlParameter() {
         // Show new password modal
         await showNewPasswordModal(authToken);
     }
+    return;
 }

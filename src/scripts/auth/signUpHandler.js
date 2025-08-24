@@ -1,6 +1,13 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // HANDLE SIGN UP MODULE
 
+// Import modules
+import { normalizeEmail, validateEmail } from '../common/validateEmail.js';
+import { validatePassword } from './validatePassword.js';
+import { apiSignUp } from './signUpApi.js';
+import { switchToSignInClick } from './signUpModal.js';
+import { showNotification } from '../common/notifications.js';
+
 // Handle sign up
 export async function handleSignUp() {
     // Get form values

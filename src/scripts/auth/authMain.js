@@ -2,9 +2,9 @@
 // AUTHENTICATION MAIN SCRIPT
 
 // Import modules
-import { signInBtnClick } from './src/scripts/auth/signInModal.js';
-import { signUpBtnClick } from './src/scripts/auth/signUpModal.js';
-import { checkNewPasswordUrlParameter } from './src/scripts/auth/newPasswordParameters.js';
+import { signInBtnClick } from './signInModal.js';
+import { signUpBtnClick } from './signUpModal.js';
+import { checkNewPasswordUrlParameter } from './newPasswordParameters.js';
 
 // Main function
 (function () {

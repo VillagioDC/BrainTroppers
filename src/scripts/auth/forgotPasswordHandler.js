@@ -1,6 +1,12 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // HANDLE FORGOT PASSWORD MODULE
 
+// Import modules
+import { normalizeEmail, validateEmail } from '../common/validateEmail.js';
+import { showNotification } from '../common/notifications.js';
+import { apiForgotPassword } from './forgotPasswordApi.js'; 
+import { removeForgotPasswordModal } from './forgotPasswordModal.js';
+
 // Handle forgot password
 export async function handleForgotPassword() {
     // Get form values

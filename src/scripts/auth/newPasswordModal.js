@@ -1,10 +1,22 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH NEW PASSWORD MODAL MODULE
 
-let newPasswordModal = null;
+// Import modules
+import { removeForgotPasswordModal } from './forgotPasswordModal.js';
+import { removeSignInModal } from './signInModal.js';
+import { removeSignUpModal, switchToSignInClick } from './signUpModal.js';
+import { validatePasswordInput } from './validatePassword.js';
+import { handleNewPassword } from './newPasswordHandler.js';
+
+let forgotPasswordModal, signInModal, signUpModal, newPasswordModal;
 
 // Show reset password modal
 export async function showNewPasswordModal(authToken) {
+    // Elements
+    forgotPasswordModal = document.getElementById('forgot-password-modal');
+    signInModal = document.getElementById('sign-in-modal');
+    signUpModal = document.getElementById('sign-up-modal');
+    newPasswordModal = document.getElementById('new-password-modal');
     // Remove opened modals
     if (forgotPasswordModal) removeForgotPasswordModal();
     if (signInModal) removeSignInModal();
@@ -54,9 +66,7 @@ export function closeNewPasswordClick() {
 
 // Outside click handler
 export function outsideClickHandler(e) {
-    if (newPasswordModal && !newPasswordModal.querySelector('.modal-content').contains(e.target)) {
-        removeNewPasswordModal();
-    }
+    if (newPasswordModal && e.target.contains(newPasswordModal)) removeNewPasswordModal();
 }
 
 // Remove new password modal

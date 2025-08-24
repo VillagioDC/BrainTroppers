@@ -1,6 +1,9 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH NEW PASSWORD API MODULE
 
+// Import modules
+import { setApiUrl } from './setApiUrl.js';
+
 // API call to new password
 export async function apiNewPassword(email, password, authToken) {
     try {

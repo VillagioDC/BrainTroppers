@@ -1,6 +1,14 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // HANDLE SIGN IN MODULE
 
+// Import modules
+import { normalizeEmail, validateEmail } from '../common/validateEmail.js';
+import { validatePassword } from './validatePassword.js';
+import { apiSignIn } from './signInApi.js';
+import { setLocalStorageUser } from '../common/userLocalStorage.js';
+import { removeSignInModal } from './signInModal.js';
+import { showNotification } from '../common/notifications.js';
+
 // Handle sign in
 export async function handleSignIn() {
     // Get form values
@@ -53,6 +61,8 @@ export async function handleSignIn() {
         if (localStorage.getItem('braintroop-user')) {
             // Show notification
             await showNotification('Signing in', 'success');
+            // Remove sign in modal
+            removeSignInModal();
             // Redirect
             setTimeout(() => {
                 window.location.href = './canvas.html';

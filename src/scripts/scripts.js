@@ -4,12 +4,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         await Promise.all([
             // Landing page modules
-            import('./src/scripts/index/getstarted.js'),
-            import('./src/scripts/index/uiux.js'),
-            import('./src/scripts/index/brainstorm.js'),
-            import('./src/scripts/common/notifications.js'),
+            import('./index/getStarted.js'),
+            import('./index/uiUx.js'),
+            import('./index/brainstorm.js'),
             // Authentication module
-            import('./src/scripts/auth/main-auth.js'),
+            import('./auth/authMain.js'),
         ]);
         // Clean local storage
         if (localStorage.getItem('braintroop-user')) localStorage.removeItem('braintroop-user');

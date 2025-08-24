@@ -1,13 +1,25 @@
 // LANDING PAGE AUTHENTICATION MODULE
 // AUTH SIGN IN MODAL MODULE
 
-let signInModal = null;
+// Import modules
+import { removeSignUpModal, signUpBtnClick } from './signUpModal.js';
+import { removeForgotPasswordModal, forgotPasswordClick} from './forgotPasswordModal.js';
+import { handleSignIn } from './signInHandler.js';
+import { initiateGoogleAuth } from './googleAuth.js';
+
+let signInModal, signUpModal, forgotPasswordModal;
 
 // Open sign in modal
 export async function signInBtnClick() {
+    // Elements
+    signInModal = document.getElementById('sign-in-modal');
+    signUpModal = document.getElementById('sign-up-modal');
+    forgotPasswordModal = document.getElementById('forgot-password-modal');
+    // Remove opened modals
     if (signInModal) return;
     if (signUpModal) removeSignUpModal();
     if (forgotPasswordModal) removeForgotPasswordModal();
+    // Load sign in modal
     signInModal = await loadSignInModal();
     bindSignInModalEvents();
     document.getElementById('sign-in-email').focus();
@@ -51,9 +63,7 @@ export function bindSignInModalEvents() {
 // Switch to sign up
 export async function switchToSignUpClick() {
     if (signInModal) removeSignInModal();
-    signUpModal = await loadSignUpModal();
-    bindSignUpModalEvents();
-    document.getElementById('sign-up-email').focus();
+    await signUpBtnClick();
 }
 
 // Close sign in
@@ -63,7 +73,7 @@ export function closeSignInClick() {
 
 // Outside click handler
 export function outsideClickHandler(e) {
-    if (signInModal && !signInModal.contains(e.target)) removeSignInModal();
+    if (signInModal && e.target.contains(signInModal)) removeSignInModal();
 }
 
 // Remove sign in modal
