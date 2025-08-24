@@ -9,9 +9,10 @@ const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
+const checkSessionExpired = require('./utils/checkExpires.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
-const mapLinkDisconnect = require('./controller/mapLinkCisconnect.jsx');
+const mapLinkDisconnect = require('./controller/mapLinkDisconnect.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
@@ -80,6 +81,16 @@ exports.handler = async (event) => {
             };
     }
 
+    // Set session expires
+    const isValid = await checkSessionExpired(userId);
+    if (!isValid) {
+      log('SERVER WARNING', 'Session expired');
+      return {
+        statusCode: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Unauthorized', expired: true })
+      };
+    }
     // Set session expires
     await setSessionExpires(userId);
 

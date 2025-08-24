@@ -8,11 +8,13 @@ const loadCORSHeaders = require('./utils/loadCORSHeaders.jsx');
 const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
+const checkSessionExpired = require('./utils/checkExpires.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const mapRead = require('./controller/mapRead.jsx');
 const mapNodeCreate = require('./controller/mapNodeCreate.jsx');
 const log = require('./utils/log.jsx');
+const checkSessionExpired = require('./utils/checkExpires.jsx');
 
 /* PARAMETERS
     input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, parentNodeId, query}} - API call
@@ -82,6 +84,16 @@ exports.handler = async (event) => {
             };
     }
 
+    // Set session expires
+    const isValid = await checkSessionExpired(userId);
+    if (!isValid) {
+      log('SERVER WARNING', 'Session expired');
+      return {
+        statusCode: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Unauthorized', expired: true })
+      };
+    }
     // Set session expires
     await setSessionExpires(userId);
 

@@ -28,8 +28,8 @@
         document.body.insertAdjacentHTML('beforeend', html);
         expandPopup = document.getElementById('expand-node-popup');
         bindExpandPopupEvents();
-        parentNodeId = mindMapCanvas.getSelectedNodeId();
-        projectId = mindMapCanvas.getProjectId();
+        parentNodeId = braintroop.getSelectedNodeId();
+        projectId = braintroop.getProjectId();
       });
   }
 
@@ -47,8 +47,8 @@
   // Load detail content
   function loadDetailContent() {
     // Load content
-    const content = mindMapCanvas.getSelectedContent();
-    const detail = mindMapCanvas.getSelectedDetail();
+    const content = braintroop.getSelectedContent();
+    const detail = braintroop.getSelectedDetail();
     // Popup node content
     const contentEl = document.getElementById('expand-node-content');
     if (contentEl) contentEl.innerText = content;
@@ -74,10 +74,10 @@
         // Set local storage map
         setLocalStorageMap(updateMap);
         // Set data
-        mindMapCanvas.setData();
+        braintroop.setData();
       }
       // Remove temp node
-      mindMapCanvas.deleteNode(tempNodeId);
+      braintroop.deleteNode(tempNodeId);
       // Remove notification
       removeNotification();
     } else {
@@ -110,13 +110,13 @@
   function addTempNode() {
     // Add temp node    
     const id = `node-${Date.now()}`;
-    const w = mindMapCanvas.canvas.offsetWidth;
-    const h = mindMapCanvas.canvas.offsetHeight;
+    const w = braintroop.canvas.offsetWidth;
+    const h = braintroop.canvas.offsetHeight;
     const content = "Expanding...";
-    mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
+    braintroop.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
     // Add connection
-    if (id && mindMapCanvas.nodes.find(n => n.id === id)) {
-    mindMapCanvas.addConnection(parentNodeId, id, 'strong');
+    if (id && braintroop.nodes.find(n => n.id === id)) {
+    braintroop.addConnection(parentNodeId, id, 'strong');
     }
     // Return new node id
     return id;
@@ -164,8 +164,8 @@
     // Confirm result
     if (!result || result.length == 0) return;
     // Get canvas width and height
-    const w = mindMapCanvas.canvas.offsetWidth;
-    const h = mindMapCanvas.canvas.offsetHeight;
+    const w = braintroop.canvas.offsetWidth;
+    const h = braintroop.canvas.offsetHeight;
     // Add node array
     result.forEach(node => {
       // Add node
@@ -174,10 +174,10 @@
       let detail = node.detail;
       let x = Math.random() * (w - 140) + 70;
       let y = Math.random() * (h - 56) + 28;
-      mindMapCanvas.addNode({ id, content, detail, x, y});
+      braintroop.addNode({ id, content, detail, x, y});
       // Add connection
-      if (id && mindMapCanvas.nodes.find(n => n.id === id)) {
-        mindMapCanvas.addConnection(parentNodeId, id, 'strong');
+      if (id && braintroop.nodes.find(n => n.id === id)) {
+        braintroop.addConnection(parentNodeId, id, 'strong');
       }
     })
   };

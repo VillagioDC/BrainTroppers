@@ -10,18 +10,24 @@ const log = require('./log.jsx');
   RETURN {bool} - true || false
 */
 
-async function checkSessionExpired(userId, expires) {
+async function checkSessionExpired(userId) {
+
+    // Check expires on database
+    const user = await executeDB({ collectionName: 'users',
+                                  type: 'findOne',
+                                  filter: { userId: userId } });
+    const expires = user.expires;
 
     // Check expires
     const now = new Date(Date.now());
     if (expires < now) {
         // Renew
         await setSessionExpires(userId);
-        // Valid
+        // Is valid
         return true;
     }
 
-    // Expired
+    // Has expired
     return false;
 
 }

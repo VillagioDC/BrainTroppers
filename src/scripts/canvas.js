@@ -5,26 +5,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load all scripts in order
     Promise.all([
+      // Load d3.js
+      loadScript("https://d3js.org/d3.v7.min.js"),
       // Local storage
       loadScript('./src/scripts/canvas/local-storage.js').catch(() => {}),
     ])
     .then (() => {
       Promise.all([
         // Interface pieces
-        loadScript('./src/scripts/canvas/sidebar.js').catch(() => {}),
+        loadScript('./src/scripts/canvas/sidebar.js'),
         loadScript('./src/scripts/canvas/user-menu.js').catch(() => {}),
         loadScript('./src/scripts/canvas/new-map.js').catch(() => {}),
         loadScript('./src/scripts/canvas/map-list.js').catch(() => {}),
         loadScript('./src/scripts/canvas/theme.js').catch(() => {}),
-        loadScript('./src/scripts/notifications.js').catch(() => {}),
-        // Core mind map canvas + initial nodes
-        loadScript('./src/scripts/canvas/mindmap-canvas.js'),
-        loadScript('./src/scripts/canvas/zoom.js').catch(() => {}),
+        // Braintroop script + initial nodes
+        loadScript('./src/scripts/canvas/braintroop.js'),
       ])
       .then(() => {
         Promise.all([
+          // Interface pieces
+          loadScript('./src/scripts/canvas/zoom.js'),
+          loadScript('./src/scripts/notifications.js'),
+          // Map example
+          loadScript('./src/scripts/canvas/loadExampleMap.js'),
           // Map menu popup
-          loadScript('./src/scripts/canvas/map-menu-popup.js').catch(() => {}),
+          loadScript('./src/scripts/canvas/map-menu-popup.js'),
           // Load command scripts
           loadScript('./src/scripts/canvas/detail-node.js'),
           loadScript('./src/scripts/canvas/add-node.js'),
@@ -35,9 +40,12 @@ document.addEventListener('DOMContentLoaded', function() {
           loadScript('./src/scripts/canvas/connect-node.js'),
           loadScript('./src/scripts/canvas/disconnect-node.js'),
           loadScript('./src/scripts/canvas/rewire-all.js'),
+          loadScript('./src/scripts/canvas/test.js').catch(() => {})
         ])
         .then(() => {
           console.log('Canvas loaded.');
+          test.publicFunc();
+          test._privateFunc();
         })
         .catch(error => {
           console.error('Error loading user commands:', error);

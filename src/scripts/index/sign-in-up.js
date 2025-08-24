@@ -380,7 +380,7 @@
             // Set user and session
             setLocalStorageUser(result.auth);
             // Navigate to canvas
-            if (localStorage.getItem('user')) {
+            if (localStorage.getItem('braintroop-user')) {
                 // Show notification
                 await showNotification('Signing in', 'success');
                 // Redirect
@@ -446,7 +446,7 @@
             return;
         }
         // Store user object in local storage
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('braintroop-user', JSON.stringify(user));
     } 
 
     // Handle sign up

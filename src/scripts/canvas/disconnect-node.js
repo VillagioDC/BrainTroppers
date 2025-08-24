@@ -11,7 +11,7 @@
     // Disconnect nodes on database
     console.log('Disconnect nodes on database');
     // Disconnect nodes on canvas
-    mindMapCanvas.disconnectSelected();
+    braintroop.disconnectSelected();
   }
 
 })();

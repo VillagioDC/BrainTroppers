@@ -29,8 +29,8 @@
         document.body.insertAdjacentHTML('beforeend', html);
         rewritePopup = document.getElementById('rewrite-node-popup');
         bindRewritePopupEvents();
-        nodeId = mindMapCanvas.getSelectedNodeId();
-        projectId = mindMapCanvas.getProjectId();
+        nodeId = braintroop.getSelectedNodeId();
+        projectId = braintroop.getProjectId();
       });
   }
 
@@ -48,8 +48,8 @@
   // Load detail content
   function loadDetailContent() {
     // Load content
-    const content = mindMapCanvas.getSelectedContent();
-    const detail = mindMapCanvas.getSelectedDetail();
+    const content = braintroop.getSelectedContent();
+    const detail = braintroop.getSelectedDetail();
     // Popup node content
     const contentEl = document.getElementById('rewrite-node-content');
     if (contentEl) contentEl.innerText = content;
@@ -67,7 +67,7 @@
       if (document.getElementById('rewrite-node-content'))
         prevContent = document.getElementById('rewrite-node-content').innerText;
       // Set temp message
-      mindMapCanvas.setSelectedContent('Rewriting node...');
+      braintroop.setSelectedContent('Rewriting node...');
       // Remove rewrite popup
       removeRewritePopup();
       // Show notification
@@ -76,13 +76,13 @@
       const updatedMap = await mapNodeRewrite(query);
       // Reset temp node
       if (!updatedMap) {
-        mindMapCanvas.setSelectedContent(prevContent);
+        braintroop.setSelectedContent(prevContent);
       }
       if (updatedMap) {
         // Set local storage map
         setLocalStorageMap(updatedMap);
         // Set data
-        mindMapCanvas.setData();
+        braintroop.setData();
       }
       // Remove notification
       removeNotification();

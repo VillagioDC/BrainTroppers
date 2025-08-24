@@ -14,26 +14,26 @@
   // Approve node
   async function approveBtnClick() {
     // Get node id
-    nodeId = mindMapCanvas.getSelectedNodeId();
+    nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) return;
     // Get project Id
-    projectId = mindMapCanvas.getProjectId();
+    projectId = braintroop.getProjectId();
     // Node content
-    prevContent = mindMapCanvas.getSelectedContent();
+    prevContent = braintroop.getSelectedContent();
     // Show notification
     await showNotification('Processing...', 'info', 'wait');
     // Set temp message
-    mindMapCanvas.setSelectedContent('Approving node...');
+    braintroop.setSelectedContent('Approving node...');
     // Approve node
     const updatedMap = await aproveMapNode(nodeId);
     if (updatedMap) {
       // Set local storage map
       setLocalStorageMap(updatedMap);
       // Set data
-      mindMapCanvas.setData();
+      braintroop.setData();
     }
     // Restore node content
-    mindMapCanvas.updateNode(nodeId, { content: prevContent });
+    braintroop.updateNode(nodeId, { content: prevContent });
     // Remove notification
     removeNotification();
     // Clean variables

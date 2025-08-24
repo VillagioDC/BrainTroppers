@@ -239,9 +239,9 @@
         // Get map id
         const projectId = currentMapItem.dataset.projectId;
         // Remove map if is current map
-        if (mindMapCanvas.projectId === projectId) {
+        if (braintroop.projectId === projectId) {
             // Remove map on canvas
-            mindMapCanvas.removeMap();
+            braintroop.removeMap();
             // Delete map on local storage
             removeLocalStorageMap();
             // Start new map

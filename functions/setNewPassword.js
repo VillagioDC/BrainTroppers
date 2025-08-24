@@ -13,7 +13,7 @@ const userNewPassword = require('./controller/userNewPassword.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {credentials: {email, password}}} - API call
+    input {headers: {Authorization: Bearer <token>}, body: {credentials: {email, password, authToken}}} - API call
     RETURN {object} - body: message || error
 */
 
@@ -45,7 +45,8 @@ exports.handler = async (event) => {
     // Check required fields
     if (!credentials || 
         !credentials.email || credentials.email.trim().length === 0 ||
-        !credentials.password || credentials.password.trim().length === 0) {
+        !credentials.password || credentials.password.trim().length === 0 ||
+        !credentials.authToken || credentials.authToken.trim().length === 0) {
       log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
       return {
         statusCode: 400,
@@ -56,7 +57,8 @@ exports.handler = async (event) => {
 
     // Anti-malicious checks
     if (typeof credentials.email !== 'string' || credentials.email.length > 50 ||
-        typeof credentials.password !== 'string' || credentials.password.length > 50) {
+        typeof credentials.password !== 'string' || credentials.password.length > 50 ||
+        typeof credentials.authToken !== 'string' || credentials.authToken.length > 50) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,

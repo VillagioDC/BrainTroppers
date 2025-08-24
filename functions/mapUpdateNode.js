@@ -9,6 +9,7 @@ const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
+const checkSessionExpired = require('./utils/checkExpires.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
 const mapNodeUpdate = require('./controller/mapNodeUpdate.jsx');
@@ -42,14 +43,22 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, nodeId, content, detail } = parsedBody;
+    const { userId, projectId, nodeId, shortName, content, detail, status, directLink, relatedLink, xy, hidden, colorScheme, layer } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0 || 
+        !shortName || shortName.trim().length === 0 ||
         !content || content.trim().length === 0 ||
-        !detail || detail.trim().length === 0) {          
+        !detail || detail.trim().length === 0 ||
+        !status || status.trim().length === 0 ||
+        !directLink || directLink.length === 0 ||
+        !relatedLink || relatedLink.length === 0 ||
+        !xy || xy.length === 0 ||
+        !hidden || hidden.length === 0 ||
+        !colorScheme || colorScheme.length === 0 ||
+        !layer || layer.length === 0) {          
           log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
           return {
             statusCode: 400,
@@ -75,7 +84,15 @@ exports.handler = async (event) => {
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50 ||
         typeof content !== 'string' || content.length > 500 ||
-        typeof detail !== 'string' || detail.length > 500) {
+        typeof detail !== 'string' || detail.length > 500 ||
+        typeof shortName !== 'string' || shortName.length > 50 ||
+        typeof status !== 'string' || status.length > 50 ||
+        Array.isArray(directLink) ||
+        Array.isArray(relatedLink) ||
+        typeof xy !== 'string' || xy.length > 50 ||
+        typeof hidden !== 'boolean' ||
+        typeof colorScheme !== 'string' || colorScheme.length > 50 ||
+        typeof layer !== 'number') {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -84,6 +101,16 @@ exports.handler = async (event) => {
             };
     }
 
+    // Set session expires
+    const isValid = await checkSessionExpired(userId);
+    if (!isValid) {
+      log('SERVER WARNING', 'Session expired');
+      return {
+        statusCode: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Unauthorized', expired: true })
+      };
+    }
     // Set session expires
     await setSessionExpires(userId);
 
@@ -110,8 +137,16 @@ exports.handler = async (event) => {
     }
 
     // Update node
+    node.shortName = shortName;
     node.content = content;
     node.detail = detail;
+    node.status = status;
+    node.directLink = directLink;
+    node.relatedLink = relatedLink;
+    node.xy = xy;
+    node.hidden = hidden;
+    node.colorScheme = colorScheme;
+    node.layer = layer;
 
     // Update map node
     const updatedMap = await mapNodeUpdate(map, node);

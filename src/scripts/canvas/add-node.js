@@ -26,8 +26,8 @@
         document.body.insertAdjacentHTML('beforeend', html);
         addPopup = document.getElementById('add-node-popup');
         bindAddPopupEvents();
-        parentNodeId = mindMapCanvas.getSelectedNodeId();
-        projectId = mindMapCanvas.getProjectId();
+        parentNodeId = braintroop.getSelectedNodeId();
+        projectId = braintroop.getProjectId();
       });
   }
 
@@ -57,13 +57,13 @@
       const updatedMap = await mapNodeAdd(query);
       // Remove temp node
       if (!updatedMap)
-        mindMapCanvas.deleteNode(nodeId);
+        braintroop.deleteNode(nodeId);
       // Update node
       if (updatedMap) {
         // Set local storage map
         setLocalStorageMap(updatedMap);
         // Set data
-        mindMapCanvas.setData();
+        braintroop.setData();
       }
       // Remove notification
       removeNotification();
@@ -97,13 +97,13 @@
   function addTempNode() {
     // Add temp node    
     const id = `node-${Date.now()}`;
-    const w = mindMapCanvas.canvas.offsetWidth;
-    const h = mindMapCanvas.canvas.offsetHeight;
+    const w = braintroop.canvas.offsetWidth;
+    const h = braintroop.canvas.offsetHeight;
     const content = "Creating...";
-    mindMapCanvas.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
+    braintroop.addNode({ id, content, x: Math.random() * (w - 140) + 70, y: Math.random() * (h - 56) + 28 });
     // Add connection
-    if (parentNodeId && mindMapCanvas.nodes.find(n => n.id === parentNodeId)) {
-    mindMapCanvas.addConnection(parentNodeId, id, 'strong');
+    if (parentNodeId && braintroop.nodes.find(n => n.id === parentNodeId)) {
+    braintroop.addConnection(parentNodeId, id, 'strong');
     }
     // Return new node id
     return id;
@@ -149,9 +149,9 @@
   // Add node
   function addNode(nodeId, result) {
     // Update node 
-    mindMapCanvas.updateNode(nodeId, { content: result.content, detail: result.detail, approved: false });
+    braintroop.updateNode(nodeId, { content: result.content, detail: result.detail, approved: false });
     // Update node id
-    mindMapCanvas.updateNodeId(nodeId, result.id);
+    braintroop.updateNodeId(nodeId, result.id);
   }
 
   // Remove add popup

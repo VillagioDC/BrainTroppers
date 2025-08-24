@@ -13,7 +13,7 @@
     // Connect nodes on database
     console.log('Connect nodes on database');
     // Connect nodes on canvas
-    mindMapCanvas.startConnection('strong');
+    braintroop.startConnection('strong');
   }
 
 })();

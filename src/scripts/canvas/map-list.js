@@ -74,7 +74,7 @@
     async function loadMap(e) {
         const projectId = e.target.closest('.map-item').dataset.projectId;
         // Remove existing map menus on canvas
-        mindMapCanvas.removeMap();
+        braintroop.removeMap();
         // Load map on database
         const map = await loadMapFromDatabase(projectId);
         if (!map || typeof map !== 'object') return;

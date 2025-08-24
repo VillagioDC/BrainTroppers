@@ -12,7 +12,7 @@
     // Rewire all nodes
     async function rewireBtnClick() {
         // Get project Id
-        projectId = mindMapCanvas.getProjectId();
+        projectId = braintroop.getProjectId();
         if (!projectId) return;
         // Show notification
         await showNotification('Processing...', 'info', 'wait');
@@ -22,7 +22,7 @@
           // Set local storage map
           setLocalStorageMap(updatedMap);
           // Set data
-          mindMapCanvas.setData();
+          braintroop.setData();
         }
         // Remove notification
         removeNotification();

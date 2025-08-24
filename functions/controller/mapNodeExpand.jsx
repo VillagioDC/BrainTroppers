@@ -16,6 +16,12 @@ const mapRewire = require('./mapRewire.jsx');
 
 async function mapNodeExpand(map, parentNodeId, query) {
 
+    // Get parent node color scheme
+    const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentNodeId).colorSchemeName;
+
+    // Get parent node layer
+    const parentNodeLayer = map.nodes.find(n => n.nodeId === parentNodeId).layer;
+
     // Deconstruct map
     const mapStr = deconstructMap(map);
 
@@ -70,11 +76,16 @@ async function mapNodeExpand(map, parentNodeId, query) {
         // Create new node
         node = {};
         node.nodeId = newNodes[i].nodeId;
+        node.shortName = newNodes[i].shortName;
         node.content = newNodes[i].content;
         node.detail = newNodes[i].detail;
         node.status = 'pending';
         node.directLink = [parentNodeId];
         node.relatedLink = [];
+        node.xy = null;
+        node.hidden = false;
+        node.colorSchemeName = parentNodeColorScheme;
+        node.layer = parentNodeLayer;
         // Push node
         map.nodes.push(node);
     }

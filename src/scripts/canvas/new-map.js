@@ -35,7 +35,7 @@
     // Remove existing map from canvas
     function removeExistingMap() {
         // Remove existing map
-        mindMapCanvas.removeMap();
+        braintroop.removeMap();
     }
 
     // Load new map container
@@ -98,13 +98,13 @@
             // Create map
             const newMap = await createMap(query);
             // Remove temp node
-            mindMapCanvas.deleteNode(tempNodeId);
+            braintroop.deleteNode(tempNodeId);
             // Place new map
             if (newMap) {
                 // Set local storage
                 setLocalStorageMap(newMap);
                 // Set data
-                mindMapCanvas.setData();
+                braintroop.setData();
                 // Create map item
                 await createMapItem(newMap);
                 // Set new map item as active
@@ -135,10 +135,10 @@
     function addTempNode() {
         // Add temp node    
         const id = `node-${Date.now()}`;
-        const w = mindMapCanvas.canvas.offsetWidth;
-        const h = mindMapCanvas.canvas.offsetHeight;
+        const w = braintroop.canvas.offsetWidth;
+        const h = braintroop.canvas.offsetHeight;
         const content = "Creating...";
-        mindMapCanvas.addNode({ id, content, x: w, y: h});
+        braintroop.addNode({ id, content, x: w, y: h});
     }
 
     // Create map

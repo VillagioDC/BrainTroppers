@@ -34,7 +34,7 @@
         document.body.insertAdjacentHTML('beforeend', html);
         detailPopup = document.getElementById('detail-node-popup');
         bindDetailPopupEvents();
-        projectId = mindMapCanvas.getProjectId();
+        projectId = braintroop.getProjectId();
       });
   }
 
@@ -56,8 +56,8 @@
   // Load detail content
   function loadDetailContent() {
     // Load content
-    const content = mindMapCanvas.getSelectedContent();
-    const detail = mindMapCanvas.getSelectedDetail();
+    const content = braintroop.getSelectedContent();
+    const detail = braintroop.getSelectedDetail();
     // Popup node content
     const contentEl = document.getElementById('detail-node-content');
     if (contentEl) contentEl.innerText = content;
@@ -102,7 +102,7 @@
     // Check changes
     if (contentChanged || detailChanged) {
       // Get node id
-      nodeId = mindMapCanvas.getSelectedNodeId();
+      nodeId = braintroop.getSelectedNodeId();
       // Get content and details
       const contentEl = document.getElementById('detail-node-content');
       const detailEl = document.getElementById('detail-node-detail');
@@ -122,36 +122,36 @@
       // Update node
       if (content && content.trim() !== '') {
         // Set temp message
-        mindMapCanvas.setSelectedContent('Saving...');
+        braintroop.setSelectedContent('Saving...');
         // Update map
         const updatedMap = await mapNodeUpdate(nodeId, content, detail);
         // Restore previous node
         if (!updatedMap) {
-          mindMapCanvas.updateNode(nodeId, { content: prevContent, detail: prevDetail });
+          braintroop.updateNode(nodeId, { content: prevContent, detail: prevDetail });
         }
         // Updated map
         if (updatedMap) {
           // Set local storage map
           setLocalStorageMap(updatedMap);
           // Set data
-          mindMapCanvas.setData();
+          braintroop.setData();
         }
       // Delete empty node
       } else {
         // Set temp message
-        mindMapCanvas.setSelectedContent('Deleting...');
+        braintroop.setSelectedContent('Deleting...');
         // Delete map
         const updatedMap = await deleteMapNode(nodeId);
         // Restore previous node
         if (!updatedMap) {
-          mindMapCanvas.updateNode(nodeId, { content: prevContent, detail: prevDetail });
+          braintroop.updateNode(nodeId, { content: prevContent, detail: prevDetail });
         }
         // Updated map
         if (updatedMap) {
           // Set local storage map
           setLocalStorageMap(updatedMap);
           // Set data
-          mindMapCanvas.setData();
+          braintroop.setData();
         }
       }
     } else {

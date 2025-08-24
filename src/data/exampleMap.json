@@ -1,0 +1,75 @@
+{
+  "projectId": "example-project",
+  "owner": "",
+  "colabs": [],
+  "userPrompt": "",
+  "title": "Example Map",
+  "lastUpdated": null,
+  "nodes": [
+    {
+      "nodeId": "1",
+      "shortName": "Start",
+      "content": "Start",
+      "detail": "Root node",
+      "status": "approved",
+      "directLink": ["2", "3"],
+      "relatedLink": [],
+      "xy": "400,240",
+      "hidden": false,
+      "scheme": "ocean",
+      "layer": 0
+    },
+    {
+      "nodeId": "2",
+      "shortName": "A",
+      "content": "Direct A",
+      "detail": "",
+      "status": "pending",
+      "directLink": ["4"],
+      "relatedLink": ["5"],
+      "xy": "640,240",
+      "hidden": false,
+      "scheme": "forest",
+      "layer": 1
+    },
+    {
+      "nodeId": "3",
+      "shortName": "B",
+      "content": "Direct B",
+      "detail": "",
+      "status": "pending",
+      "directLink": [],
+      "relatedLink": ["2", "5"],
+      "xy": "400,400",
+      "hidden": false,
+      "scheme": "sunset",
+      "layer": 1
+    },
+    {
+      "nodeId": "4",
+      "shortName": "C",
+      "content": "Child of A",
+      "detail": "",
+      "status": "pending",
+      "directLink": [],
+      "relatedLink": ["5"],
+      "xy": "800,240",
+      "hidden": false,
+      "scheme": "city",
+      "layer": 2
+    },
+    {
+      "nodeId": "5",
+      "shortName": "Hub",
+      "content": "Related Hub",
+      "detail": "",
+      "status": "pending",
+      "directLink": [],
+      "relatedLink": [],
+      "xy": "640,400",
+      "hidden": true,
+      "scheme": "ocean",
+      "layer": 2
+    }
+  ]
+}

@@ -18,6 +18,10 @@ const mapLastUpdate = require('./mapLastUpdate.jsx');
 
 async function mapNodeCreate(map, parentNodeId, query) {
 
+    // Get parent settings
+    const parentNodeLayer = map.nodes.find(n => n.nodeId === parentNodeId).layer;
+    const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentNodeId).colorSchemeName;
+
     // Generate new node id
     const newNodeId = generateToken();
 
@@ -73,10 +77,15 @@ async function mapNodeCreate(map, parentNodeId, query) {
     // Create new node
     let newNode = {
         nodeId: newNodeId,
+        shortName: jsonResponse.nodes[0].shortName,
         content: jsonResponse.nodes[0].content,
         detail: jsonResponse.nodes[0].detail,
         directLink: [parentNodeId],
-        relatedLink: []
+        relatedLink: [],
+        xy: null,
+        hidden: false,
+        colorScheme: parentNodeColorScheme,
+        nodeLayer: parentNodeLayer
     }
     // Push new node
     map.nodes.push(newNode);

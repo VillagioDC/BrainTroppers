@@ -1,9 +1,24 @@
-// NOTIFICATIONS SCRIPT
-// Global notification function
+// NOTIFICATIONS MODULE
 
+// Private timeout variable
 let notificationTimeout = null;
 
-async function showNotification(message, type = 'success', action = null) {
+// Private function to load modal
+async function loadNotificationModal() {
+    try {
+        const res = await fetch('./src/snippets/notification-popup.html');
+        if (!res.ok) {
+            throw new Error('Failed to fetch notification modal');
+        }
+        const html = await res.text();
+        document.body.insertAdjacentHTML('beforeend', html);
+    } catch (error) {
+        console.error('Failed to load notification popup:', error);
+        throw error;
+    }
+}
+
+export async function showNotification(message, type = 'success', action = null) {
     try {
         if (!document.getElementById('notification-popup')) {
             await loadNotificationModal();
@@ -19,8 +34,7 @@ async function showNotification(message, type = 'success', action = null) {
         popup.classList.add(type);
         icon.classList.remove('fa-spinner', 'spinning', 'fa-check-circle', 'fa-times-circle', 'fa-info-circle');
         if (action === 'wait') {
-            icon.classList.add('fa-spinner');
-            icon.classList.add('spinning');
+            icon.classList.add('fa-spinner', 'spinning');
         } else {
             icon.classList.add(
                 type === 'success' ? 'fa-check-circle' :
@@ -39,27 +53,12 @@ async function showNotification(message, type = 'success', action = null) {
                 popup.remove();
             }, 3000);
         }
-    // Catch errors
     } catch (error) {
         console.error('Notification error:', error);
     }
 }
 
-async function loadNotificationModal() {
-    try {
-        const res = await fetch('./src/snippets/notification-popup.html');
-        if (!res.ok) {
-            throw new Error('Failed to fetch notification modal');
-        }
-        const html = await res.text();
-        document.body.insertAdjacentHTML('beforeend', html);
-    } catch (error) {
-        console.error('Failed to load notification popup:', error);
-        throw error;
-    }
-}
-
-function removeNotification() {
+export function removeNotification() {
     const popup = document.getElementById('notification-popup');
     if (popup) {
         popup.remove();

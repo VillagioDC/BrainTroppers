@@ -7,10 +7,15 @@
   "lastUpdated": "",
   "nodes": [{  
     "nodeId": "",
+    "shortName": "",
     "content": "",
     "detail": "",
     "status": "",
     "directLink": [],
-    "relatedLink": []
+    "relatedLink": [],
+    "xy": "",
+    "hidden": false,
+    "scheme": "",
+    "layer": 0
   }]  
 }  

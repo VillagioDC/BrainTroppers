@@ -16,7 +16,7 @@ const log = require('../utils/log.jsx');
 async function userNewPassword(credentials) {
 
     // Check credentials
-    if (!credentials || !credentials.email || !credentials.password) {
+    if (!credentials || !credentials.email || !credentials.password || !credentials.authToken) {
         log('SERVER WARNING', 'Missing credentials', credentials);
         return {
             statusCode: 400,
@@ -34,6 +34,14 @@ async function userNewPassword(credentials) {
         return {
                 statusCode: 409,
                 body: JSON.stringify({ error: 'User not found' })
+        };
+    }
+    // Check auth Token
+    if (!user.authToken || user.authToken !== authToken) {
+        log('SERVER WARNING', 'Unauthorized new password request', credentials.email);
+        return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Unauthorized' })
         };
     }
 
