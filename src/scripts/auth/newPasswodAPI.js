@@ -1,3 +1,4 @@
+// LANDING PAGE AUTHENTICATION MODULE
 // AUTH NEW PASSWORD API MODULE
 
 // API call to new password
@@ -6,8 +7,7 @@ export async function apiNewPassword(email, password, authToken) {
         // Set Parameters
         const headers = { 'Content-Type': 'application/json' };
         const body = { credentials: { email, password } };
-        // const url = `${process.env.API_URL}/setNewPassword`;
-        const url = 'http://localhost:8888/.netlify/functions/setNewPassword';
+        const url = setApiUrl('newPassword');
         // API call
         const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify({ ...body, authToken }) });
         // Handle response

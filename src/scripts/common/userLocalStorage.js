@@ -1,4 +1,4 @@
-// USER LOCAL STORAGE SCRIPT
+// USER LOCAL STORAGE MODULE
 
 // Read local storage user
 export function getLocalStorageUser() {

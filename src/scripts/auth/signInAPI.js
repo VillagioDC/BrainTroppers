@@ -1,4 +1,8 @@
+// LANDING PAGE AUTHENTICATION MODULE
 // AUTH SIGN IN API MODULE
+
+// Import modules
+import { setApiUrl } from './setApiUrl.js';
 
 // API call to sign in
 export async function apiSignIn(email, password) {
@@ -6,8 +10,7 @@ export async function apiSignIn(email, password) {
         // Set Parameters
         const headers = { 'Content-Type': 'application/json' };
         const body = { credentials: { email, password } };
-        // const url = `${process.env.API_URL}/signIn`;
-        const url = 'http://localhost:8888/.netlify/functions/signIn';
+        const url = setApiUrl('signIn');
         // API call
         const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
         // Handle response

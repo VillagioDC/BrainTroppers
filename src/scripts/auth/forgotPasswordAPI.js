@@ -1,3 +1,4 @@
+// LANDING PAGE AUTHENTICATION MODULE
 // AUTH FORGOT PASSWORD API MODULE
 
 // API call to forgot password
@@ -6,8 +7,7 @@ export async function apiForgotPassword(email) {
         // Set Parameters
         const headers = { 'Content-Type': 'application/json' };
         const body = { credentials: { email } };
-        // const url = `${process.env.API_URL}/forgotPassword`;
-        const url = 'http://localhost:8888/.netlify/functions/forgotPassword';
+        const url = setApiUrl('forgotPassword');
         // API call
         const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
         // Handle response

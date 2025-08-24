@@ -1,3 +1,4 @@
+// LANDING PAGE AUTHENTICATION MODULE
 // AUTH SIGN UP API MODULE
 
 // API call to sign up
@@ -6,8 +7,7 @@ export async function apiSignUp(email, password) {
         // Set Parameters
         const headers = { 'Content-Type': 'application/json' };
         const body = { credentials: { email, password } };
-        // const url = `${process.env.API_URL}/signUp`;
-        const url = 'http://localhost:8888/.netlify/functions/signUp';
+        const url = setApiUrl('signUp');
         // API call
         const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
         // Handle response
