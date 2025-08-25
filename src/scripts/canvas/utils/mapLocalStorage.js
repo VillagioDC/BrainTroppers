@@ -1,13 +1,14 @@
+// CANVAS
 // MAP LOCAL STORAGE MODULES
 
 // Read local storage map
-function getLocalStorageMap() {
+export function getLocalStorageMap() {
     if (!localStorage.getItem('braintroop-map')) return;
     return JSON.parse(localStorage.getItem('braintroop-map'));
 }
 
 // Set local storage map
-function setLocalStorageMap(map) {
+export function setLocalStorageMap(map) {
     // Validate map object
     if (!map || typeof map !== 'object') {
         console.error('Invalid map object for local storage');
@@ -18,12 +19,6 @@ function setLocalStorageMap(map) {
 }
 
 // Remove local storage map
-function removeLocalStorageMap() {
-    localStorage.removeItem('braintroop-map');
-}
-
-// Remove local storage data
-function removeLocalStorageData() {
-    localStorage.removeItem('braintroop-user');
+export function removeLocalStorageMap() {
     localStorage.removeItem('braintroop-map');
 }

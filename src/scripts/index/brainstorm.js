@@ -1,4 +1,5 @@
-// LANDING PAGE BRAINSTORM MODULE
+// LANDING PAGE MODULE
+// BRAINSTORM IMAGE MODULE
 
 // Brainstorm animation
 (function() {

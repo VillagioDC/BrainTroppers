@@ -26,3 +26,8 @@ export function setLocalStorageUser(user) {
     // Store user object in local storage
     localStorage.setItem('braintroop-user', JSON.stringify(user));
 }
+
+// Remove local storage user
+export function removeLocalStorageUser() {
+    localStorage.removeItem('braintroop-user');
+}

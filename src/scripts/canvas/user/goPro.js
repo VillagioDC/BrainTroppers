@@ -1,0 +1,63 @@
+// CANVAS MODULES
+// GO PRO POPUP MODULE
+
+// Import modules
+import { removeUserMenu } from '../interface/userMenu.js';
+import { userWaitlistApi } from './userWaitlistApi.js'
+
+export async function goProPlan() {
+    // Load pro plan popup
+    await loadProPlanPopup();
+    // Bind event listeners
+    bindProPlanPopupEvents();
+    // Remove user menu
+    removeUserMenu();
+}
+
+// Load pro plan popup
+async function loadProPlanPopup() {
+    try {
+        const response = await fetch('./src/snippets/pro-plan.html');
+        if (!response.ok) throw new Error('Failed to load pro-plan.html');
+        const html = await response.text();
+        document.body.insertAdjacentHTML('beforeend', html);
+    } catch (error) {
+        console.error('Error loading pro plan popup:', error);
+    }
+}
+
+// Bind event listeners to pro plan popup
+function bindProPlanPopupEvents() {
+    // Add event listeners to pro plan popup
+    if (document.getElementById("pro-plan-form"))
+        document.getElementById("pro-plan-form").addEventListener("submit", proPlanFormSubmit);
+    if (document.getElementById("pro-plan-close"))
+        document.getElementById("pro-plan-close").addEventListener("click", removeProPlanPopup);
+}
+
+// Submit pro plan form
+async function proPlanFormSubmit(e) {
+    e.preventDefault();
+    // Call API
+    const result = await userWaitlistApi();
+    // Handle result
+    if (!result || result.error) {
+        // Error
+        await showNotification('Failed to register', 'error');
+    } else {
+        // Registered
+        await showNotification('Done', 'success');
+    }
+    removeProPlanPopup();
+}
+
+// Remove pro plan popup
+function removeProPlanPopup() {
+    // Remove event listeners
+    if (document.getElementById("pro-plan-form"))
+        document.getElementById("pro-plan-form").removeEventListener("submit", proPlanFormSubmit);
+    if (document.getElementById("pro-plan-close"))
+        document.getElementById("pro-plan-close").removeEventListener("click", removeProPlanPopup);
+    // Remove pro plan popup
+    document.getElementById("pro-plan-modal").remove();
+}

@@ -5,7 +5,6 @@
 // No modules
 
 export function setCanvasUrl() {
-
     // Set URL
     let url = "";
     // If production mode

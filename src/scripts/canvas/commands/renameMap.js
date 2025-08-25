@@ -1,0 +1,113 @@
+// CANVAS MODULES
+// RENAME MAP MODULE
+
+// Import modules
+import { removeMapMenu } from '../interface/mapListPopup.js';
+import { renameMapApi } from './renameMapApi.js';
+
+// Rename map
+export async function renameMap(currentMapItem) {
+    // Remove map menu
+    removeMapMenu();
+    // Load rename map html
+    await loadRenameMapPopup();
+    // Bind event listeners
+    bindRenameMapListeners();
+    // Set title popup and input
+    setRenameTitle(currentMapItem);
+}
+
+// Load rename map html
+async function loadRenameMapPopup() {
+    try {
+        const response = await fetch('./src/snippets/rename-title.html');
+        if (!response.ok) throw new Error('Failed to load rename-title.html');
+        const html = await response.text();
+        document.body.insertAdjacentHTML('beforeend', html);
+    } catch (error) {
+        console.error('Error loading rename map popup:', error);
+    }
+}
+
+// Bind event listeners
+function bindRenameMapListeners() {
+    // Elements
+    const confirmBtn = document.getElementById('rename-title-confirm');
+    const cancelBtn = document.getElementById('rename-title-cancel');
+    // Event listeners
+    if (confirmBtn) confirmBtn.addEventListener('click', renameConfirm);
+    if (cancelBtn) cancelBtn.addEventListener('click', renameCancel);
+    document.addEventListener('click', outsideRenameMapClickHandler);
+}
+
+// Set rename title popup and input
+function setRenameTitle(currentMapItem) {
+    // Fill existing title
+    const currentTitle = currentMapItem.querySelector('.map-title').textContent;
+    const titleInput = document.getElementById('rename-title-input');
+    if (!titleInput || !currentTitle) return;
+    titleInput.value = currentTitle.trim();
+    // Position popup near clicked button
+    const buttonRect = currentMapItem.getBoundingClientRect();
+    const popup = document.getElementById('rename-title-popup');
+    if (!popup) return;
+    popup.style.top = `${buttonRect.bottom + window.scrollY - 45}px`;
+    // Focus
+    titleInput.focus();
+}
+
+// Rename confirm
+async function renameConfirm() {
+    // Get input value
+    const input = document.getElementById('rename-title-input');
+    if (!input) return;
+    const newTitle = input.value.trim();
+    if (newTitle) {
+        // Show notification
+        await showNotification('Processing...', 'info', 'wait');
+        // Update title on database
+        const updatedMap = await renameMapApi(newTitle);
+        // Update title on canvas
+        if (updatedMap) {
+            // Set local storage map
+            setLocalStorageMap(updatedMap);
+            // Update map title
+            const titleElement = currentMapItem.querySelector('.map-title');
+                if (titleElement) {
+                    titleElement.textContent = newTitle;
+        }}
+        // Remove notification
+        removeNotification();
+    }
+    // Remove popups
+    removeRename();
+}
+
+// Rename cancel
+function renameCancel() {
+    // Clean input
+    const input = document.getElementById('rename-title-input');
+    input.value = '';
+    // Remove rename popup
+    removeRename();
+}
+
+// Remove rename popup
+function removeRename() {
+    // Remove event listeners
+    if (document.getElementById('rename-title-confirm'))
+        document.getElementById('rename-title-confirm').removeEventListener('click', renameConfirm);
+    if (document.getElementById('rename-title-cancel'))
+        document.getElementById('rename-title-cancel').removeEventListener('click', renameCancel);
+    document.removeEventListener('click', outsideRenameMapClickHandler);
+    // Remove popup container
+    if (document.getElementById('rename-title-popup'))
+        document.getElementById('rename-title-popup').remove();
+}
+
+// Outside click handler
+function outsideRenameMapClickHandler(e) {
+    if (!document.getElementById('rename-title-popup') || !document.getElementById('rename-title-popup').contains(e.target)) {
+        removeRename();
+    }
+}

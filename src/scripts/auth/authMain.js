@@ -4,7 +4,7 @@
 // Import modules
 import { signInBtnClick } from './signInModal.js';
 import { signUpBtnClick } from './signUpModal.js';
-import { checkNewPasswordUrlParameter } from './newPasswordParameters.js';
+import { checkUrlQuery } from './checkUrlQuery.js';
 
 // Main function
 (function () {
@@ -16,7 +16,7 @@ import { checkNewPasswordUrlParameter } from './newPasswordParameters.js';
     if (signInBtn) signInBtn.addEventListener('click', signInBtnClick);
     if (signUpBtn) signUpBtn.addEventListener('click', signUpBtnClick);
 
-    // Check new password url parameter
-    checkNewPasswordUrlParameter();
-    
+    // Check url parameter
+    checkUrlQuery();
+
 })();
