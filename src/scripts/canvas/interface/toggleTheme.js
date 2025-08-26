@@ -4,26 +4,31 @@
 // Import modules
 // No modules
 
+// Toggle theme
 export function toggleTheme() {
     // Elements
-    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggle = document.getElementById('canvas');
 
-    // Toggle to light mode
-    if (themeToggle.contains('fa-moon')) {
-        themeToggle.querySelector('i').classList.remove('fa-moon');
-        themeToggle.querySelector('i').classList.add('fa-sun');
-        themeToggle.innerText = '&nbsp;Light Mode';
-        // Implement changes on canvas
-        // Implement changes on interface
-        console.log('Toggle to light mode');
+    // Toggle theme changes on interface
+    // Canvas background
+    document.getElementById('canvas').classList.contains('light')?
+            document.getElementById('canvas').classList.remove('light') : document.getElementById('canvas').classList.add('light');
+    // Canvas zoom
+    document.querySelector('.zoom-controls').classList.contains('light')?
+            document.querySelector('.zoom-controls').classList.remove('light') : document.querySelector('.zoom-controls').classList.add('light');
+    // Expand button
+    if (document.getElementById('expand-btn'))
+        document.getElementById('expand-btn').classList.contains('light')?
+            document.getElementById('expand-btn').classList.remove('light') : document.getElementById('expand-btn').classList.add('light');
+    // New map container
+    if (document.getElementById('new-map-container')) 
+        document.getElementById('new-map-container').classList.contains('light')?
+            document.getElementById('new-map-container').classList.remove('light') : document.getElementById('new-map-container').classList.add('light');
+    if (document.querySelector('.map-new-input-container'))
+        document.querySelector('.map-new-input-container').classList.contains('light')?
+            document.querySelector('.map-new-input-container').classList.remove('light') : document.querySelector('.map-new-input-container').classList.add('light');
 
-        // Toggle to dark mode
-    } else if (themeToggle.contains('fa-sun')) {
-        themeToggle.querySelector('i').classList.remove('fa-sun');
-        themeToggle.querySelector('i').classList.add('fa-moon');
-        themeToggle.innerText = '&nbsp;Light Mode';
-        // Implement changes on canvas
-        // Implement changes on interface
-        console.log('Toggle to dark mode');
-    }
+            // Toggle theme changes on canvas
+    // Implement here
+    
 }

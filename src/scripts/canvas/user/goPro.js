@@ -33,6 +33,7 @@ function bindProPlanPopupEvents() {
         document.getElementById("pro-plan-form").addEventListener("submit", proPlanFormSubmit);
     if (document.getElementById("pro-plan-close"))
         document.getElementById("pro-plan-close").addEventListener("click", removeProPlanPopup);
+    document.addEventListener('click', outsideClickHandler);
 }
 
 // Submit pro plan form
@@ -49,6 +50,14 @@ async function proPlanFormSubmit(e) {
         await showNotification('Done', 'success');
     }
     removeProPlanPopup();
+}
+
+// Handle outside click
+function outsideClickHandler(e) {
+    const proPlanContent = document.querySelector('.pro-plan-content');
+    if (proPlanContent && !proPlanContent.contains(e.target)) {
+        removeProPlanPopup();
+    }
 }
 
 // Remove pro plan popup

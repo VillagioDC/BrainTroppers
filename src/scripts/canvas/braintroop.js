@@ -1,6 +1,5 @@
-// braintroop.js (rewritten & completed)
 // BrainTroop Interactive Mind Map Canvas using D3.js v7
-// Local storage key: 'braintroop_map'
+// Local storage key: 'braintroop-map'
 
 (function () {
   // Require d3 v7
@@ -20,42 +19,39 @@
       this.canvas.style.overflow = "hidden";
 
       // Backend-scheme map key stored in localStorage
-      // Backend schema: { projectId, owner, colabs[{email, userId}], userPrompt, title, lastUpdated, nodes [{nodeId, shortName, content, detail, status, directLink, relatedLink, xy, hidden, colorScheme, layer }] }
+      // Backend schema: { projectId, owner, colabs[{email, userId}], userPrompt, title, lastUpdated, nodes [{nodeId, shortName, content, detail, directLink, relatedLink, xy, hidden, colorScheme, layer }] }
       this.mapKey = "braintroop-map";
 
       // Grid and sizing defaults
       this.gridSpacing = 50;               // modular grid spacing
       this.nodeWidth = 146;                // default node width (grid modular)
       this.nodeHeight = 46;                // default node height
+      this.nodeBorderRadius = 10;          // default node border radius
       this.hiddenNodeWidth = 30;           // when hidden, smaller shape
       this.hiddenNodeHeight = 30;
+      this.hiddenNodeBorderRadius = 5;
       this.nodeSnapOffset = { x: this.nodeWidth / 2, y: this.nodeHeight / 2 };
+      this.nodeMargin = 2;                 // small margin requested
 
       // Palette structure
       this.palette = {
         dark: {
-          canvas: { bg: "#111111", gridDot: "#444444" },
-          node: { fill: "#1f1f1f", stroke: "#aaaaaa", text: "#ffffff", selected: "#ff4444" },
-          edge: { stroke: "#aaaaaa", strokeSelected: "#ff4444", style: "solid" }
-        },
+          canvas: { bg: "none", gridDot: "#3a4d6a" },
+          node: { fill: "#1f2f45", stroke: "#3a4d6a", text: "#e0e0e0", selected: "#54c3eb" },
+          edge: { stroke: "#3a4d6a", strokeSelected: "#54c3eb", style: "solid" } },
         light: {
-          canvas: { bg: "#ffffff", gridDot: "#cccccc" },
-          node: { fill: "#f0f0f0", stroke: "#777777", text: "#222222", selected: "#ff0000" },
-          edge: { stroke: "#888888", strokeSelected: "#ff0000", style: "solid" }
-        }
-      };
-
+          canvas: { bg: "none", gridDot: "#d5dce5" },
+          node: { fill: "#f3f6fa", stroke: "#d5dce5", text: "#1a1a1a", selected: "#00a3d4" },
+          edge: { stroke: "#d5dce5", strokeSelected: "#00a3d4", style: "solid" } } };
       // Preset color schemes for nodes
       this.colorSchemes = {
-        ocean: { fill: "#0077be", stroke: "#004d73", strokeSelected: "#00bfff", text: "#ffffff" },
-        sunset: { fill: "#ff7043", stroke: "#e64a19", strokeSelected: "#ffab91", text: "#ffffff" },
-        forest: { fill: "#388e3c", stroke: "#1b5e20", strokeSelected: "#66bb6a", text: "#ffffff" },
-        city: { fill: "#9e9e9e", stroke: "#424242", strokeSelected: "#bdbdbd", text: "#ffffff" }
-      };
+        "ocean": { "fill": "#1f2f45", "stroke": "#3a4d6a", "strokeSelected": "#54c3eb", "text": "#e0e0e0" },
+        "pearl": { "fill": "#f3f6fa", "stroke": "#d5dce5", "strokeSelected": "#ffffff", "text": "#1a1a1a" },
+      }
 
       // Theme state (dark or light)
       this.currentTheme = "dark";
-      this.currentColorScheme = "ocean"; // default node color scheme
+      this.currentColorScheme = "ocean";
 
       // Current layer index for toggles
       this.currentLayer = 0;
@@ -79,6 +75,10 @@
       this.selectionRect = null;
       this.simulation = null;
       this.zoom = null;
+      this.linkForce = null;
+      this.chargeForce = null;
+      this.collideForce = null;
+      this.forcesActive = false; // enable forces only during drag
 
       // Initialize D3 elements and forces
       this._initD3();
@@ -91,10 +91,10 @@
 
       // Keep grid & center updated on resize
       window.addEventListener("resize", () => this._onResize());
-
     }
 
     // -------------------- PRIVATE: D3 INIT --------------------
+    // Initializes D3 SVG, groups, zoom behavior, and force simulation.
     _initD3() {
       // Clear existing canvas contents
       this.canvas.innerHTML = "";
@@ -106,7 +106,7 @@
         .attr("width", "100%")
         .attr("height", "100%")
         .style("display", "block")
-        .style("background", this.palette[this.currentTheme].canvas.bg)
+        .style("background", "none")
         .style("cursor", "grab");
 
       // Root group for pan/zoom transforms
@@ -116,20 +116,23 @@
       this.gridG = this.g.append("g").attr("class", "dot-grid");
       this._updateDotGrid();
 
+      // Edge arrow marker (optional; guard for setTheme usage)
+      const defs = this.svg.append("defs");
+      defs.append("marker")
+        .attr("id", "arrow")
+        .attr("viewBox", "0 0 10 10")
+        .attr("refX", 10)
+        .attr("refY", 5)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto-start-reverse")
+        .append("path")
+        .attr("d", "M 0 0 L 10 5 L 0 10 z")
+        .attr("fill", this.palette[this.currentTheme].edge.stroke);
+
       // Groups for edges and nodes
       this.edgesG = this.g.append("g").attr("class", "edges");
       this.nodesG = this.g.append("g").attr("class", "nodes");
-
-      // Selection rectangle (visual rectangular-square-border used to highlight selected node)
-      this.selectionRect = this.nodesG.append("rect")
-        .attr("class", "selection-rect")
-        .attr("rx", 0)
-        .attr("ry", 0)
-        .style("fill", "none")
-        .style("stroke", this.palette[this.currentTheme].node.selected)
-        .style("stroke-width", 1)
-        .style("pointer-events", "none")
-        .style("display", "none");
 
       // D3 zoom with start/zoom/end handlers; adjust cursor while panning
       this.zoom = d3.zoom()
@@ -160,20 +163,103 @@
 
       // Force simulation: link/connect, charge, collide and a magnetic custom force
       this.simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(d => d.id).distance(160).strength(0.8))
-        .force("charge", d3.forceManyBody().strength(-400))
-        .force("collide", d3.forceCollide(Math.max(this.nodeWidth, this.nodeHeight) * 0.6).strength(0.9))
-        .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
-        .force("magnetic", this._magneticForce.bind(this)); // custom magnetic snapping
+        .force("link", d3.forceLink().id(d => d.id).distance(160).strength(0))
+        .force("charge", d3.forceManyBody().strength(0))
+        // NOTE: changed collision radius function to always return a radius so locked nodes
+        // can repel/magnetize unlocked nodes while remaining pinned (via fx/fy).
+        .force("collide", d3.forceCollide(d => {
+          const mapNode = d.__mapNode || {};
+          const r = (mapNode.hidden ? this.hiddenNodeWidth : this.nodeWidth) * 0.6;
+          return r;
+        }).strength(0))
+        .force("magnetic", this._magneticForce.bind(this)); // custom magnetic snapping / repulsion
+
+      // Keep references to adjust strengths on drag
+      this.linkForce = this.simulation.force("link");
+      this.chargeForce = this.simulation.force("charge");
+      this.collideForce = this.simulation.force("collide");
+
+      // Ensure tick enforces locked nodes immutability (E1)
+      this.simulation.on("tick.enforceLocked", () => {
+        const simNodes = this.simulation.nodes() || [];
+        for (const n of simNodes) {
+          const mapNode = n && n.__mapNode;
+          if (mapNode && mapNode.locked === true) {
+            // enforce position exactly to fx/fy if present, otherwise to stored x,y
+            if (typeof n.fx === "number" && typeof n.fy === "number") {
+              n.x = n.fx;
+              n.y = n.fy;
+            } else if (typeof mapNode.x === "number" && typeof mapNode.y === "number") {
+              n.x = mapNode.x;
+              n.y = mapNode.y;
+              n.fx = mapNode.x;
+              n.fy = mapNode.y;
+            }
+            // zero velocities to avoid drift
+            n.vx = 0; n.vy = 0;
+          }
+        }
+      });
+    }
+
+    // Enables drag forces and pins locked nodes during drag operations.
+    _enableDragForces(draggingNodeId = null) {
+      this.forcesActive = true;
+      if (this.linkForce && this.linkForce.strength) this.linkForce.strength(0.1);
+      if (this.chargeForce && this.chargeForce.strength) this.chargeForce.strength(-200);
+      if (this.collideForce && this.collideForce.strength) this.collideForce.strength(1);
+
+      // Pin locked nodes explicitly here as well (reassert fx/fy and zero velocity)
+      const simNodes = this.simulation.nodes() || [];
+      simNodes.forEach(n => {
+        try {
+          if (n && n.__mapNode && n.__mapNode.locked === true) {
+            const mapNode = n.__mapNode;
+            // If this locked node is the one currently being dragged, don't override its fx/fy
+            if (draggingNodeId && n.id === draggingNodeId) {
+              // ensure it has fx/fy defined so tick.enforceLocked behaves predictably
+              if (typeof n.fx !== "number" || typeof n.fy !== "number") {
+                const px = (typeof mapNode.x === "number") ? mapNode.x : n.x;
+                const py = (typeof mapNode.y === "number") ? mapNode.y : n.y;
+                n.fx = px;
+                n.fy = py;
+                n.x = px; n.y = py;
+                n.vx = 0; n.vy = 0;
+              }
+            } else {
+              // Normal pin behavior for other locked nodes
+              const px = (typeof mapNode.x === "number") ? mapNode.x : n.x;
+              const py = (typeof mapNode.y === "number") ? mapNode.y : n.y;
+              n.fx = px;
+              n.fy = py;
+              n.x = px; n.y = py;
+              n.vx = 0; n.vy = 0;
+            }
+          }
+        } catch (e) {
+          // ignore per-node errors
+        }
+      });
+      this.simulation.alphaTarget(0.3).restart();
+    }
+
+    // Disables drag forces when not dragging, keeping locked nodes pinned.
+    _disableDragForces() {
+      this.forcesActive = false;
+      if (this.linkForce && this.linkForce.strength) this.linkForce.strength(0);
+      if (this.chargeForce && this.chargeForce.strength) this.chargeForce.strength(0);
+      if (this.collideForce && this.collideForce.strength) this.collideForce.strength(0);
+      // Keep locked nodes pinned (do not clear fx/fy) to ensure immutability across updates
+      this.simulation.alphaTarget(0);
     }
 
     // -------------------- PRIVATE: GRID --------------------
-    // Draw dotted grid to match viewport
+    // Draws a dotted grid beyond the visible area for visual reference.
     _updateDotGrid() {
       // Compute approximate visible area
       const bbox = this.canvas.getBoundingClientRect();
-      const width = Math.max(bbox.width, window.innerWidth);
-      const height = Math.max(bbox.height, window.innerHeight);
+      const width = Math.max(bbox.width, 2 * window.innerWidth);
+      const height = Math.max(bbox.height, 2 *window.innerHeight);
 
       // Build dots array (coarse but performant)
       const dots = [];
@@ -197,25 +283,78 @@
     }
 
     // -------------------- PRIVATE: CUSTOM FORCE --------------------
-    // Magnetic snapping force: attracts "free" nodes toward nearest grid intersection
+    // Custom magnetic force: attracts unlocked nodes to nearest grid intersection
+    // and repels them from locked nodes when too close.
     _magneticForce(alpha) {
-      if (!this.map.nodes) return;
-      // Only affect nodes that are free === true (respond to magnets)
-      this.map.nodes.forEach(node => {
-        const n = node.__d3node; // reference to simulation node object
-        if (!n) return;
-        if (n.locked === false) return; // fixed nodes do not respond to magnets
-        // compute nearest grid point (snap target)
-        const gx = Math.round(n.x / this.gridSpacing) * this.gridSpacing;
-        const gy = Math.round(n.y / this.gridSpacing) * this.gridSpacing;
-        // apply a gentle pull toward the grid point
-        n.vx += (gx - n.x) * 0.05 * alpha;
-        n.vy += (gy - n.y) * 0.05 * alpha;
-      });
+      // alpha: small positive number from simulation tick
+      if (!this.map.nodes || !this.forcesActive) return;
+      const simNodes = this.simulation.nodes() || [];
+      if (!simNodes || simNodes.length === 0) return;
+
+      // Build quick lookup of locked nodes positions
+      const lockedNodes = [];
+      for (const n of simNodes) {
+        if (!n || !n.__mapNode) continue;
+        if (n.__mapNode.locked === true) {
+          // locked position - prefer fx/fy if present
+          const lx = (typeof n.fx === "number") ? n.fx : n.x;
+          const ly = (typeof n.fy === "number") ? n.fy : n.y;
+          lockedNodes.push({ x: lx, y: ly });
+        }
+      }
+
+      // For each sim node that is unlocked, apply:
+      //  - gentle attraction towards nearest grid point
+      //  - repulsive force away from any locked node closer than a threshold
+      const gridSpacing = this.gridSpacing;
+      const repelRadius = Math.max(this.nodeWidth, this.nodeHeight) * 1.2; // radius within which repulsion occurs
+      const repelStrength = 0.6;  // scale of repulsion
+      const gridPull = 0.05;     // attraction to grid
+      for (const n of simNodes) {
+        if (!n || !n.__mapNode) continue;
+        const mapNode = n.__mapNode;
+        // Skip locked nodes entirely
+        if (mapNode.locked === true) continue;
+
+        // --- Grid pull ---
+        // compute nearest grid intersection
+        const gx = Math.round(n.x / gridSpacing) * gridSpacing;
+        const gy = Math.round(n.y / gridSpacing) * gridSpacing;
+        // apply gentle acceleration toward grid center scaled by alpha
+        const dxg = gx - n.x;
+        const dyg = gy - n.y;
+        n.vx += dxg * gridPull * alpha;
+        n.vy += dyg * gridPull * alpha;
+
+        // --- Repel from locked nodes if too close ---
+        if (lockedNodes.length > 0) {
+          for (const ln of lockedNodes) {
+            const dx = n.x - ln.x;
+            const dy = n.y - ln.y;
+            const dist2 = dx * dx + dy * dy;
+            if (dist2 === 0) {
+              // jitter slightly to break exact overlap
+              n.vx += (Math.random() - 0.5) * 0.1;
+              n.vy += (Math.random() - 0.5) * 0.1;
+              continue;
+            }
+            const dist = Math.sqrt(dist2);
+            if (dist < repelRadius) {
+              // normalized vector away from locked node
+              const nx = dx / dist;
+              const ny = dy / dist;
+              // magnitude grows as nodes get closer
+              const strength = (1 - dist / repelRadius) * repelStrength * alpha;
+              n.vx += nx * strength;
+              n.vy += ny * strength;
+            }
+          }
+        }
+      }
     }
 
     // -------------------- PRIVATE: STORAGE --------------------
-    // Load from localStorage into this.map
+    // Loads the map from localStorage into the in-memory canvas model.
     _loadMapFromStorage() {
       const raw = localStorage.getItem(this.mapKey);
       if (!raw) {
@@ -235,7 +374,7 @@
       }
     }
 
-    // Save this.map (canvas model) to localStorage backend map
+    // Saves the in-memory canvas map to localStorage in backend format.
     _saveMapToStorage() {
       try {
         // Convert canvas map to backend schema and persist
@@ -246,7 +385,7 @@
       }
     }
 
-    // Convert backend map to canvas map
+    // Converts backend map schema to canvas map schema.
     _convertMapToCanvas(backendMap) {
       //Check map
       if (!backendMap || typeof backendMap !== "object") {
@@ -274,7 +413,6 @@
           const shortName = n.shortName || "";
           const content = n.content || "";
           const detail = n.detail || "";
-          const status = n.status || "pending";
           const colorSchemeName = n.colorScheme || this.currentColorScheme;
           const layer = typeof n.layer === "number" ? n.layer : 0;
           const hidden = !!n.hidden;
@@ -298,7 +436,6 @@
             shortName,
             content,
             detail,
-            status,
             x,
             y,
             locked,
@@ -356,13 +493,13 @@
       return { nodes, edges };
     }
 
-    // Convert canvas map to backend map
+    // Converts canvas map schema to backend map schema.
     _convertMapToBackend() {
       // Build lookup for edges
       const directLinks = {};
       const relatedLinks = {};
       // Loop all edges
-      (canvas.edges || []).forEach(e => {
+      (this.map.edges || []).forEach(e => {
         if (!e.source || !e.target) return;
         // Direct links
         if (e.type === "direct") {
@@ -383,7 +520,7 @@
 
       // Convert canvas nodes to backend nodes
       const nodes = (this.map.nodes || []).map(n => {
-        // Always store xy as "x,y" string or null if free
+        // Always store xy as "x,y" string or null if unlocked
         let xy = null;
         if (typeof n.x === "number" && typeof n.y === "number") {
           xy = `${Math.round(n.x)},${Math.round(n.y)}`;
@@ -396,7 +533,6 @@
           shortName: n.shortName || "",
           content: n.content || "",
           detail: n.detail || "",
-          status: n.status || "pending",
           directLink: directLinks[n.id] || [],
           relatedLink: relatedLinks[n.id] || [],
           xy,
@@ -419,7 +555,7 @@
     }
 
     // -------------------- PUBLIC API --------------------
-    // Replace entire map and render
+    // Replaces the entire map and renders it.
     setMap(map) {
       // Check map
       if (!map) return;
@@ -428,7 +564,7 @@
       this.updateMap(true);
     }
 
-    // Delete entire map
+    // Deletes the entire map.
     deleteMap() {
       // Delete canvas map
       this.map = { nodes: [], edges: [] };
@@ -438,8 +574,8 @@
       this._setSelected(null, null);
     }
 
-    // Reads the local storage backend map, converts to canvas map and rebuilds
-    // parameter `forceFull` instructs to fully rebuild bindings if needed
+    // Reads the local storage backend map, converts to canvas map and rebuilds.
+    // Parameter `forceFull` instructs to fully rebuild bindings if needed.
     updateMap(forceFull = false) {
       // Load canvas map from local storage backend map
       this._loadMapFromStorage();
@@ -449,7 +585,7 @@
       this._saveMapToStorage();
     }
 
-    // Add a node connected to selected node
+    // Adds a new node connected to the specified parent.
     // Accepts object: { id: string, content: string, layer: int, colorSchemeName: string, nodeXY: "x,y" (optional), locked: boolean }
     addNode({ parentId, id, shortName = "", content = "", detail = "", nodeXY = null, locked = false, layer = 0, colorSchemeName = this.currentColorScheme } = {}) {
       // Check parentId
@@ -460,7 +596,7 @@
 
       // Determine initial coords: first node center, others random
       let x = null, y = null;
-      if (nodeXY && typeof nodeXY === "string" && nodeXY.contains(",")) {
+      if (nodeXY && typeof nodeXY === "string" && nodeXY.includes(",")) {
         const parts = nodeXY.split(",").map(p => parseFloat(p));
         x = parts[0]; y = parts[1];
       } else {
@@ -482,6 +618,12 @@
       locked = false;
       if (this.map.nodes.length === 0) locked = true;
 
+      // Set color scheme
+      if (!colorSchemeName) colorSchemeName = this.currentColorScheme; // default color scheme
+      // Inherit parent color scheme
+      const parentNode = this.map.nodes.find(n => n.id === parentId);
+      if (parentNode && parentNode.colorSchemeName) colorSchemeName = parentNode.colorSchemeName;
+
       // Construct node
       const node = {
         id,
@@ -494,19 +636,23 @@
         locked,
         colorSchemeName,
         layer: typeof layer === "number" ? layer : this.currentLayer,
-        hidden: false     // visible by default
+        hidden: false
       };
       // Push node
       this.map.nodes.push(this._normalizeNode(node));
-      // Persist and refresh
-      this._saveMapToStorage();
+      
+      // Set edge
+      this.setConnection(parentId, id, "direct");
+      
+      // Select this node
+      this._setSelected(id, null);
+
       this.updateMap();
       // Return node id (temporary id)
       return node.id;
     }
 
-    // Connect two nodes: frontend will call setConnection(nodeFrom, nodeTo)
-    // Edge type: 'direct' (solid) or 'related' (dash)
+    // Connects two nodes with an edge of specified type ('direct' or 'related').
     setConnection(nodeFromId, nodeToId, type = "direct") {
       if (!nodeFromId || !nodeToId) return;
       const edgeId = `edge-${nodeFromId}-${nodeToId}`;
@@ -525,20 +671,45 @@
       this.updateMap();
     }
 
-    // Toggle theme (dark/light)
+    // Disconnects two nodes by removing edges in both directions.
+    disconnect(nodeFromId, nodeToId) {
+      if (!nodeFromId || !nodeToId) return;
+      const ids = new Set([`edge-${nodeFromId}-${nodeToId}`, `edge-${nodeToId}-${nodeFromId}`]);
+      const before = this.map.edges.length;
+      this.map.edges = (this.map.edges || []).filter(e => !ids.has(e.id));
+      if (this.map.edges.length !== before) {
+        this._saveMapToStorage();
+        this.updateMap();
+      }
+    }
+
+    // Removes a specific edge by its ID.
+    removeEdge(edgeId) {
+      if (!edgeId) return;
+      const before = this.map.edges.length;
+      this.map.edges = (this.map.edges || []).filter(e => e.id !== edgeId);
+      if (this.map.edges.length !== before) {
+        this._saveMapToStorage();
+        this.updateMap();
+      }
+    }
+
+    // Toggles between dark and light themes.
     setTheme(themeName) {
       if (!this.palette[themeName]) return;
       this.currentTheme = themeName;
-      // Update background and grid dot colors
-      this.svg.style("background", this.palette[this.currentTheme].canvas.bg);
+      // Update grid dot colors
       this._updateDotGrid();
-      // Update arrow marker color
-      this.svg.select("defs marker#arrow path").attr("fill", this.palette[this.currentTheme].edge.stroke);
+      // Update arrow marker color (guard if path exists)
+      const markerPath = this.svg.select("defs marker#arrow path");
+      if (!markerPath.empty()) {
+        markerPath.attr("fill", this.palette[this.currentTheme].edge.stroke);
+      }
       // Repaint nodes/edges
       this.updateMap(true);
     }
 
-    // Set color scheme for a node by name
+    // Sets the color scheme for a specific node.
     setColorScheme(nodeId, schemeName) {
       // Find node
       const node = this.map.nodes.find(n => n.id === nodeId);
@@ -554,8 +725,7 @@
       this.updateMap();
     }
 
-    // Toggle hide/show of nodes of a layer and below
-    // layerId numeric. Nodes with layer >= layerId will be toggled hidden=true/false
+    // Toggles visibility of nodes at or above the specified layer.
     toggleLayer(layerId) {
       if (typeof layerId !== "number") return;
       // determine new state (flip for nodes of that layer group)
@@ -568,7 +738,7 @@
       this.updateMap();
     }
 
-    // Export - export canvas as PNG or SVG
+    // Exports the canvas as PNG or SVG.
     // type: 'png' | 'svg'
     export(type = "png") {
       // Check content
@@ -624,7 +794,7 @@
     }
 
     // -------------------- EVENTS EMISSION (only two events) --------------------
-    // Emit 'select' with { nodeId, edgeId } where one is non-null
+    // Emits 'select' event with { nodeId, edgeId } where one is non-null.
     _emitSelect(nodeId = null, edgeId = null) {
       // update internal selected state
       if (nodeId) {
@@ -635,25 +805,25 @@
         this.selected = { type: null, id: null };
       }
       // dispatch only this custom event for frontend
-      this.canvas.dispatchEvent(new CustomEvent("select", { detail: { nodeId: nodeId || null, edgeId: edgeId || null } }));
-      // update visual selection rectangle / edge highlight
+      this.canvas.dispatchEvent(new CustomEvent("select", { detail: { nodeId, edgeId } }));
+      // Feature: immediately update visual selection rectangle / edge highlight
       this._paintSelection();
     }
 
-    // Emit 'nodeMove' after a node has been dragged & dropped and persisted
+    // Emits 'nodeMove' after a node has been dragged & dropped and persisted.
     _emitNodeMove(nodeId, nodeXY) {
       this.canvas.dispatchEvent(new CustomEvent("nodeMove", { detail: { nodeId, nodeXY } }));
     }
 
-    // Convenience to set selection programmatically
+    // Convenience to set selection programmatically.
     _setSelected(type, id) {
-      if (type === "node") this._emitSelect(id, null);
+      if (type === "node") this._emitSelect(id, null, null);
       else if (type === "edge") this._emitSelect(null, id);
-      else this._emitSelect(null, null);
+      else this._emitSelect(null, null, null);
     }
 
     // -------------------- PRIVATE: BINDING NODES & EDGES --------------------
-    // Transform this.map into D3 nodes/links and bind enter/update/exit
+    // Transforms this.map into D3 nodes/links and binds enter/update/exit.
     _bindEdgesAndNodes(forceFull = false) {
       // Build lookup map for quick referencing
       const nodeById = new Map();
@@ -677,12 +847,23 @@
           x = n.x; y = n.y;
         }
 
-        return {
+        const sn = {
           id: n.id,
           x: x !== null ? x : (window.innerWidth / 2 + (Math.random() - 0.5) * 200),
           y: y !== null ? y : (window.innerHeight / 2 + (Math.random() - 0.5) * 200),
           __mapNode: n
         };
+
+        // Feature: if node is locked, pin it using fx/fy so forces won't move it
+        if (n.locked === true) {
+          // ensure fx/fy always set (even if x/y were null originally)
+          sn.fx = (typeof n.x === "number" ? n.x : sn.x);
+          sn.fy = (typeof n.y === "number" ? n.y : sn.y);
+          // preserve exact x/y as well
+          sn.x = sn.fx; sn.y = sn.fy;
+        }
+
+        return sn;
       });
 
       // Prepare edges - include edges connecting to existing nodes only
@@ -726,6 +907,7 @@
         .attr("class", "edge-hit")
         .attr("stroke-width", 12)
         .style("stroke", "transparent")
+        .style("cursor", "pointer")
         .style("pointer-events", "stroke");
 
       // Edge click -> select edge (stop propagation so background click doesn't clear)
@@ -770,49 +952,98 @@
         // Make nodes draggable (drag start -> drag -> end)
         .call(d3.drag()
           .on("start", (event, d) => {
-            if (!event.active) this.simulation.alphaTarget(0.2).restart();
-            // nothing else - don't auto-fix during drag; we commit on end
+            const mapNode = d.__mapNode;
+            // Store initial position
+            d.startX = d.x;
+            d.startY = d.y;
+            // Pin to current position so drag has a stable starting point
+            d.fx = d.x;
+            d.fy = d.y;
+            // Enable forces and pin other locked nodes.
+            // If we're dragging a locked node, pass its id so we don't override its fx/fy.
+            this._enableDragForces(mapNode && mapNode.locked === true ? d.id : null);
+
+            // cursor feedback
+            try { this.svg.style("cursor", "grabbing"); } catch (e) {}
           })
           .on("drag", (event, d) => {
-            // Move the simulated node to the pointer location
-            d.x = event.x;
-            d.y = event.y;
+            // Always allow movement while dragging (locked or unlocked)
+            const [nx, ny] = d3.pointer(event, this.g.node());
+            d.fx = nx;
+            d.fy = ny;
+            d.x = nx;
+            d.y = ny;
             // Immediate visual update while dragging
-            d3.select(event.subject.__containerNode).attr("transform", `translate(${d.x - this.nodeWidth / 2}, ${d.y - this.nodeHeight / 2})`);
+            if (event.subject && event.subject.__containerNode) {
+              d3.select(event.subject.__containerNode).attr("transform", `translate(${d.x - this.nodeWidth / 2}, ${d.y - this.nodeHeight / 2})`);
+            }
             this._tickUpdatePositions();
           })
           .on("end", (event, d) => {
-            if (!event.active) this.simulation.alphaTarget(0);
-            // Snap to grid on drop
-            const snappedX = Math.round(d.x / this.gridSpacing) * this.gridSpacing;
-            const snappedY = Math.round(d.y / this.gridSpacing) * this.gridSpacing;
-            d.x = snappedX; d.y = snappedY;
-
-            // Persist new nodeXY and mark node as fixed (free=false) (F15)
             const mapNode = d.__mapNode;
-            mapNode.nodeXY = `${Math.round(d.x)},${Math.round(d.y)}`;
-            mapNode.x = d.x; mapNode.y = d.y;
-            mapNode.free = false; // no longer respond to magnets
+            // Snap to grid on drop (world coords)
+            const margin = this.nodeMargin || 0;
+            const grid = this.gridSpacing;
 
-            // Persist and emit move event
+            let snappedX = Math.round(d.x / grid) * grid;
+            let snappedY = Math.round(d.y / grid) * grid;
+            if (Math.abs(snappedX - d.x) <= margin) snappedX = d.x;
+            if (Math.abs(snappedY - d.y) <= margin) snappedY = d.y;
+            // Assign final coordinates and pin (lock) the node
+            d.x = snappedX; d.y = snappedY;
+            d.fx = snappedX; d.fy = snappedY;
+            d.vx = 0; d.vy = 0;
+
+            // Consider only relevant movements
+            if (mapNode) {
+              const minMove = Math.ceil(this.gridSpacing / 2);
+              const moved = Math.abs(snappedX - d.startX) > minMove || Math.abs(snappedY - d.startY) > minMove;
+              if (moved) {
+                // Persist new nodeXY and mark node as locked (always lock on drop)
+                mapNode.nodeXY = `${Math.round(d.x)},${Math.round(d.y)}`;
+                mapNode.x = d.x; mapNode.y = d.y;
+                mapNode.locked = true;
+                // Persist and emit move event
+                this._saveMapToStorage();
+                if (mapNode) this._emitNodeMove(mapNode.id, mapNode.nodeXY);
+                // Select node after drop so selection UI updates immediately
+                if (mapNode) this._setSelected("node", mapNode.id);
+              }
+            }
+
+            // Let forces tick briefly to settle unlocked nodes, then disable aggressive forces
+            this.simulation.alpha(0.2).restart();
+            this._disableDragForces();
+
+            // Ensure storage is up-to-date
             this._saveMapToStorage();
-            this._emitNodeMove(mapNode.id, mapNode.nodeXY);
 
-            // Update simulation so other nodes react
-            this.updateMap();
+            // restore cursor
+            try { this.svg.style("cursor", "grab"); } catch (e) {}
           })
-        );
+        )
 
-      // Attach container node reference (used in drag)
+      // Attach container node reference (used in drag) for newly entered nodes
       nodeEnter.each((d, i, nodes) => {
         d.__containerNode = nodes[i];
       });
 
+      // Append selected node rect (hidden as initial state)
+      nodeEnter.append("rect")
+        .attr("class", "selection-rect")
+        .attr("rx", d => d.__mapNode.hidden ? this.hiddenNodeBorderRadius : this.nodeBorderRadius)
+        .attr("ry", d => d.__mapNode.hidden ? this.hiddenNodeBorderRadius : this.nodeBorderRadius)
+        .style("fill", "none")
+        .style("stroke-width", 1)
+        .style("cursor", "pointer")
+        .style("pointer-events", "none")
+        .style("display", "none");
+
       // Append rect and text inside node group
       nodeEnter.append("rect")
-        .attr("class", "node-rect")
-        .attr("rx", 10)
-        .attr("ry", 10)
+        .attr("class", "selected-node")
+        .attr("rx", this.nodeBorderRadius)
+        .attr("ry", this.nodeBorderRadius)
         .style("stroke-width", 1)
         .style("cursor", "pointer");
 
@@ -844,6 +1075,12 @@
 
       // UPDATE (applies to both new and existing nodes)
       const allNodeGroups = this.nodesG.selectAll("g.node-group");
+
+      // Ensure every simulation node has a container DOM reference (enter + update)
+      allNodeGroups.each((d, i, nodes) => {
+        d.__containerNode = nodes[i];
+      });
+
       allNodeGroups.each((d, i, nodes) => {
         const g = d3.select(nodes[i]);
         const mapNode = d.__mapNode;
@@ -853,7 +1090,7 @@
         const h = mapNode.hidden ? this.hiddenNodeHeight : this.nodeHeight;
 
         // Determine border radius based on hidden state
-        const borderRadius = mapNode.hidden ? Math.min(w, h) / 2 : 10;
+        const borderRadius = mapNode.hidden ? this.hiddenNodeBorderRadius : this.nodeBorderRadius;
 
         // Compute color scheme or use theme defaults
         const scheme = this.colorSchemes[mapNode.colorSchemeName] || null;
@@ -863,7 +1100,7 @@
         const textColor = scheme ? scheme.text : this.palette[this.currentTheme].node.text;
 
         // Update rect size & corner radius (hidden nodes become circular-ish)
-        g.select(".node-rect")
+        g.select(".selected-node")
           .attr("width", w)
           .attr("height", h)
           .attr("rx", borderRadius)
@@ -871,8 +1108,24 @@
           .style("fill", fill)
           .style("stroke", (this.selected.type === "node" && this.selected.id === mapNode.id) ? strokeSelected : stroke);
 
+        // Compute padded dimensions for selection rect
+        const pad = 3;
+        const selWidth = w + pad * 2;
+        const selHeight = h + pad * 2;
+
+        // Update selection rect (position at -pad to outset)
+        g.select(".selection-rect")
+          .attr("x", -pad)
+          .attr("y", -pad)
+          .attr("width", selWidth)
+          .attr("height", selHeight)
+          .attr("rx", borderRadius)
+          .attr("ry", borderRadius)
+          .style("fill", this.palette[this.currentTheme].node.selected)
+          .style("display", (this.selected.type === "node" && this.selected.id === mapNode.id) ? null : "none");
+
         // Update text: show '+' sign if hidden, otherwise content; adjust font size
-        const nodeText = mapNode.hidden ? "+" : (mapNode.content || "");
+        const nodeText = mapNode.hidden ? "+" : (mapNode.shortName || "");
         g.select(".node-text")
           .attr("x", w / 2)
           .attr("y", h / 2)
@@ -889,7 +1142,7 @@
 
       // ----------------- SIMULATION TICK -----------------
       // On each tick update positions of node groups and edges positions
-      this.simulation.on("tick", () => {
+      this.simulation.on("tick.updateDOM", () => {
         // Update each node group's transform (centered)
         this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
           // compute width/height based on hidden state
@@ -917,7 +1170,7 @@
       this._paintSelection();
     }
 
-    // Helper: update positions instantly (used during drag)
+    // Helper: updates positions instantly (used during drag).
     _tickUpdatePositions() {
       this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
         const mapNode = d.__mapNode;
@@ -934,7 +1187,7 @@
     }
 
     // -------------------- PRIVATE: UTILS & NORMALIZATIONS --------------------
-    // Normalize node object shape and set defaults. Also ensures numeric x,y if possible.
+    // Normalizes node object shape and sets defaults. Ensures numeric x,y if possible.
     _normalizeNode(n) {
       // parse nodeXY into x,y numbers if available
       let nodeXY = "";
@@ -952,15 +1205,20 @@
         if (typeof n.y === "number") y = n.y;
       }
 
+      // Feature: translate any 'locked'
+      // FIXED: use straightforward boolean coercion for locked default (was previously confusing)
+      const isLocked = !!n.locked;
+
       return {
         id: String(n.id),
-        content: n.content || "",
+        shortName: n.shortName || "",
         // store canonical nodeXY as string if possible
         nodeXY: (typeof nodeXY === "string" ? nodeXY : (x !== null && y !== null ? `${Math.round(x)},${Math.round(y)}` : "")),
         // numeric coordinates (might be null)
         x: (typeof x === "number" ? x : null),
         y: (typeof y === "number" ? y : null),
-        free: typeof n.free === "boolean" ? n.free : true,
+        // Feature: lock nodes position x y
+        locked: !!n.locked,
         layer: typeof n.layer === "number" ? n.layer : 0,
         colorSchemeName: n.colorSchemeName || n.colorScheme || "ocean",
         hidden: !!n.hidden,
@@ -968,7 +1226,7 @@
       };
     }
 
-    // Normalize edge object
+    // Normalizes edge object.
     _normalizeEdge(e) {
       return {
         id: e.id || `edge-${e.source}-${e.target}`,
@@ -979,9 +1237,9 @@
     }
 
     // -------------------- PRIVATE: VISUAL SELECTION RENDERING --------------------
-    // Paint selection visuals (rect around node or highlight selected edge)
+    // Paints selection visuals (rect around node or highlight selected edge).
     _paintSelection() {
-      // Set edge stroke colors and highlight selected edge
+      // Edges: Set stroke colors and highlight selected edge
       this.edgesG.selectAll("g.edge-group").each((d, i, nodes) => {
         const g = d3.select(nodes[i]);
         const line = g.select(".edge-line");
@@ -990,51 +1248,41 @@
         else line.style("stroke", this.palette[this.currentTheme].edge.stroke);
       });
 
-      // If a node is selected, place the selectionRect around its current bounding box
-      if (this.selected.type === "node" && this.selected.id) {
-        const nodeGroup = this.nodesG.selectAll("g.node-group").filter(d => d.id === this.selected.id);
-        if (!nodeGroup.empty()) {
-          const gNode = nodeGroup.node();
-          if (gNode) {
-            // Get the bounding box of the node group in its local coordinate system
-            const gBounding = gNode.getBBox();
-            // Get the node group's transform attribute (translate(x,y))
-            const transformAttr = gNode.getAttribute("transform") || "translate(0,0)";
-            const translateMatch = transformAttr.match(/translate\(([^,]+),([^)]+)\)/);
-            let translateX = 0, translateY = 0;
-            if (translateMatch) {
-              translateX = parseFloat(translateMatch[1]) || 0;
-              translateY = parseFloat(translateMatch[2]) || 0;
-            }
+      // Feature: show selection rect & change stroke immediately
+      this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
+        const g = d3.select(nodes[i]);
+        const mapNode = d.__mapNode;
+        const scheme = this.colorSchemes[mapNode.colorSchemeName] || null;
+        const stroke = scheme ? scheme.stroke : this.palette[this.currentTheme].node.stroke;
+        const strokeSelected = scheme ? scheme.strokeSelected : this.palette[this.currentTheme].node.selected;
 
-            // Adjust bounding box coordinates by the node group's translation
-            const pad = 2;
-            const rectX = gBounding.x + translateX - pad;
-            const rectY = gBounding.y + translateY - pad;
-            const rectWidth = gBounding.width + pad * 2;
-            const rectHeight = gBounding.height + pad * 2;
+        const isSelected = (this.selected.type === "node" && this.selected.id === mapNode.id);
 
-            // Apply the selection rectangle attributes
-            this.selectionRect
-              .attr("x", rectX)
-              .attr("y", rectY)
-              .attr("width", rectWidth)
-              .attr("height", rectHeight)
-              .style("display", null);
+        g.select(".selected-node")
+          .style("stroke", isSelected ? strokeSelected : stroke);
 
-          } else {
-            this.selectionRect.style("display", "none");
-          }
-        } else {
-          this.selectionRect.style("display", "none");
-        }
-      } else {
-        // Hide selection rect if nothing selected
-        this.selectionRect.style("display", "none");
-      }
+        g.select(".selection-rect")
+          .style("display", isSelected ? null : "none");
+      });
     }
 
-    // Determine stroke color for selected node (prefer node scheme's strokeSelected)
+    // Updates node strokes and selection rectangles immediately.
+    _updateNodeStrokes() {
+      this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
+        const g = d3.select(nodes[i]);
+        const mapNode = d.__mapNode;
+        const scheme = this.colorSchemes[mapNode.colorSchemeName] || this.colorSchemes[this.currentColorScheme];
+        const stroke = (scheme && scheme.stroke) || this.palette[this.currentTheme].node.stroke;
+        const strokeSelected = this._getSelectedNodeStroke(mapNode.id);
+        const isSelected = (this.selected.type === "node" && this.selected.id === mapNode.id);
+        g.select(".selected-node")
+          .style("stroke", isSelected ? strokeSelected : stroke);
+        g.select(".selection-rect")
+          .style("display", isSelected ? null : "none");
+      });
+    }
+    
+    // Determines stroke color for selected node (prefer node scheme's strokeSelected).
     _getSelectedNodeStroke(nodeId) {
       const node = (this.map.nodes || []).find(n => n.id === nodeId);
       if (!node) return this.palette[this.currentTheme].edge.strokeSelected;
@@ -1044,19 +1292,20 @@
     }
 
     // -------------------- CONNECTION WORKFLOW (frontend helpers) --------------------
-    // Start connection from currently selected node (frontend should call this when user clicks 'connect' in node tools)
+    // Starts a connection from the currently selected node.
     startConnectionFromSelected() {
       if (!this.selected || this.selected.type !== "node") return;
       this._pendingConnectionFrom = this.selected.id;
       // Frontend should indicate to the user: "Click another node to connect"
     }
 
-    // Cancel a pending connection
+    // Cancels a pending connection.
     cancelPendingConnection() {
       this._pendingConnectionFrom = null;
     }
 
     // -------------------- REMOVAL / UPDATES --------------------
+    // Deletes a node and its connected edges.
     deleteNode(nodeId) {
       if (!nodeId) return;
       // Remove node
@@ -1068,6 +1317,7 @@
       this._setSelected(null, null);
     }
 
+    // Deletes an edge by ID.
     deleteEdge(edgeId) {
       if (!edgeId) return;
       this.map.edges = (this.map.edges || []).filter(e => e.id !== edgeId);
@@ -1076,28 +1326,28 @@
       this._setSelected(null, null);
     }
 
-    // Programmatic selection
+    // Programmatically selects a node or edge.
     selectElement({ nodeId = null, edgeId = null } = {}) {
       if (nodeId) this._setSelected("node", nodeId);
       else if (edgeId) this._setSelected("edge", edgeId);
       else this._setSelected(null, null);
     }
 
-    // Utility: get shallow copy of canvas map
+    // Utility: gets a shallow copy of the canvas map.
     getMap() {
       return JSON.parse(JSON.stringify(this.map));
     }
 
     // -------------------- INTERNAL: resize handler --------------------
+    // Handles window resize by updating grid and simulation.
     _onResize() {
       // update grid dots and center force
       this._updateDotGrid();
-      this.simulation.force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
       this.simulation.alpha(0.2).restart();
     }
 
     // -------------------- HELPER: zoom utilities for frontend --------------------
-    // Exposes a simple zoomBy utility so frontend can call mindMap.zoom.scaleBy through transition.
+    // Zooms the canvas by a factor.
     zoomBy(factor = 1.2) {
       // safe guard
       if (!this.svg || !this.zoom) return;
@@ -1105,83 +1355,83 @@
       this.svg.transition().duration(200).call(this.zoom.scaleBy, factor);
     }
 
-    // Zoom to fit all nodes in viewport
+    // Zooms to fit all nodes in the viewport with padding.
     zoomFit(padding = 50) {
       if (!this.svg || !this.zoom) return;
-      const nodes = this.map?.nodes || [];
-      if (nodes.length === 0) return;
+      // Use the live simulation nodes; they always have current positions
+      const simNodes = (this.simulation && typeof this.simulation.nodes === "function")
+        ? this.simulation.nodes()
+        : [];
+      if (!simNodes || simNodes.length === 0) return;
+      // SVG viewport geometry
+      const svgRect = this.svg.node().getBoundingClientRect();
+      // Sidebar handling (assume #sidebar may exist and may be "collapsed")
+      let sidebarWidth = 0;
+      const sidebar = document.getElementById("sidebar");
+      if (sidebar && !(sidebar.classList && sidebar.classList.contains("collapsed"))) {
+        sidebarWidth = sidebar.offsetWidth || 0;
+      }
+      // Visible area (screen units)
+      const visibleWidth  = Math.max(1, svgRect.width  - sidebarWidth);
+      const visibleHeight = Math.max(1, svgRect.height);
+      // Apply padding as a margin in SCREEN space by shrinking the viewport
+      const pad = Math.max(0, padding);
+      const innerW = Math.max(1, visibleWidth  - 2 * pad);
+      const innerH = Math.max(1, visibleHeight - 2 * pad);
+      // Compute WORLD bounds of all node rectangles, using current node sizes
+      let minX =  Infinity, maxX = -Infinity, minY =  Infinity, maxY = -Infinity;
+      for (const n of simNodes) {
+        const mapNode = n.__mapNode || {};
+        const w = mapNode.hidden ? this.hiddenNodeWidth  : this.nodeWidth;
+        const h = mapNode.hidden ? this.hiddenNodeHeight : this.nodeHeight;
+        // n.x/n.y are world coordinates of the node center
+        const x = (typeof n.x === "number") ? n.x : 0;
+        const y = (typeof n.y === "number") ? n.y : 0;
+        const left   = x - w / 2;
+        const right  = x + w / 2;
+        const top    = y - h / 2;
+        const bottom = y + h / 2;
+        if (left   < minX) minX = left;
+        if (right  > maxX) maxX = right;
+        if (top    < minY) minY = top;
+        if (bottom > maxY) maxY = bottom;
+      }
 
-      // Get dimensions from container if not passed explicitly
-      const bbox = this.svg.node().getBoundingClientRect();
-      const viewportWidth = width || bbox.width;
-      const viewportHeight = height || bbox.height;
+      // WORLD content size and center
+      let contentW = maxX - minX;
+      let contentH = maxY - minY;
+      // Fallbacks in degenerate cases
+      if (!(contentW > 0)) contentW = 1;
+      if (!(contentH > 0)) contentH = 1;
 
-      // Compute bounding box of all VISIBLE nodes (hidden nodes are ignored)
-      const visibleNodes = nodes.filter(n => !n.hidden);
-      if (visibleNodes.length === 0) return;
+      const cx = (minX + maxX) / 2; // world center X
+      const cy = (minY + maxY) / 2; // world center Y
 
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      // Choose scale to fit content into inner viewport (preserving aspect)
+      const scaleX = innerW / contentW;
+      const scaleY = innerH / contentH;
+      let k = Math.min(scaleX, scaleY);
 
-      visibleNodes.forEach(n => {
-        const x = typeof n.x === "number" ? n.x : 0;
-        const y = typeof n.y === "number" ? n.y : 0;
-        const nodeWidth = n.hidden ? this.hiddenNodeWidth : this.nodeWidth;
-        const nodeHeight = n.hidden ? this.hiddenNodeHeight : this.nodeHeight;
-        minX = Math.min(minX, x - nodeWidth / 2);
-        maxX = Math.max(maxX, x + nodeWidth / 2);
-        minY = Math.min(minY, y - nodeHeight / 2);
-        maxY = Math.max(maxY, y + nodeHeight / 2);
-      });
+      // Clamp to the zoom's configured extent
+      const extent = (typeof this.zoom.scaleExtent === "function") ? this.zoom.scaleExtent() : [0.2, 5];
+      const kMin = Array.isArray(extent) ? extent[0] : 0.2;
+      const kMax = Array.isArray(extent) ? extent[1] : 5;
+      k = Math.max(kMin, Math.min(k, kMax));
 
-      // Bounding box dimensions
-      const nodesWidth = maxX - minX;
-      const nodesHeight = maxY - minY;
+      // SCREEN target center — the center of the VISIBLE area (to the right of the sidebar)
+      const px = sidebarWidth + visibleWidth / 2; // NOTE: full sidebar offset, not /2
+      const py = visibleHeight / 2;
 
-      // Compute scale factor to fit bounding box into viewport, preserving aspect ratio
-      const scaleX = (viewportWidth - padding * 2) / nodesWidth;
-      const scaleY = (viewportHeight - padding * 2) / nodesHeight;
-      let scale = Math.min(scaleX, scaleY);
+      // Translation in SCREEN units to bring (cx,cy) to (px,py)
+      const tx = px - k * cx;
+      const ty = py - k * cy;
 
-      // Clamp zoom scale to avoid over-zooming or under-zooming
-      scale = Math.max(Math.min(scale, 3), 0.2); // respects your zoom extent config
+      // Compose transform and animate
+      const transform = d3.zoomIdentity.translate(tx, ty).scale(k);
 
-      // Compute translation to center all nodes in the viewport
-      const centerX = (minX + maxX) / 2;
-      const centerY = (minY + maxY) / 2;
-      const translateX = viewportWidth / 2 - scale * centerX;
-      const translateY = viewportHeight / 2 - scale * centerY;
-
-      // Build the new D3 transform
-      const transform = d3.zoomIdentity
-        .translate(translateX, translateY)
-        .scale(scale);
-
-      // Animate the zoom transform (smooth transition)
       this.svg.transition()
-        .duration(350)
+        .duration(250)
         .call(this.zoom.transform, transform);
-    }
-
-    // Center viewport on selected node
-    centerOnNode() {
-      // Get selected node
-      const nodeId = this.selected && this.selected.id;
-      const node = (this.map.nodes || []).find(n => n.id === nodeId);
-      if (!node || node.x == null || node.y == null) return;
-      // Compute required transform to center that node in the viewport (preserve current scale)
-      const svgEl = this.svg.node();
-      const bbox = svgEl.getBoundingClientRect();
-      // Get current transform
-      const transform = d3.zoomTransform(this.svg.node());
-      // target screen center in SVG coordinates
-      const targetX = node.x;
-      const targetY = node.y;
-      // compute translate to center node
-      const k = transform.k;
-      const tx = (bbox.width / 2) - (targetX * k);
-      const ty = (bbox.height / 2) - (targetY * k);
-      const t = d3.zoomIdentity.translate(tx, ty).scale(k);
-      this.svg.transition().duration(350).call(this.zoom.transform, t);
     }
   }
 

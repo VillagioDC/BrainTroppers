@@ -28,7 +28,7 @@ import { getLocalStorageUser } from "../../common/userLocalStorage.js";
     if (user && user.plan) {
         switch (user.plan) {
             case 'Pro Plan':
-                planHtml = 'Pro Plan&nbsp;<i class="fas fa-crown"></i>';
+                planHtml = 'Pro Plan&nbsp;<i class="fas fa-crown pro-plan"></i>';
                 break;
             default:
                 planHtml = 'Free Plan&nbsp;<i class="fas fa-gift"></i>';

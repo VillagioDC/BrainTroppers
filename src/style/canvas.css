@@ -13,6 +13,17 @@
   --menu-hover: #25374e;
   --delete-color: #e5428e;
   --gold-plan: #f9d440;
+  /* LIGHT MODE */
+  --light-background: #f7f9fc;
+  --light-background-shadow: #edf1f7;
+  --light-primary: #3a8bbf;
+  --light-secondary: #b34c7f; 
+  --light-text: #1a1a1a;
+  --light-accent: #00a3d4;
+  --light-border: #d5dce5;
+  --light-menu-bg: #f3f6fa;
+  --light-menu-hover: #dde4ef;
+  --light-delete-color: #e5428e;
 }
 * {
   margin: 0;
@@ -29,7 +40,6 @@ body {
   height: 100vh;
   position: relative;
 }
-
 /* OVERLAID LOGO */
 .logo-overlay {
   position: absolute;
@@ -53,34 +63,52 @@ body {
   overflow: hidden;
   z-index: 8000;
 }
+.canvas.light {
+  background-color: var(--light-background);
+}
 
 /* ZOOM CONTROLS */
 .zoom-controls {
   position: fixed;
-  bottom: 35px;
+  bottom: 30px;
   right: 20px;
+  width: 2.2rem;
+  height: 6.4rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-shadow);
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
   gap: 0.5rem;
   z-index: 10900;
 }
 .zoom-controls button {
-  width: 35px;
-  height: 35px;
-  border: 1px solid var(--border);
-  background: var(--background-shadow);
-  color: var(--text);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1rem;
   display: flex;
+  width: 1.1rem;
   align-items: center;
   justify-content: center;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  border: none;
   transition: all 0.3s;
 }
+.zoom-controls i {
+  font-size: 1.1rem;
+  color: var(--text);
+}
 .zoom-controls button:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  transform: scale(1.5);
+  margin: 0.4rem 0;
+}
+.zoom-controls.light {
+  background: var(--light-background-shadow);
+  border-color: var(--light-border);
+}
+.zoom-controls.light i {
+  color: var(--light-text);
 }
 
 /* SIDEBAR */
@@ -175,6 +203,9 @@ body {
   overflow: hidden;
 }
 .user-plan i {
+  color: var(--primary);
+}
+.user-plan i.pro-plan {
   color: var(--gold-plan);
 }
 
@@ -204,6 +235,14 @@ body {
 .expand-btn.collapsed {
   display: flex;
   opacity: 1;
+}
+.expand-btn.light {
+  color: var(--light-primary);
+  background: var(--light-background-shadow);
+  border: 1px solid var(--light-border);
+}
+.expand-btn.light:hover {
+  background: var(--light-border);
 }
 
 /* SIDEBAR NEW MAP BUTTON */
@@ -250,45 +289,47 @@ body {
   visibility: hidden;
 }
 
-/* FLOATING COMMAND MENU */
-.command-bar {
-  position: absolute;
-  top: 100px;
-  right: 10px;
-  width: auto;
-  height: auto;
+/* FLOATING TOOLS MENU */
+.tools {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 2.2rem;
+  height: 20rem;
   background: var(--background-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
+  gap: 0.5rem;
   padding: 0.5rem;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 1.1rem;
   flex-wrap: wrap;
   z-index: 9500;
 }
 
-.cmd-btn {
+.tools-btn {
   display: flex;
-  width: 100%;
+  width: 1.1rem;
   justify-content: center;
-  padding: 0.4rem 0.5rem;
-  background: rgba(86, 161, 192, 0.1);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 0;
+  background: none;
+  border: none;
   cursor: pointer;
-  font-size: 0.8rem;
   transition: all 0.3s;
 }
-.cmd-btn:hover {
-  background: rgba(86, 161, 192, 0.2);
-  border-color: var(--primary);
+.tools-btn:hover {
+  transform: scale(1.5);
+  margin: 0.4rem 0;
 }
-.cmd-btn i {
-  color: var(--accent);
+.tools-btn i {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.tools-btn i.fa-trash {
+  color: var(--delete-color);
 }
 
 /* USER MENU POPUP */
@@ -464,6 +505,9 @@ body {
     gap: 0.5rem;
     z-index: 11000;
 }
+.map-new-container.light {
+    color: var(--light-text);
+}
 .map-new-container h3 {
     font-size: 1rem;
     font-weight: 300;
@@ -493,6 +537,9 @@ body {
     border-radius: 10px;
     padding: 0.9rem;
     gap: 0.5rem;
+}
+.map-new-input-container.light {
+    background-color: var(--light-background-shadow);
 }
 .map-new-input-container textarea {
     width: 100%;

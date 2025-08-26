@@ -79,7 +79,6 @@ async function mapNodeExpand(map, parentNodeId, query) {
         node.shortName = newNodes[i].shortName;
         node.content = newNodes[i].content;
         node.detail = newNodes[i].detail;
-        node.status = 'pending';
         node.directLink = [parentNodeId];
         node.relatedLink = [];
         node.xy = null;

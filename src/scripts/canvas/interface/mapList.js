@@ -7,10 +7,10 @@ import { loadMapApi } from '../commands/loadMapApi.js';
 import { popupMapMenu } from './mapListPopup.js';
 
 // Map list
-(function() {
+(async function() {
     // On load
-    initMapList();
-});
+    await initMapList();
+})();
 
 // Init map list
 async function initMapList() {

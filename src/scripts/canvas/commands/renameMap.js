@@ -6,7 +6,12 @@ import { removeMapMenu } from '../interface/mapListPopup.js';
 import { renameMapApi } from './renameMapApi.js';
 
 // Rename map
-export async function renameMap(currentMapItem) {
+export async function renameMap() {
+    // Get current map item
+    const mapList = document.getElementById('map-list');
+    const popupMapMenu = document.getElementById('map-menu-popup');
+    const projectId = popupMapMenu.dataset.projectId;
+    const currentMapItem = mapList.querySelector(`[data-project-id="${projectId}"]`);
     // Remove map menu
     removeMapMenu();
     // Load rename map html

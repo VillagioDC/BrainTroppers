@@ -30,7 +30,7 @@ async function loadMapMenu(currentMapItem) {
         const html = raw.replace('{{projectId}}', projectId);
         // Create popup container
         document.body.insertAdjacentHTML('beforeend', html);
-        mapMenuPopup = document.getElementById("map-menu-item");
+        const mapMenuPopup = document.getElementById("map-menu-popup");
         // Position popup near the clicked button
         const buttonRect = currentMapItem.getBoundingClientRect();
         mapMenuPopup.style.top = `${buttonRect.bottom + window.scrollY - 45}px`;
@@ -63,8 +63,8 @@ export async function removeMapMenu() {
         document.getElementById('map-item-delete').removeEventListener('click', deleteMap);
     document.removeEventListener('click', outsideClickHandler);
     // Remove popup container
-    if (document.getElementById('map-menu-item'))
-        document.getElementById('map-menu-item').remove();
+    if (document.getElementById('map-menu-popup'))
+        document.getElementById('map-menu-popup').remove();
 }
 
 // Outside click handler

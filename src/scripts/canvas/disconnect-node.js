@@ -3,7 +3,7 @@
 
 (function () {
   // Elements
-  const disconnectBtn = document.getElementById('disconnect-node-btn');
+  const disconnectBtn = document.getElementById('unlink-node-btn');
   // Event listeners
   if (disconnectBtn) disconnectBtn.addEventListener('click', disconnectBtnClick)
 

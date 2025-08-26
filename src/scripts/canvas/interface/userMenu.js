@@ -15,6 +15,8 @@ export async function toggleUserMenu(e) {
     if (!userMenuPopup) {
         // Load user menu
         await loadUserMenu();
+        // Set current theme
+        setCurrentTheme();
         // Add event listeners
         bindUserMenuEvents();
     // Remove menu
@@ -35,6 +37,17 @@ async function loadUserMenu() {
     } catch (error) {
         console.error('Error loading user menu:', error);
     }
+}
+
+// Set current theme
+function setCurrentTheme() {
+    // Elements
+    const themeToggle = document.getElementById('canvas');
+    const menuTheme = document.getElementById("theme-toggle");
+    if (!menuTheme) return;
+    // Set current theme
+    if (themeToggle.classList.contains('light'))
+        menuTheme.innerHTML = '<i class="fas fa-sun"></i>&nbsp;Light Mode';
 }
 
 // Bind event listeners to user menu items

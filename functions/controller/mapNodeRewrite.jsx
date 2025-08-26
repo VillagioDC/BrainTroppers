@@ -66,7 +66,6 @@ async function mapNodeRewrite(map, nodeId, query) {
     reviewNode.shortName = jsonResponse.shortName;
     reviewNode.content = jsonResponse.content;
     reviewNode.detail = jsonResponse.detail;
-    reviewNode.status = "pending";
     reviewNode.hidden = false;
 
     // Update node

@@ -3,7 +3,7 @@
 
 (function () {
   // Elements
-  const connectBtn = document.getElementById('connect-node-btn');
+  const connectBtn = document.getElementById('link-node-btn');
 
   // Event listeners
   if (connectBtn) connectBtn.addEventListener('click', connectBtnClick);

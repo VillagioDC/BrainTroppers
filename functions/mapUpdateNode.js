@@ -52,7 +52,6 @@ exports.handler = async (event) => {
         !shortName || shortName.trim().length === 0 ||
         !content || content.trim().length === 0 ||
         !detail || detail.trim().length === 0 ||
-        !status || status.trim().length === 0 ||
         !directLink || directLink.length === 0 ||
         !relatedLink || relatedLink.length === 0 ||
         !xy || xy.length === 0 ||
@@ -86,7 +85,6 @@ exports.handler = async (event) => {
         typeof content !== 'string' || content.length > 500 ||
         typeof detail !== 'string' || detail.length > 500 ||
         typeof shortName !== 'string' || shortName.length > 50 ||
-        typeof status !== 'string' || status.length > 50 ||
         Array.isArray(directLink) ||
         Array.isArray(relatedLink) ||
         typeof xy !== 'string' || xy.length > 50 ||
@@ -140,7 +138,6 @@ exports.handler = async (event) => {
     node.shortName = shortName;
     node.content = content;
     node.detail = detail;
-    node.status = status;
     node.directLink = directLink;
     node.relatedLink = relatedLink;
     node.xy = xy;

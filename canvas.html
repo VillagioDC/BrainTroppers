@@ -21,8 +21,9 @@
 
     <!-- Zoom Controls -->
     <div class="zoom-controls">
-        <button id="zoom-in"><i class="fas fa-plus"></i></button>
-        <button id="zoom-out"><i class="fas fa-minus"></i></button>
+        <button id="zoom-fit" title="Zoom to fit"><i class="fas fa-expand"></i></button>
+        <button id="zoom-in" title="Zoom in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+        <button id="zoom-out" title="Zoom out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
     </div>
 
     <!-- Sidebar -->
@@ -36,10 +37,10 @@
                 </button>
                 <!-- User Icon -->
                 <div class="user-icon" id="user-icon">
-                    <span>AB</span>
+                    <span>&nbsp;</span>
                 </div>
                 <!-- User Plan -->
-                <span id="user-plan" class="user-plan">Free Plan</span>
+                <span id="user-plan" class="user-plan">&nbsp;</span>
             </div>
         </div>
         <!-- New Map Button -->
@@ -48,8 +49,8 @@
         </button>
         <!-- Map List -->
         <ul id="map-list" class="map-list">
-            <li class="map-item active" data-projedt-id="1">
-                <span class="map-title">Product Roadmap 2025</span>
+            <li class="map-item active" data-projedt-id="0">
+                <span class="map-title">Default Map</span>
                 <div class="map-menu-container">
                     <button class="map-menu-btn">
                         <i class="fas fa-ellipsis-h"></i>
@@ -62,19 +63,6 @@
     <button class="expand-btn collapsed" id="expand-btn">
         <i class="fas fa-chevron-right"></i>
     </button>
-
-    <!-- Floating Command Menu -->
-    <div class="command-bar">
-        <button class="cmd-btn" id="detail-node-btn"><i class="fas fa-file-alt"></i>&nbsp;Detail</button>
-        <button class="cmd-btn" id="add-node-btn"><i class="fas fa-plus"></i>&nbsp;Add</button>
-        <button class="cmd-btn" id="expand-node-btn"><i class="fas fa-sitemap"></i>&nbsp;Expand</button>
-        <button class="cmd-btn" id="rewrite-node-btn"><i class="fas fa-sync-alt"></i>&nbsp;Rewrite</button>
-        <button class="cmd-btn" id="approve-node-btn"><i class="fas fa-check-circle"></i>&nbsp;Approve</button>
-        <button class="cmd-btn" id="delete-node-btn"><i class="fas fa-trash"></i>&nbsp;Delete</button>
-        <button class="cmd-btn" id="connect-node-btn"><i class="fas fa-link"></i>&nbsp;Connect</button>
-        <button class="cmd-btn" id="disconnect-node-btn"><i class="fas fa-unlink"></i>&nbsp;Disconnect</button>
-        <button class="cmd-btn" id="rewire-all-btn"><i class="fas fa-redo"></i>&nbsp;Rewire All</button>
-    </div>
 
     <!-- Scripts -->
     <script src="./src/scripts/canvas.js"></script>
