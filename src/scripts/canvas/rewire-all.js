@@ -19,10 +19,8 @@
         // Request rewire all nodes on database
         const updatedMap = await mapRewireAll(projectId);
         if (updatedMap) {
-          // Set local storage map
-          setLocalStorageMap(updatedMap);
           // Set data
-          braintroop.setData();
+          braintroop.setData(updatedMap);
         }
         // Remove notification
         removeNotification();

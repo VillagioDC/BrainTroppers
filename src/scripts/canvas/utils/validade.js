@@ -2,12 +2,15 @@
 // VALIDATE MODULE
 
 // Import modules
-// No modules
+import { showNotification } from "../../common/notifications.js";
 
 // Check query
 export function checkQuery(queryEl) {
     // Check content
-    if (!queryEl || !queryEl.value || queryEl.value.trim() === '') return null;
+    if (!queryEl || !queryEl.value || queryEl.value.trim() === '') {
+        showNotification('Provide a query', 'error');
+        return null;
+    }
     // Return sanitized query
     return sanitizeInput(queryEl.value);
 }

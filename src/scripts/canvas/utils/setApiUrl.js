@@ -30,6 +30,30 @@ export function setApiUrl(api) {
         case 'deleteMap':
             url += '/mapDelete';
             break;
+        case 'loadMap':
+            url += '/mapRead';
+            break;
+        case 'addNewNode':
+            url += '/mapAddNode';
+            break;
+        case 'expandNode':
+            url += '/mapExpandNode';
+            break;
+        case 'rewriteNode':
+            url += '/mapRewriteNode';
+            break;
+        case 'rewireNode':
+            url += '/mapRewireNode';
+            break;
+        case 'updateNode':
+            url += '/mapUpdateNode';
+            break;
+        case 'assignMapToUser':
+            url += '/userAssignMap';
+            break;
+        case 'refreshUser':
+            url += '/userRefresh';
+            break;
         default:
             url = '';
             throw new Error('Invalid API call.');

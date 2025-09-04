@@ -12,7 +12,7 @@
   --menu-bg: #1a283b;
   --menu-hover: #25374e;
   --delete-color: #e5428e;
-  --gold-plan: #f9d440;
+  --gold-plan: #ffc827;
   /* LIGHT MODE */
   --light-background: #f7f9fc;
   --light-background-shadow: #edf1f7;
@@ -39,6 +39,7 @@ body {
   overflow: hidden;
   height: 100vh;
   position: relative;
+  user-select: none;
 }
 /* OVERLAID LOGO */
 .logo-overlay {
@@ -292,11 +293,11 @@ body {
 /* FLOATING TOOLS MENU */
 .tools {
   position: fixed;
-  top: 50%;
+  top: 45%;
   right: 20px;
   transform: translateY(-50%);
   width: 2.2rem;
-  height: 20rem;
+  height: 23rem;
   background: var(--background-shadow);
   display: flex;
   flex-direction: column;
@@ -308,6 +309,9 @@ body {
   border-radius: 1.1rem;
   flex-wrap: wrap;
   z-index: 9500;
+}
+.tools.link-tools {
+  height: 7.5rem;
 }
 
 .tools-btn {
@@ -324,6 +328,7 @@ body {
   transform: scale(1.5);
   margin: 0.4rem 0;
 }
+
 .tools-btn i {
   font-size: 1.1rem;
   color: var(--text);
@@ -357,6 +362,94 @@ body {
   color: var(--gold-plan);
 }
 
+/* USER ACCOUNT */
+.user-content {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background);
+    color: var(--text);
+    padding: 1.2rem;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    width: 50%;
+    max-width: 300px;
+    height: auto;
+    position: relative;
+    gap: 1rem;
+}
+.user-content h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: default;
+  user-select: none;
+}
+.user-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.user-info h3 {
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1rem;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+}
+.user-info h3.inactive {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-style: italic;
+  cursor: default;
+}
+.user-info i.button {
+  font-size: 0.6rem;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.user-info p {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--primary);
+  cursor: pointer;
+  user-select: none;
+}
+.user-info p:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.delete-account {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+.delete-account h3 {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--primary);
+}
+.delete-account i {
+  font-size: 0.8rem;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.delete-account i:hover {
+  color: var(--delete-color);
+}
+.delete-account i.disabled {
+  cursor: default;
+  opacity: 0;
+}
+
 /* MAP ITEM */
 .map-item {
   position: relative;
@@ -371,6 +464,7 @@ body {
   border-left: 5px solid transparent;
   overflow-x: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
   transition: all 0.3s;
 }
 .map-item:hover {
@@ -475,6 +569,7 @@ body {
   cursor: text;
   overflow-x: hidden;
   white-space: nowrap;
+  user-select: text;
 }
 .rename-title-btn {
   width: 20px;
@@ -552,6 +647,7 @@ body {
     border: none;
     color: var(--text);
     font-size: 0.9rem;
+    user-select: text;
 }
 .map-new-input-container textarea:hover,
 .map-new-input-container textarea:focus,
@@ -578,15 +674,18 @@ body {
 
 /* COMMAND MENU POPUP */
 .popup-shader {
-    display: block;
     position: fixed;
-    z-index: 11000;
     left: 0;
     top: 0;
     width: 100vw;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
     background-color: rgba(0,0,0,0.6);
+    z-index: 11000;
 }
 
 .popup-content {
@@ -594,12 +693,12 @@ body {
     flex-direction: column;
     background-color: var(--background);
     color: var(--text);
-    margin: 10% auto;
     padding: 1.2rem;
     border: 1px solid var(--primary);
     border-radius: 8px;
     width: 80%;
     max-width: 400px;
+    height: auto;
     position: relative;
     gap: 0.5rem;
 }

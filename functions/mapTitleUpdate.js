@@ -108,11 +108,11 @@ exports.handler = async (event) => {
     // Update map title
     const updatedMap = await mapTitleUpdate(map, newTitle);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update node on map');
+      log('SERVER ERROR', 'Unable to update title on map');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to update node' })
+        body: JSON.stringify({ error: 'Unable to update title' })
       };
     }
 

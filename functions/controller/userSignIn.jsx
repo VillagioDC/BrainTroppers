@@ -5,6 +5,7 @@
 const executeDB = require('../mongoDB/executeDB.jsx');
 const generateToken = require('../utils/generateToken.jsx');
 const setSessionExpires = require('../utils/setExpires.jsx')
+const userRefresh = require('./userRefresh.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -54,6 +55,8 @@ async function userSignIn(credentials) {
     const sessionToken = generateToken();
     // Set expires
     const expires = await setSessionExpires(user.userId);
+    // Refresh user data
+    const refresh = await userRefresh(user.userId);
     // Construct authorization
     const auth = {
         userId: user.userId,
@@ -61,7 +64,7 @@ async function userSignIn(credentials) {
         name: user.name,
         icon: user.icon,
         plan: user.plan,
-        maps: user.maps,
+        maps: refresh.maps || user.maps,
         sessionToken: sessionToken,
         expires: expires
     }

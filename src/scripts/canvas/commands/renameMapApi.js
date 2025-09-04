@@ -3,7 +3,6 @@
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
-import { getLocalStorageMap } from '../utils/mapLocalStorage.js';
 import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
@@ -12,7 +11,7 @@ export async function renameMapApi(newTitle) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
-        const { projectId } = getLocalStorageMap();
+        const { projectId } = JSON.parse(braintroop.map.projectId());
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionToken}`,
@@ -24,14 +23,15 @@ export async function renameMapApi(newTitle) {
             headers,
             body: JSON.stringify(body),
         });
+        // Parse response
+        const responseData = await response.json();
         // Check response
         if (!response.ok) {
-            await checkSessionExpired(response);
-            throw new Error(`HTTP error! status: ${response.status}`);
+            checkSessionExpired(responseData);
         }
         // Get new map
-        const newMap = await response.json();
-        return newMap;
+        const updatedMap = responseData;
+        return updatedMap;
         // Catch errors
         } catch (error) {
             console.error('Error adding node:', error);

@@ -5,17 +5,21 @@
   "userPrompt": "",
   "title": "",  
   "lastUpdated": "",
+  "selectedNode": "",
   "nodes": [{  
     "nodeId": "",
     "shortName": "",
     "content": "",
     "detail": "",
-    "status": "",
+    "status": "pending",
     "directLink": [],
     "relatedLink": [],
-    "xy": "",
+    "x": null,
+    "y": null,
+    "locked": false,
+    "approved": false,
     "hidden": false,
-    "scheme": "",
-    "layer": 0
+    "scheme": null,
+    "layer": 1
   }]  
 }  

@@ -3,7 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
-const mapLastUpdate = require('./mapLastUpdate.jsx');
+const mapLastUpdated = require('./mapLastUpdated.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -13,6 +13,8 @@ const log = require('../utils/log.jsx');
 
 async function mapTitleUpdate(map, title) {
 
+    console.log('Update title:', map.projectId, title);
+    
     // Update title on map
     map.title = title;
 
@@ -21,13 +23,14 @@ async function mapTitleUpdate(map, title) {
                                      type: 'updateOne',
                                      filter: { projectId: map.projectId },
                                      update: { $set: { title: title } } });
+
     // Handle error
     if (!result || result.modifiedCount === 0) {
         log("SERVER ERROR", "Unable to update title on map @mapTitleUpdate.");
     }
 
     // Last update
-    const updatedMap = await mapLastUpdate(map);
+    const updatedMap = await mapLastUpdated(map);
 
     // Return
     return updatedMap;

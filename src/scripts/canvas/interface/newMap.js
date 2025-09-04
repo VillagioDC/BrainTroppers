@@ -6,10 +6,10 @@ import { createNewMap } from '../commands/createMap.js';
 import { getLocalStorageUser } from '../../common/userLocalStorage.js';
 
 (function() {
-    // Elements
-    const newMapBtn = document.getElementById("new-map-btn");
+    
     // Event listeners
-    if (newMapBtn) newMapBtn.addEventListener("click", newMapClick);
+    if (document.getElementById('new-map-btn'))
+        document.getElementById('new-map-btn').addEventListener("click", newMapClick);
 
     // On load
     initNewMap();
@@ -20,26 +20,26 @@ import { getLocalStorageUser } from '../../common/userLocalStorage.js';
 async function initNewMap() {
     // Elements
     const newMapContainer = document.getElementById("new-map-container");
+    // Prevent reloading new map container
     if (newMapContainer) return;
+    // Prevent loading map container if there is a current map active
+    const currentMap = braintroop.map;
+    const activeMap = document.querySelector('.map-item.active');
+    if (currentMap && currentMap.projectId && activeMap) return;
     // Load new map container
     await loadNewMapContainer();
 }
 
 // New map button click
-export async function newMapClick() {
+export async function newMapClick(e) {
+    e.preventDefault();
     // Remove existing map from canvas
-    removeExistingMap();
-    // Load new map container
+    braintroop.deleteMap();
+    // Prevent reloading new map container
     const newMapContainer = document.getElementById("new-map-container");
     if (newMapContainer) return;
     // Load new map container
     await loadNewMapContainer();
-}
-
-// Remove existing map from canvas
-function removeExistingMap() {
-    // Remove existing map
-    braintroop.removeMap();
 }
 
 // Load new map container
@@ -64,7 +64,10 @@ function bindNewMapEvents() {
     const submit = document.getElementById('map-new-submit');
     // Event listeners
     if (query) query.addEventListener('input', ResizeTextArea);
-    if (submit) submit.addEventListener('click', createNewMap);
+    if (submit) submit.addEventListener('click', async (e) => {
+        e.preventDefault();
+        createNewMap();
+    });
 }
 
 // Replace user name
@@ -75,11 +78,11 @@ function replaceUserNameOnNewMap() {
     if (!headline) return;
     // Get user name
     const user = getLocalStorageUser();
-    let userName = '';
-    if (user && user.name && typeof user.name === 'string' && !user.name)
-        userName = ` ${user.name}`;
+    let name = '';
+    if (user && user.name && typeof user.name === 'string' && user.name)
+        name = ` ${user.name}`;
     // Replace user name
-    headline.textContent = headline.textContent.replace(' {{username}}', userName);
+    headline.textContent = headline.textContent.replace(' {{username}}', name);
 }
 
 // Resize textarea

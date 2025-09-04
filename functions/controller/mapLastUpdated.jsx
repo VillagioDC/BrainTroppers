@@ -3,7 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
-const userLastUpdate = require('./userLastUpdate.jsx');
+const userLastUpdated = require('./userLastUpdated.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -11,26 +11,32 @@ const log = require('../utils/log.jsx');
     RETURN {object} - updated map
 */
 
-async function mapLastUpdate(map) {
+async function mapLastUpdated(map) {
+
+    // Check input
+    if (!map || typeof map !== 'object' || !map.projectId) {
+        log("SERVER ERROR", "Unable to update map @mapLastUpdated.");
+        return null;
+    }
 
     // Update last change on map
-    map.lastUpdated = Date.now();
+    map.lastUpdated = new Date(Date.now());
 
     // Update last change on database
     const result = await executeDB({ collectionName: 'maps',
                                      type: 'updateOne',
                                      filter: { projectId: map.projectId  },
-                                     update: { $set: { lastUpdated: Date.now() } } });
+                                     update: { $set: { lastUpdated: map.lastUpdated } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update last change on map @mapLastUpdate.");
+        log("SERVER ERROR", "Unable to update last change on map @mapLastUpdated.");
     }
 
     // Update user maps
-    await userLastUpdate(map);
+    await userLastUpdated(map);
 
     // Return
     return map;
 }
 
-module.exports = mapLastUpdate;
+module.exports = mapLastUpdated;

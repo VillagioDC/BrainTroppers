@@ -9,18 +9,18 @@ const constructConversation = require('../ai/constructConversation.jsx');
 const askAIBridge = require('../ai/askAIBridge.jsx');
 const parseJSON = require('../utils/parseJSON.jsx');
 const executeDB = require('../mongoDB/executeDB.jsx');
-const mapLastUpdate = require('./mapLastUpdate.jsx');
+const mapLastUpdated = require('./mapLastUpdated.jsx');
 
 /* PARAMETERS
     input {object, string, string} - map, parendNodeId, query
     RETURN {object} - new node || null
 */
 
-async function mapNodeCreate(map, parentNodeId, query) {
+async function mapNodeCreate(map, parentId, query) {
 
     // Get parent settings
-    const parentNodeLayer = map.nodes.find(n => n.nodeId === parentNodeId).layer;
-    const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentNodeId).colorSchemeName;
+    const parentNodeLayer = map.nodes.find(n => n.nodeId === parentId).layer;
+    const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentId).colorSchemeName;
 
     // Generate new node id
     const newNodeId = generateToken();
@@ -32,8 +32,8 @@ async function mapNodeCreate(map, parentNodeId, query) {
     let stage = ["createNode", "transformNodes"];
 
     // Set user message
-    const nodeContent = map.nodes.find(n => n.nodeId === parentNodeId).content;
-    const nodeDetail = map.nodes.find(n => n.nodeId === parentNodeId).detail;
+    const nodeContent = map.nodes.find(n => n.nodeId === parentId).content;
+    const nodeDetail = map.nodes.find(n => n.nodeId === parentId).detail;
     let userMessage = "Create one node. User query is " + query + ". Last thoughs are " + nodeContent + " and " + nodeDetail + ". ";
 
     // Loop stages
@@ -63,7 +63,7 @@ async function mapNodeCreate(map, parentNodeId, query) {
 
         // Pause if not last stage
         if (i < stage.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
 
@@ -80,9 +80,12 @@ async function mapNodeCreate(map, parentNodeId, query) {
         shortName: jsonResponse.nodes[0].shortName,
         content: jsonResponse.nodes[0].content,
         detail: jsonResponse.nodes[0].detail,
-        directLink: [parentNodeId],
+        directLink: [parentId],
         relatedLink: [],
-        xy: null,
+        x: null,
+        y: null,
+        locked: false,
+        approved: false,
         hidden: false,
         colorScheme: parentNodeColorScheme,
         nodeLayer: parentNodeLayer
@@ -101,7 +104,7 @@ async function mapNodeCreate(map, parentNodeId, query) {
     }
 
     // Last update
-    const updatedMap = await mapLastUpdate(map);
+    const updatedMap = await mapLastUpdated(map);
 
     // Return
     return updatedMap;

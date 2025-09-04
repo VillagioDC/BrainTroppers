@@ -43,21 +43,22 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, nodeId, shortName, content, detail, status, directLink, relatedLink, xy, hidden, colorScheme, layer } = parsedBody;
+    const { userId, projectId, nodeId, shortName, content, detail, directLink, relatedLink, x, y, locked, approved, hidden, colorScheme, layer } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0 || 
         !shortName || shortName.trim().length === 0 ||
-        !content || content.trim().length === 0 ||
-        !detail || detail.trim().length === 0 ||
-        !directLink || directLink.length === 0 ||
-        !relatedLink || relatedLink.length === 0 ||
-        !xy || xy.length === 0 ||
-        !hidden || hidden.length === 0 ||
+        !directLink ||
+        !relatedLink ||
+        !x || x.length === 0 ||
+        !y || y.length === 0 ||
+        !locked ||
+        !approved ||
+        !hidden ||
         !colorScheme || colorScheme.length === 0 ||
-        !layer || layer.length === 0) {          
+        !layer) {          
           log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
           return {
             statusCode: 400,
@@ -85,9 +86,12 @@ exports.handler = async (event) => {
         typeof content !== 'string' || content.length > 500 ||
         typeof detail !== 'string' || detail.length > 500 ||
         typeof shortName !== 'string' || shortName.length > 50 ||
-        Array.isArray(directLink) ||
-        Array.isArray(relatedLink) ||
-        typeof xy !== 'string' || xy.length > 50 ||
+        !Array.isArray(directLink) ||
+        !Array.isArray(relatedLink) ||
+        typeof x !== 'number' ||
+        typeof y !== 'number' ||
+        typeof locked !== 'boolean' ||
+        typeof approved !== 'boolean' ||
         typeof hidden !== 'boolean' ||
         typeof colorScheme !== 'string' || colorScheme.length > 50 ||
         typeof layer !== 'number') {

@@ -20,13 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ]),
     // Stage 2: Braintroop and initial interface
     () => Promise.all([
-      loadScript('./src/scripts/canvas/braintroop.js'),
+      import('./canvas/braintroop.js'),
       import('./canvas/interface/sidebar.js')
     ]),
     // Stage 3: Examples
     () => Promise.all([
-      import('./canvas/commands/braintroopApi.js'),
-      import('./canvas/utils/loadExampleMap.js')
     ]),
     // Stage 4: Additional interface components
     () => Promise.all([
@@ -39,14 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     () => Promise.all([
       import('./canvas/interface/userMenu.js'),
       import('./canvas/interface/mapListPopup.js'),
-      loadScript('./src/scripts/canvas/detail-node.js'),
-      loadScript('./src/scripts/canvas/add-node.js'),
-      loadScript('./src/scripts/canvas/expand-node.js'),
-      loadScript('./src/scripts/canvas/rewrite-node.js'),
-      loadScript('./src/scripts/canvas/delete-node.js'),
-      loadScript('./src/scripts/canvas/connect-node.js'),
-      loadScript('./src/scripts/canvas/disconnect-node.js'),
-      loadScript('./src/scripts/canvas/rewire-all.js')
     ])
   ];
 

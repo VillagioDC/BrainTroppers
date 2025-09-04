@@ -3,6 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
+const log = require('../utils/log.jsx');
 
 /* PARAMETERS
     input {object} - map

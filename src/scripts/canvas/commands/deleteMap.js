@@ -2,7 +2,7 @@
 // DELETE MAP MODULE
 
 // Import modules
-import { removeLocalStorageMap } from '../utils/mapLocalStorage.js';
+import { removeMapFromMapList } from '../interface/mapList.js';
 import { deleteMapApi } from './deleteMapApi.js';
 import { showNotification } from '../../common/notifications.js'
 import { removeMapMenu } from '../interface/mapListPopup.js';
@@ -16,8 +16,6 @@ export async function deleteMap() {
     if (braintroop.projectId === projectId) {
         // Remove map on canvas
         braintroop.removeMap();
-        // Delete map on local storage
-        removeLocalStorageMap();
         // Start new map
         const newMapBtn = document.getElementById('new-map-btn');
         if (newMapBtn) newMapBtn.click();

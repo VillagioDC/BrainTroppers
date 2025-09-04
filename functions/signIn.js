@@ -81,7 +81,7 @@ exports.handler = async (event) => {
       return {
         statusCode: auth.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: auth.body
+        body: JSON.stringify(auth.body)
       };
     }
 

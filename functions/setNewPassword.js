@@ -83,7 +83,7 @@ exports.handler = async (event) => {
       return {
         statusCode: signedUp.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: updated.body
+        body: JSON.stringify(updated.body)
       };
     }
 
@@ -91,7 +91,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: updated.body
+      body: JSON.stringify(updated.body)
     };
 
   // Catch error

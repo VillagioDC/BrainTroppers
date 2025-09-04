@@ -4,6 +4,7 @@
 // Import modules
 import { toggleUserMenu } from "./userMenu.js";
 import { getLocalStorageUser } from "../../common/userLocalStorage.js";
+import { getUserPlan } from "../utils/getUserPlan.js";
 
 (function() {
     // Elements
@@ -24,17 +25,7 @@ import { getLocalStorageUser } from "../../common/userLocalStorage.js";
     }
 
     // Set user plan
-    let planHtml = "";
-    if (user && user.plan) {
-        switch (user.plan) {
-            case 'Pro Plan':
-                planHtml = 'Pro Plan&nbsp;<i class="fas fa-crown pro-plan"></i>';
-                break;
-            default:
-                planHtml = 'Free Plan&nbsp;<i class="fas fa-gift"></i>';
-                break;
-        }
-        userPlan.innerHTML = planHtml;
-    }
+    const userPlanHtml = getUserPlan();
+    userPlan.innerHTML = userPlanHtml;
 
 })();

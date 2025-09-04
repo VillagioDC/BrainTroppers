@@ -17,17 +17,17 @@ async function askAI(constructedConversation) {
         return null;
     }
 
-    // Set temperature from 0.5 to 0.9
-    const temperature = Math.random() * (0.9 - 0.5) + 0.5;
+    // Set temperature from 0.5 to 0.7
+    const temperature = Math.random() * (0.7 - 0.5) + 0.5;
 
     // Initialize the model (defaults or provide specific options)
     const chat = new ChatLLM7({
         modelName: "gpt-4o-mini-2024-07-18",
+        //modelName: "gpt-4.1-nano",
         temperature: temperature,
-        maxTokens: 15960,
+        maxTokens: 1000,
         timeout: 120,
-        maxRetries: 3,
-        stop: ["\n", "STOP"]
+        maxRetries: 3
     });
 
     // Construct message to LLM7 api

@@ -92,7 +92,7 @@ exports.handler = async (event) => {
     await setSessionExpires(userId);
 
     // Create new map
-    const newMap = await mapCreateNew(query);
+    const newMap = await mapCreateNew({userId, query});
     if (!newMap) {
       log('SERVER WARNING', 'Unable to create map');
       return {

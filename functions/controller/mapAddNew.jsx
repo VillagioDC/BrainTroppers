@@ -11,7 +11,7 @@ const executeDB = require('../mongoDB/executeDB.jsx');
     RETURN {object} - map data or null
 */
 
-async function mapAddNew(query) {
+async function mapAddNew({userId, query}) {
 
     // Get empty map
     const map = await loadMapSchema();
@@ -22,16 +22,25 @@ async function mapAddNew(query) {
     // Add project ID
     map.projectId = projectId;
 
+    // Add owner
+    map.owner = userId;
+
     // Add user prompt
     map.userPrompt = query;
 
     // Add last updated
-    map.lastUpdated = Date.now();
+    map.lastUpdated = new Date(Date.now());
 
     // Insert new map on MongoDB
     const result = await executeDB({ collectionName: 'maps',
                                      type: 'insertOne',
                                      document: map });
+
+    // Handle error
+    if (!result || result.insertedCount === 0) {
+        log("SERVER ERROR", "Unable to add new map @mapAddNew.");
+        return null;
+    }
 
     // Return
     return map;

@@ -4,6 +4,7 @@
 // Import modules
 import { removeMapMenu } from '../interface/mapListPopup.js';
 import { renameMapApi } from './renameMapApi.js';
+import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Rename map
 export async function renameMap() {
@@ -74,9 +75,12 @@ async function renameConfirm() {
         const updatedMap = await renameMapApi(newTitle);
         // Update title on canvas
         if (updatedMap) {
-            // Set local storage map
-            setLocalStorageMap(updatedMap);
-            // Update map title
+            // Set map
+            braintroop.setMap(updatedMap);
+            // Update map title on sidebar
+            const projectId = updatedMap.projectId;
+            const mapList = document.getElementById('map-list');
+            const currentMapItem = mapList.querySelector(`[data-project-id="${projectId}"]`);
             const titleElement = currentMapItem.querySelector('.map-title');
                 if (titleElement) {
                     titleElement.textContent = newTitle;

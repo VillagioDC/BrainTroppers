@@ -2,29 +2,43 @@
 // NODE TOOLS MENU MODULE
 
 // Import modules
+import { detailNode } from './detailNode.js';
+import { addNewNode } from './addNewNode.js';
 import { addBlankNode } from './addBlankNode.js';
+import { expandNode } from './expandNode.js';
+import { rewriteNode } from './rewriteNode.js';
+import { pinNode, unpinNode } from './pinNode.js';
+import { approveNode } from './approveNode.js';
+import { hideNode, unhideNode } from './hideNode.js';
+import { layerNode } from './layerNode.js';
+import { openColorSchemePopup } from './colorSchemeNode.js';
+import { deleteNode } from './deleteNode.js';
 
-export async function openNodeToolsMenu(node) {
-    // Check nodeId
-    if (!node || !node.id) return;
-    console.log('Node tools menu opened');
+export async function openNodeToolsMenu(selectedNode) {
+    // Get selected node
+    const node = selectedNode;
+    if (!node || !node.nodeId) { console.error('No node selected'); return; }
+    // Remove existing node tools menu
+    removeNodeToolsMenu();
     // Load node tools menu
-    await loadNodeToolsMenu(node);
+    await loadNodeToolsMenu();
     // Toggle tool buttons
     toggleNodeToolsButtons(node);
     // Show node tools menu
-    document.getElementById('node-tools').style.visibility = 'visible';
+    const toolsMenu = document.getElementById('node-tools');
+        if (toolsMenu) {
+            toolsMenu.style.display = 'flex';
+        }
     // Bind event listeners
     bindNodeToolsMenuEvents();
 }
 
 // Load node tools menu
-async function loadNodeToolsMenu(node) {
+async function loadNodeToolsMenu() {
     try {
         const response = await fetch('./src/snippets/node-tools.html');
         if (!response.ok) throw new Error('failed to load node-tools.html');
-        const raw = await response.text();
-        const html = raw.replace('{{selectedNodeId}}', node.id);
+        const html = await response.text();
         // Create popup container
         // Element #node-tools is hidden (visibility=hidden)
         document.body.insertAdjacentHTML('beforeend', html);
@@ -34,10 +48,11 @@ async function loadNodeToolsMenu(node) {
 }
 
 // Toggle node tool buttons
-function toggleNodeToolsButtons(nodeId) {
+export function toggleNodeToolsButtons(node) {
     // Element
+    if (!node || !node.nodeId) { console.warn('No valid node provided for toggling buttons'); return; }
     // Hide/unhide button
-    if (nodeId.hidden) {
+    if (node.hidden) {
         document.getElementById('hide-node-btn').style.display = 'none';
         document.getElementById('unhide-node-btn').style.display = 'flex';
     } else {
@@ -45,34 +60,113 @@ function toggleNodeToolsButtons(nodeId) {
         document.getElementById('unhide-node-btn').style.display = 'none';
     }
     // Pin/unpin button
-    if (!nodeId.locked) {
+    if (!node.locked) {
         document.getElementById('unpin-node-btn').style.display = 'none';
         document.getElementById('pin-node-btn').style.display = 'flex';
     } else {
         document.getElementById('unpin-node-btn').style.display = 'flex';
         document.getElementById('pin-node-btn').style.display = 'none';
     }
+    // Approve button
+    if (node.approved) {
+        document.getElementById('approve-node-btn').style.color = '#7dbf4f';
+    } else {
+        document.getElementById('approve-node-btn').style.color = '#e0e0e0';
+    }
 }
 
 // Bind event listeners
 function bindNodeToolsMenuEvents() {
     // Add event listeners
+    // Detail node button
+    if (document.getElementById('detail-node-btn'))
+        document.getElementById('detail-node-btn').addEventListener('click', detailNode);
+    // Add new node button
+    if (document.getElementById('add-node-btn'))
+        document.getElementById('add-node-btn').addEventListener('click', addNewNode);
+    // Blank button
     if (document.getElementById('blank-node-btn'))
         document.getElementById('blank-node-btn').addEventListener('click', addBlankNode);
+    // Expand node button
+    if (document.getElementById('expand-node-btn'))
+        document.getElementById('expand-node-btn').addEventListener('click', expandNode);
+    // Rewrite node button
+    if (document.getElementById('rewrite-node-btn'))
+        document.getElementById('rewrite-node-btn').addEventListener('click', rewriteNode);
+    // Pin node button
+    if (document.getElementById('pin-node-btn'))
+        document.getElementById('pin-node-btn').addEventListener('click', pinNode);
+    // Unpin node button
+    if (document.getElementById('unpin-node-btn'))
+        document.getElementById('unpin-node-btn').addEventListener('click', unpinNode);
+    // Approve node button
+    if (document.getElementById('approve-node-btn'))
+        document.getElementById('approve-node-btn').addEventListener('click', approveNode);
+    // Hide node button
+    if (document.getElementById('hide-node-btn'))
+        document.getElementById('hide-node-btn').addEventListener('click', hideNode);
+    // Unhide node button
+    if (document.getElementById('unhide-node-btn'))
+        document.getElementById('unhide-node-btn').addEventListener('click', unhideNode);
+    // Layer node
+    if (document.getElementById('layer-node-btn'))
+        document.getElementById('layer-node-btn').addEventListener('click', layerNode);
+    // Color scheme node button
+    if (document.getElementById('color-node-btn'))
+        document.getElementById('color-node-btn').addEventListener('click', openColorSchemePopup);
+    // Delete node button
+    if (document.getElementById('delete-node-btn'))
+        document.getElementById('delete-node-btn').addEventListener('click', deleteNode);
     document.addEventListener('click', outsideClickHandler);
 }
 
 // Remove node tools menu
 export function removeNodeToolsMenu() {
     // Remove event listeners
+    // Detail node button
+    if (document.getElementById('detail-node-btn'))
+        document.getElementById('detail-node-btn').removeEventListener('click', detailNode);
+    // Add new node button
+    if (document.getElementById('add-node-btn'))
+        document.getElementById('add-node-btn').removeEventListener('click', addNewNode);    
+    // Add blank node button
     if (document.getElementById('blank-node-btn'))
         document.getElementById('blank-node-btn').removeEventListener('click', addBlankNode);
+    // Expand node button
+    if (document.getElementById('expand-node-btn'))
+        document.getElementById('expand-node-btn').removeEventListener('click', expandNode);    
+    // Rewrite node button
+    if (document.getElementById('rewrite-node-btn'))
+        document.getElementById('rewrite-node-btn').removeEventListener('click', rewriteNode);
+    // Pin node button
+    if (document.getElementById('pin-node-btn'))
+        document.getElementById('pin-node-btn').removeEventListener('click', pinNode);
+    // Unpin node button
+    if (document.getElementById('unpin-node-btn'))
+        document.getElementById('unpin-node-btn').removeEventListener('click', unpinNode);
+    // Approve node button
+    if (document.getElementById('approve-node-btn'))
+        document.getElementById('approve-node-btn').removeEventListener('click', approveNode);
+    // Hide node button
+    if (document.getElementById('hide-node-btn'))
+        document.getElementById('hide-node-btn').removeEventListener('click', hideNode);
+    // Unhide node button
+    if (document.getElementById('unhide-node-btn'))
+        document.getElementById('unhide-node-btn').removeEventListener('click', unhideNode);
+    // Layer node
+    if (document.getElementById('layer-node-btn'))
+        document.getElementById('layer-node-btn').removeEventListener('click', layerNode);
+    // Color scheme node button
+    if (document.getElementById('color-node-btn'))
+        document.getElementById('color-node-btn').removeEventListener('click', openColorSchemePopup);
+    // Delete node button
+    if (document.getElementById('delete-node-btn'))
+        document.getElementById('delete-node-btn').removeEventListener('click', deleteNode);
     document.removeEventListener('click', outsideClickHandler);
     // Remove popup container
     if (document.getElementById('node-tools')) {
         document.getElementById('node-tools').remove();
     }
-    console.log('Node tools menu removed');
 }
 
 // Click outside event handler

@@ -12,7 +12,7 @@ const log = require('../utils/log.jsx');
 
 async function userDeleteMap(projectId) {
 
-    // Delete project from user and all colabs
+    // Delete project from all users: owner and colabs
     const result = await executeDB({ collectionName: 'users',
                                      type: 'updateMany',
                                      filter: { 'maps.projectId': projectId  },

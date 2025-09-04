@@ -10,20 +10,20 @@ const log = require('../utils/log.jsx');
     RETURN {object} - modified count || null
 */
 
-async function userLastUpdate(map) {
+async function userLastUpdated(map) {
 
     // Get project ID
     const projectId = map.projectId;
-    const lastUpdate = map.lastUpdated;
+    const lastUpdated = map.lastUpdated;
 
     // Update last change on user and all colabs
     const result = await executeDB({ collectionName: 'users',
                                      type: 'updateMany',
                                      filter: { 'maps.projectId': projectId },
-                                     update: { $set: { 'maps.$.lastUpdated': lastUpdate } } });
+                                     update: { $set: { 'maps.$.lastUpdated': lastUpdated } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update last change on user @userLastUpdate.");
+        log("SERVER ERROR", "Unable to update last change on user @userLastUpdated.");
         return null;
     }
 
@@ -31,4 +31,4 @@ async function userLastUpdate(map) {
     return result;
 }
 
-module.exports = userLastUpdate;
+module.exports = userLastUpdated;

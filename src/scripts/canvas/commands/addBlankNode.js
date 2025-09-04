@@ -1,24 +1,23 @@
 // CANVAS MODULES
-// ADD BLACK NODE MODULE
+// ADD BLANK NODE MODULE
 
 // Import modules
-import { removeNodeToolsMenu } from './nodeToolsMenu.js';
+import { openDetailPopup } from './detailNode.js';
 
 // Add blank node to selected node
 export async function addBlankNode() {
-    // Get parent node
-    const nodeTools = document.getElementById('node-tools');
-    if (nodeTools && nodeTools.dataset.selectedNode) {
-        const parentId = nodeTools.dataset.selectedNode;
-        // Add blank node
-        const blankNode = {
-            parentId,
-            shortName: "New node",
-            content: "",
-            detail: ""
-        }
-        braintroop.addNode(blankNode);
+    // Get selected node Id
+    const parentId = braintroop.selected.id;
+
+    // Add blank node
+    const blankNode = {
+        parentId,
+        shortName: "New node",
+        content: "",
+        detail: ""
     }
-    // Remove node tools popup menu
-    removeNodeToolsMenu();
+    // Add blank node to canvas
+    braintroop.addNode(blankNode);
+    // Open detail popup
+    openDetailPopup();
 }

@@ -16,7 +16,7 @@ const mapNodeExpand = require('./controller/mapNodeExpand.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, parentNodeId, query}} - API call
+    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, parentId, query}} - API call
     RETURN [{object}] - body: updatedMap || error
 */
 
@@ -43,12 +43,12 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, parentNodeId, query } = parsedBody;
+    const { userId, projectId, parentId, query } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ||
-        !parentNodeId || parentNodeId.trim().length === 0 ||
+        !parentId || parentId.trim().length === 0 ||
         !query || query.trim().length === 0) {
       log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
       return {
@@ -73,7 +73,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ||
-        typeof parentNodeId !== 'string' || parentNodeId.length > 50 ||
+        typeof parentId !== 'string' || parentId.length > 50 ||
         typeof query !== 'string' || query.length > 500) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
@@ -108,7 +108,7 @@ exports.handler = async (event) => {
     }
 
     // Expand node based on query
-    const updatedMap = await mapNodeExpand(map, parentNodeId, query);
+    const updatedMap = await mapNodeExpand(map, parentId, query);
     if (!updatedMap) {
       log('SERVER ERROR', 'Unable to expand node');
       return {

@@ -9,6 +9,7 @@ const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
+const checkSessionExpired = require('./utils/checkExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
 const log = require('./utils/log.jsx');
 
@@ -76,8 +77,8 @@ exports.handler = async (event) => {
             };
     }
 
-    // Set session expires
-    await setSessionExpires(userId);
+    // Check session expires
+    await checkSessionExpired(userId);
 
     // Read map
     const map = await mapRead(projectId);

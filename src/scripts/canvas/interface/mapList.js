@@ -3,8 +3,10 @@
 
 // Import modules
 import { getLocalStorageUser } from '../../common/userLocalStorage.js';
+import { removeNewMapContainer } from '../interface/newMap.js';
 import { loadMapApi } from '../commands/loadMapApi.js';
 import { popupMapMenu } from './mapListPopup.js';
+import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Map list
 (async function() {
@@ -42,11 +44,11 @@ async function loadMapItemHtml() {
 function placeMapItem(maps, html) {
     // Parent element <ul>
     const mapUL = document.getElementById('map-list');
-    // Sort maps by lastUpdate (most recent first)
+    // Sort maps by lastUpdated
     const sortedMaps = maps.sort((a, b) => {
         // Handle missing or invalid lastUpdate
-        const dateA = a.lastUpdate ? new Date(a.lastUpdate) : new Date(0);
-        const dateB = b.lastUpdate ? new Date(b.lastUpdate) : new Date(0);
+        const dateA = a.lastUpdated ? new Date(a.lastUpdated) : new Date(0);
+        const dateB = b.lastUpdated ? new Date(b.lastUpdated) : new Date(0);
         // Check if dates are valid
         if (isNaN(dateA.getTime())) dateA.setTime(0);
         if (isNaN(dateB.getTime())) dateB.setTime(0);            
@@ -81,16 +83,28 @@ function bindMapItemEvents() {
 
 // Load map
 export async function loadMap(e) {
+    // Get project id
     const projectId = e.target.closest('.map-item').dataset.projectId;
+    if (!projectId) { console.error('Missing project'); return; };
+    // Check if map already opened
+    const currentProjectId = braintroop.map.projectId;
+    if (projectId === currentProjectId) return;
+    showNotification('Loading map...', 'info', 'wait');
     // Remove existing map menus on canvas
-    braintroop.removeMap();
+    braintroop.deleteMap();
     // Load map on database
     const map = await loadMapApi(projectId);
-    if (!map || typeof map !== 'object') return;
-    // Set map on local storage
-    setLocalStorageMap(map);
+    if (!map || typeof map !== 'object') { console.error('Failed to load map'); return; }
+    // Remove new map container
+    removeNewMapContainer();
     // Set map on canvas
     braintroop.setMap(map);
+    // Rebuild map 
+    braintroop.rebuildMap();
+    // Set active map item
+    setActiveMapItem(projectId);
+    // Remove notification
+    removeNotification();
 }
 
 // Create map item on sidebar
@@ -98,10 +112,12 @@ export async function createMapItem(newMap) {
     // Check map
     if (!newMap) return;
     // Fetch HTML
-    const raw = await fetch('./src/snippets/map-item.html')
+    const response = await fetch('./src/snippets/map-item.html')
+    if (!response.ok) { console.error('Failed to load map-item.html'); return; }
+    const raw = await response.text();
     // Replace map title
     const html = raw.replace('{{Title}}', newMap.title);
-    // Keep projectId as placeholder for later substitution
+    // Leave {{projectId}} as placeholder
     // Insert HTML on sidebar map ul
     const mapList = document.getElementById('map-list');
     mapList.insertAdjacentHTML('afterbegin', html);
@@ -110,8 +126,10 @@ export async function createMapItem(newMap) {
 // Set map item as active
 export function setActiveMapItem(projectId) {
     // Remove all active map items
+    if (!projectId) { console.error('Missing project'); return; }
+    // Remove all active map items
     const activeMaps = document.querySelectorAll('.map-item.active');
-    if (activeMaps) return;
+    if (!activeMaps) return;
         activeMaps.forEach(mapItem => mapItem.classList.remove('active'));
     // Set active map item
     const mapItem = document.querySelector(`[data-project-id="${projectId}"]`);

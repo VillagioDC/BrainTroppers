@@ -5,9 +5,9 @@
 import { showNotification } from '../../common/notifications.js';
 import { redirectToSignIn } from '../../common/redirectToInitialPage.js';
 
-export async function checkSessionExpired(response) {
+export function checkSessionExpired(responseData) {
     // Check response for session expired
-    if (response && response.status === 401 && response.expired) {
+    if (responseData && responseData.expired) {
         showNotification('Session expired.', 'error');
         setTimeout(() => {
             redirectToSignIn();

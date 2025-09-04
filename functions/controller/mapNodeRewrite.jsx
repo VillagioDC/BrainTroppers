@@ -67,6 +67,7 @@ async function mapNodeRewrite(map, nodeId, query) {
     reviewNode.content = jsonResponse.content;
     reviewNode.detail = jsonResponse.detail;
     reviewNode.hidden = false;
+    reviewNode.approved = false;
 
     // Update node
     const updatedNodeMap = await mapNodeUpdate(map, reviewNode);

@@ -14,13 +14,14 @@ const mapUpdate = require('./mapUpdate.jsx');
     RETURN {object} - new map
 */
 
-async function mapCreateNew(query) {
+async function mapCreateNew({userId, query}) {
 
     // Generate  new map and add to database
-    const newMap = await mapAddNew(query);
+    const newMap = await mapAddNew({userId, query});
+    if (!newMap) return null;
 
     // Set stages
-    const stage = ["brainstorm", "transformer", "expand", "connections"];
+    const stage = ["brainstorm", "transformer", "parentNode"];
 
     // Set user message
     let userMessage = query;
@@ -50,25 +51,39 @@ async function mapCreateNew(query) {
         // Response
         response = userMessage;
 
+        console.log("Stage: " + stage[i]);
+        console.log(response);
+
         // Pause if not last stage
         if (i < stage.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
 
     // Parse response
     const jsonResponse = parseJSON(response);
 
-    // Update map 
+    // Fill meta data 
     newMap.title = jsonResponse.title;
     newMap.nodes = jsonResponse.nodes;
-    await mapUpdate(newMap);
 
-    // Update user projects with new map
-    await userAddNewMap(newMap, newMap.owner);
+    // Fill nodes
+    for (let i=0; i<newMap.nodes.length; i++) {
+        newMap.nodes[i].x = null;
+        newMap.nodes[i].y = null
+        newMap.nodes[i].locked = false;
+        newMap.nodes[i].approved = false;
+        newMap.nodes[i].hidden = false;
+        newMap.nodes[i].parentNodeColorScheme = null;
+        newMap.nodes[i].layer = 1;
+    }
+
+    // Update map
+    const updatedMap = await mapUpdate(newMap);
+    if (!updatedMap) return null;
 
     // Return
-    return newMap;
+    return updatedMap;
 }
 
 module.exports = mapCreateNew;

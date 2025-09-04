@@ -10,17 +10,17 @@ const parseJSON = require('../utils/parseJSON.jsx');
 const mapRewire = require('./mapRewire.jsx');
 
 /* PARAMETERES
-    input {object, string, string} - map, parentNodeId, user query
+    input {object, string, string} - map, parentId, user query
     RETURN {object} - updated map
 */
 
-async function mapNodeExpand(map, parentNodeId, query) {
+async function mapNodeExpand(map, parentId, query) {
 
     // Get parent node color scheme
-    const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentNodeId).colorSchemeName;
+    const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentId).colorSchemeName;
 
     // Get parent node layer
-    const parentNodeLayer = map.nodes.find(n => n.nodeId === parentNodeId).layer;
+    const parentNodeLayer = map.nodes.find(n => n.nodeId === parentId).layer;
 
     // Deconstruct map
     const mapStr = deconstructMap(map);
@@ -29,8 +29,8 @@ async function mapNodeExpand(map, parentNodeId, query) {
     let stage = ["expandNode", "transformNodes"];
 
     // Set user message
-    const nodeContent = map.nodes.find(n => n.nodeId === parentNodeId).content;
-    const nodeDetail = map.nodes.find(n => n.nodeId === parentNodeId).detail;
+    const nodeContent = map.nodes.find(n => n.nodeId === parentId).content;
+    const nodeDetail = map.nodes.find(n => n.nodeId === parentId).detail;
     let userMessage = "Expand node about " + nodeContent + "and " + nodeDetail + ". " + (query || "") + ". ";
 
     // Loop stages
@@ -79,9 +79,12 @@ async function mapNodeExpand(map, parentNodeId, query) {
         node.shortName = newNodes[i].shortName;
         node.content = newNodes[i].content;
         node.detail = newNodes[i].detail;
-        node.directLink = [parentNodeId];
+        node.directLink = [parentId];
         node.relatedLink = [];
-        node.xy = null;
+        node.x = null;
+        node.y = null;
+        node.locked = false;
+        node.approved = false;
         node.hidden = false;
         node.colorSchemeName = parentNodeColorScheme;
         node.layer = parentNodeLayer;

@@ -3,7 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
-const mapLastUpdate = require('./mapLastUpdate.jsx');
+const mapLastUpdated = require('./mapLastUpdated.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -28,7 +28,7 @@ async function mapNodeDelete(map, nodeId) {
     }
 
     // Last update
-    updatedMap = await mapLastUpdate(updatedMap);
+    updatedMap = await mapLastUpdated(updatedMap);
 
     // Return
     return updatedMap;

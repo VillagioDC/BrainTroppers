@@ -16,20 +16,21 @@ export async function loadMapApi(projectId) {
             'Authorization': `Bearer ${token}`,
         };
         const body = { userId, projectId };
-        const url = setApiUrl('createNewMap');
+        const url = setApiUrl('loadMap');
         const response = await fetch(url, {
             method: 'POST',
             headers,
             body: JSON.stringify(body),
         });
+        // Parse response
+        const responseData = await response.json();
         // Check response
         if (!response.ok) {
-            await checkSessionExpired(response);
-            throw new Error(`HTTP error! status: ${response.status}`);
+            checkSessionExpired(responseData);
         }
         // Get updated node
-        const updatedNode = await response.json();
-        return updatedNode;
+        const map = responseData;
+        return map;
     // Catch errors
     } catch (error) {
         console.error('Error adding node:', error);

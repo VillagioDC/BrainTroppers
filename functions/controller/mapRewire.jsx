@@ -20,7 +20,7 @@ async function mapRewire(map) {
     const mapStr = deconstructMap(map);
 
     // Set stages
-    const stage = ["connections"];
+    const stage = ["allConnections"];
 
     // Set user message
     let userMessage = "Review all `directLink` and `relatedLink` connections and update the arrays.";
@@ -64,7 +64,7 @@ async function mapRewire(map) {
     let resultMap = jsonResponse;
     resultMap.projectId = map.projectId;
     resultMap.title = map.title;
-    resultMap.lastUpdated = Date.now();
+    resultMap.lastUpdated = new Date(Date.now());
     resultMap.userPrompt = map.userPrompt;
     const updatedMap = await mapUpdate(resultMap);
 

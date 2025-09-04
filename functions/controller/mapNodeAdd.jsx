@@ -3,7 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
-const mapLastUpdate = require('./mapLastUpdate.jsx');
+const mapLastUpdated = require('./mapLastUpdated.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -27,7 +27,7 @@ async function mapNodeAdd(map, node) {
     }
 
     // Last update
-    const updatedMap = await mapLastUpdate(map);
+    const updatedMap = await mapLastUpdated(map);
 
     // Return
     return updatedMap;
