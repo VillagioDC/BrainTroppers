@@ -26,7 +26,7 @@ async function openRewriteNodePopup() {
 // Load rewrite popup
 async function loadRewriteNode() {
     try {
-        const response = await fetch('./src/snippets/rewrite-node-popup.html');
+        const response = await fetch('./snippets/rewrite-node-popup.html');
         if (!response.ok) throw new Error('Failed to load rewrite-node-popup.html');
         const html = await response.text();
         // Add node popup

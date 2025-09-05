@@ -29,7 +29,7 @@ export async function toggleUserMenu(e) {
 // Fetch and load user menu HTML
 async function loadUserMenu() {
     try {
-        const response = await fetch('./src/snippets/user-menu.html');
+        const response = await fetch('./snippets/user-menu.html');
         if (!response.ok) throw new Error('failed to load user-menu.html');
         const html = await response.text();
         // Create popup container

@@ -26,7 +26,7 @@ export async function renameMap() {
 // Load rename map html
 async function loadRenameMapPopup() {
     try {
-        const response = await fetch('./src/snippets/rename-title.html');
+        const response = await fetch('./snippets/rename-title.html');
         if (!response.ok) throw new Error('Failed to load rename-title.html');
         const html = await response.text();
         document.body.insertAdjacentHTML('beforeend', html);

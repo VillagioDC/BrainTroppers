@@ -17,7 +17,7 @@ export async function goProPlan() {
 // Load pro plan popup
 async function loadProPlanPopup() {
     try {
-        const response = await fetch('./src/snippets/pro-plan.html');
+        const response = await fetch('./snippets/pro-plan.html');
         if (!response.ok) throw new Error('Failed to load pro-plan.html');
         const html = await response.text();
         document.body.insertAdjacentHTML('beforeend', html);

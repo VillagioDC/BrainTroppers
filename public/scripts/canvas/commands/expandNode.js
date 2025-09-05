@@ -36,7 +36,7 @@ async function openExpandNodePopup() {
 // Load expand popup
 async function loadExpandNode() {
     try {
-        const response = await fetch('./src/snippets/expand-node-popup.html');
+        const response = await fetch('./snippets/expand-node-popup.html');
         if (!response.ok) throw new Error('Failed to load expand-node-popup.html');
         const html = await response.text();
         // Add node popup

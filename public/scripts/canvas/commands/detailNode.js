@@ -33,7 +33,7 @@ export async function openDetailPopup() {
 // Load detail popup
 async function loadDetailPopup() {
     try {
-        const response = await fetch('./src/snippets/detail-node-popup.html');
+        const response = await fetch('./snippets/detail-node-popup.html');
         if (!response.ok) throw new Error('Failed to load detail-node-popup.html');
         const html = await response.text();
         // Add node popup

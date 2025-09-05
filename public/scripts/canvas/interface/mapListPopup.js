@@ -22,7 +22,7 @@ export async function popupMapMenu(e) {
 // Fetch and load map menu HTML
 async function loadMapMenu(currentMapItem) {
     try {
-        const response = await fetch('./src/snippets/map-menu-popup.html');
+        const response = await fetch('./snippets/map-menu-popup.html');
         if (!response.ok) throw new Error('Failed to load map-menu-popup.html');
         const raw = await response.text();
         // Replace map title

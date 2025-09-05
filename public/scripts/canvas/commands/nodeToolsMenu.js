@@ -36,7 +36,7 @@ export async function openNodeToolsMenu(selectedNode) {
 // Load node tools menu
 async function loadNodeToolsMenu() {
     try {
-        const response = await fetch('./src/snippets/node-tools.html');
+        const response = await fetch('./snippets/node-tools.html');
         if (!response.ok) throw new Error('failed to load node-tools.html');
         const html = await response.text();
         // Create popup container

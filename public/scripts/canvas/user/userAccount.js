@@ -20,7 +20,7 @@ export async function userAccount() {
 
 async function loadUserAccountPopup() {
     try {
-        const response = await fetch('./src/snippets/user-account.html');
+        const response = await fetch('./snippets/user-account.html');
         if (!response.ok) throw new Error('Failed to load user account.html');
         const html = await response.text();
         document.body.insertAdjacentHTML('beforeend', html);

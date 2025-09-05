@@ -14,6 +14,6 @@
 
 // Load example map JSON
 async function loadExampleMapJson() {
-    const json = await fetch('./src/data/exampleMap.json');
+    const json = await fetch('./data/exampleMap.json');
     return json.json();
 }

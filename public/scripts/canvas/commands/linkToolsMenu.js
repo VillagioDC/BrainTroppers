@@ -26,7 +26,7 @@ export async function openLinkToolsMenu(edge) {
 // Load link tools menu
 async function loadLinkToolsMenu(edge) {
     try {
-        const response = await fetch('./src/snippets/link-tools.html');
+        const response = await fetch('./snippets/link-tools.html');
         if (!response.ok) throw new Error('failed to load link-tools.html');
         const raw = await response.text();
         const html = raw.replace('{{selectedEdgeId}}', edge.id);

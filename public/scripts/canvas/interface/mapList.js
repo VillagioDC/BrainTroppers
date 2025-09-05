@@ -31,7 +31,7 @@ async function initMapList() {
 // Load map item HTML
 async function loadMapItemHtml() {
     try {
-        const response = await fetch('./src/snippets/map-item.html');
+        const response = await fetch('./snippets/map-item.html');
         if (!response.ok) throw new Error('failed to load map-item.html');
         const html = await response.text();
         return html;
@@ -112,7 +112,7 @@ export async function createMapItem(newMap) {
     // Check map
     if (!newMap) return;
     // Fetch HTML
-    const response = await fetch('./src/snippets/map-item.html')
+    const response = await fetch('./snippets/map-item.html')
     if (!response.ok) { console.error('Failed to load map-item.html'); return; }
     const raw = await response.text();
     // Replace map title

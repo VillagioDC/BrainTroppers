@@ -6,7 +6,7 @@ let notificationTimeout = null;
 // Private function to load modal
 async function loadNotificationModal() {
     try {
-        const res = await fetch('./src/snippets/notification-popup.html');
+        const res = await fetch('./snippets/notification-popup.html');
         if (!res.ok) {
             throw new Error('Failed to fetch notification modal');
         }

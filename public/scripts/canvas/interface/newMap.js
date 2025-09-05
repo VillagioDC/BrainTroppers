@@ -44,7 +44,7 @@ export async function newMapClick(e) {
 
 // Load new map container
 async function loadNewMapContainer() {
-    return await fetch('./src/snippets/map-new.html')
+    return await fetch('./snippets/map-new.html')
         .then(res => res.text())
         .then(html => {
             document.body.insertAdjacentHTML('beforeend', html);

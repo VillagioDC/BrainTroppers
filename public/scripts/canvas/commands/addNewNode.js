@@ -35,7 +35,7 @@ async function openNewNodePopup() {
 // Load add popup
 async function loadAddPopup() {
     try {
-        const response = await fetch('./src/snippets/add-node-popup.html');
+        const response = await fetch('./snippets/add-node-popup.html');
         if (!response.ok) throw new Error('Failed to load detail-node-popup.html');
         const html = await response.text();
         // Add node popup
