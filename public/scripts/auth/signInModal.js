@@ -28,7 +28,7 @@ export async function signInBtnClick() {
 // Load sign in modal
 export async function loadSignInModal() {
     try {
-        const res = await fetch('./src/snippets/sign-in-modal.html');
+        const res = await fetch('./snippets/sign-in-modal.html');
         const html = await res.text();
         document.body.insertAdjacentHTML('beforeend', html);
         return document.getElementById('sign-in-modal');

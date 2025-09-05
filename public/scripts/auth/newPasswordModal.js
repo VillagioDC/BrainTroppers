@@ -31,7 +31,7 @@ export async function showNewPasswordModal(authToken) {
 // Load new password modal
 export async function loadNewPasswordModal(authToken) {
     try {
-        const res = await fetch('./src/snippets/new-password-modal.html');
+        const res = await fetch('./snippets/new-password-modal.html');
         let html = await res.text();
         html = html.replace('{{authToken}}', authToken);
         document.body.insertAdjacentHTML('beforeend', html);

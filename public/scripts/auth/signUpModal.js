@@ -29,7 +29,7 @@ export async function signUpBtnClick() {
 // Load sign up modal
 export async function loadSignUpModal() {
     try {
-        const res = await fetch('./src/snippets/sign-up-modal.html');
+        const res = await fetch('./snippets/sign-up-modal.html');
         const html = await res.text();
         document.body.insertAdjacentHTML('beforeend', html);
         return document.getElementById('sign-up-modal');

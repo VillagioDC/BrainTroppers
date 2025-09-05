@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         await Promise.all([
             // Landing page modules
-            import('./index/getStarted.js'),
             import('./index/uiUx.js'),
             import('./index/brainstorm.js'),
             // Authentication module
@@ -12,7 +11,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         ]);
         // Clean local storage
         if (localStorage.getItem('braintroop-user')) localStorage.removeItem('braintroop-user');
-        if (localStorage.getItem('braintroop-map')) localStorage.removeItem('braintroop-map');
         // Modules loaded successfully
         console.log('Page loaded successfully');
     } catch (error) {

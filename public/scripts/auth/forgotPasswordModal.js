@@ -27,7 +27,7 @@ export async function forgotPasswordClick() {
 // Load forgot password modal
 export async function loadForgotPasswordModal() {
     try {
-        const res = await fetch('./src/snippets/forgot-password-modal.html');
+        const res = await fetch('./snippets/forgot-password-modal.html');
         const html = await res.text();
         document.body.insertAdjacentHTML('beforeend', html);
         return document.getElementById('forgot-password-modal');
