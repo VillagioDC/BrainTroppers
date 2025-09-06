@@ -27,10 +27,12 @@ export async function loadMapApi(projectId) {
         // Check response
         if (!response.ok) {
             checkSessionExpired(responseData);
+            return false;
         }
         // Get updated node
         const map = responseData;
         return map;
+        
     // Catch errors
     } catch (error) {
         console.error('Error adding node:', error);

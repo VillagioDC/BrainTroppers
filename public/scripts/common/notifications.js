@@ -53,6 +53,7 @@ export async function showNotification(message, type = 'success', action = null)
                 popup.remove();
             }, 3000);
         }
+
     } catch (error) {
         console.error('Notification error:', error);
     }

@@ -2,7 +2,7 @@
 // DETAIL NODE MODULE
 
 // Import modules
-import { sanitizeInput } from '../utils/validade.js';
+import { sanitizeInput } from '../utils/validate.js';
 import { deleteNode } from './deleteNode.js';
 import { updateNode } from './updateNode.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';

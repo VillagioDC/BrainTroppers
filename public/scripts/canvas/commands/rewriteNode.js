@@ -2,7 +2,7 @@
 // REWRITE NODE MODULE
 
 // Import modules
-import { checkQuery } from "../utils/validade.js";
+import { checkQuery } from "../utils/validate.js";
 import { rewriteNodeApi } from "./rewriteNodeApi.js";
 import { showNotification, removeNotification } from '../../common/notifications.js';
 

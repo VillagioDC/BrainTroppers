@@ -28,6 +28,9 @@ async function mapAddNew({userId, query}) {
     // Add user prompt
     map.userPrompt = query;
 
+    // Add creation status
+    map.creationStatus = 'requested';
+
     // Add last updated
     map.lastUpdated = new Date(Date.now());
 

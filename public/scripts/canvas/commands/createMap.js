@@ -2,13 +2,15 @@
 // CREATE NEW MAP
 
 // Import modules
-import { checkQuery } from '../utils/validade.js';
+import { checkQuery } from '../utils/validate.js';
 import { removeNewMapContainer } from '../interface/newMap.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 import { createMapApi } from './createMapApi.js';
+import { createMapGetStatus } from './createMapGetStatus.js';
 import { assignMapToUserApi } from './assignMapToUserApi.js';
 import { createMapItem, setActiveMapItem } from '../interface/mapList.js';
 import { setLocalStorageUser } from '../../common/userLocalStorage.js';
+import { pauseS } from '../utils/pauseS.jsx';
 
 // Create new map
 export async function createNewMap() {
@@ -23,13 +25,35 @@ export async function createNewMap() {
     // Close new map container
     removeNewMapContainer();
     // Show notification
-    await showNotification('Processing...', 'info', 'wait');
-    // Create map
+    await showNotification('Requesting...', 'info', 'wait');
+    // Request creation of map
     const map = await createMapApi(query);
+    // Check error requesting map
+    if (!map || typeof map !== 'object' || !map.projectId) {
+        // Remove temp node (placeholder)
+        deleteFirstNode(placeholderNodeId);
+        // Show error notification
+        showNotification('Error creating map', 'error');
+        return;
+    };
+    // Pooling map
+    await showNotification('Creating...', 'info', 'wait');
+    await pauseS(30);
+    let creationStatus = 'creating';
+    while (creationStatus === 'creating') {
+        // Call api
+        const map = await createMapGetStatus(map.projectId);
+        // Check status
+        if (map && map.creationStatus) {
+            creationStatus = map.creationStatus;
+        }
+        // Wait
+        await pauseS(10);
+    }
     // Remove temp node (placeholder)
     deleteFirstNode(placeholderNodeId);
     // Place new map
-    if (map) {
+    if (map && map.creationStatus === 'created') {
         // Set data
         braintroop.setMap(map);
         // Create map item
@@ -40,9 +64,11 @@ export async function createNewMap() {
         const updatedUser = await assignMapToUserApi( {map, assignedUserId: map.owner } );
         // Update user on local storage
         setLocalStorageUser(updatedUser);
+        // Remove notification
+        removeNotification();
+    } else {
+        showNotification('Error creating map', 'error');
     }
-    // Remove notification
-    removeNotification();
 }
 
 // Add first node (placeholder)

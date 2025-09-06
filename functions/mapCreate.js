@@ -11,7 +11,7 @@ const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
-const mapCreateNew = require('./controller/mapCreateNew.jsx');
+const mapCreateRequest = require('./controller/mapCreateRequest.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
@@ -91,8 +91,8 @@ exports.handler = async (event) => {
     // Set session expires
     await setSessionExpires(userId);
 
-    // Create new map
-    const newMap = await mapCreateNew({userId, query});
+    // Create new map request
+    const newMap = await mapCreateRequest({userId, query});
     if (!newMap) {
       log('SERVER WARNING', 'Unable to create map');
       return {
@@ -102,16 +102,16 @@ exports.handler = async (event) => {
       };
     }
 
-    // Return success
+    // Return request response
     return {
-      statusCode: 200,
+      statusCode: newMap.statusCode,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(newMap)
+      body: JSON.stringify(newMap.body)
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapCreateNew endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -1,5 +1,5 @@
 // CANVAS MODULES
-// CREATE NEW MAP API MODULE
+// HECK CREATION STATUS API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
@@ -7,21 +7,18 @@ import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
 // Create map api
-export async function renameMapApi(newTitle) {
+export async function createMapGetStatus(projectId) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
-        const { projectId } = JSON.parse(braintroop.map.projectId());
         const headers = {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionToken}`,
         };
-        const body = { userId, projectId, newTitle };
-        const url = setApiUrl('renameMap');
+        const query = `?projectId=${projectId}&userId=${userId}`;
+        const url = setApiUrl('createMapGetStatus');
         const response = await fetch(url, {
-            method: 'POST',
+            method: 'GET',
             headers,
-            body: JSON.stringify(body),
         });
         // Parse response
         const responseData = await response.json();
@@ -31,12 +28,12 @@ export async function renameMapApi(newTitle) {
             return false;
         }
         // Get new map
-        const updatedMap = responseData;
-        return updatedMap;
+        const newMap = responseData;
+        return newMap;
         
         // Catch errors
         } catch (error) {
-            console.error('Error adding node:', error);
+            console.error('Error creating map:', error);
             return false;
     }
 }

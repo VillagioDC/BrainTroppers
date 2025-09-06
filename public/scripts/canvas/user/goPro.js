@@ -34,6 +34,7 @@ function bindProPlanPopupEvents() {
     if (document.getElementById("pro-plan-close"))
         document.getElementById("pro-plan-close").addEventListener("click", removeProPlanPopup);
     document.addEventListener('click', outsideClickHandler);
+    document.addEventListener('keydown', escapeKeyHandler);
 }
 
 // Submit pro plan form
@@ -60,6 +61,13 @@ function outsideClickHandler(e) {
     }
 }
 
+// Escape key handler
+function escapeKeyHandler(e) {
+    if (e.key === 'Escape') {
+        removeProPlanPopup();
+    }
+}
+
 // Remove pro plan popup
 function removeProPlanPopup() {
     // Remove event listeners
@@ -67,6 +75,8 @@ function removeProPlanPopup() {
         document.getElementById("pro-plan-form").removeEventListener("submit", proPlanFormSubmit);
     if (document.getElementById("pro-plan-close"))
         document.getElementById("pro-plan-close").removeEventListener("click", removeProPlanPopup);
+    document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', escapeKeyHandler);
     // Remove pro plan popup
     document.getElementById("pro-plan-modal").remove();
 }

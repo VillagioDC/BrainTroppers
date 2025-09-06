@@ -2,7 +2,7 @@
 // EXPAND NODE MODULE
 
 // Import modules
-import { checkQuery } from '../utils/validade.js';
+import { checkQuery } from '../utils/validate.js';
 import { expandNodeApi } from './expandNodeApi.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 

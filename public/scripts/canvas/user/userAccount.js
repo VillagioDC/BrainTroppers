@@ -7,7 +7,6 @@ import { getLocalStorageUser } from '../../common/userLocalStorage.js';
 import { showNotification } from '../../common/notifications.js';
 
 export async function userAccount() {
-    const user = getLocalStorageUser();
     // Remove user menu
     removeUserMenu();
     // Load user account popup
@@ -64,6 +63,7 @@ function bindUserAccountPopupEvents() {
     if (document.getElementById("delete-account"))
         document.getElementById("delete-account").addEventListener("click", showDeleteAccountConfirm);
     document.addEventListener('click', outsideClickHandler);
+    document.addEventListener('keydown', escapeKeyHandler);
 }
 
 // Edit icon
@@ -113,6 +113,17 @@ function deleteAccount() {
     removeUserAccountPopup();
 }
 
+// Outside click
+function outsideClickHandler(e) {
+    const userAccountPopup = document.getElementById("user-account-popup");
+    if (e.target === userAccountPopup ) removeUserAccountPopup();
+}
+
+// Escape key handler
+function escapeKeyHandler(e) {
+    if (e.key === "Escape") removeUserAccountPopup();
+}
+
 // Remove user account popup
 function removeUserAccountPopup() {
     // Remove event listeners from user account popup
@@ -129,13 +140,8 @@ function removeUserAccountPopup() {
     if (document.getElementById("confirm-delete-account"))
         document.getElementById("confirm-delete-account").removeEventListener("click", deleteAccount);
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', escapeKeyHandler);
     // Remove popup container
     if (document.getElementById("user-account-popup"))
         document.getElementById("user-account-popup").remove();
-}
-
-// Outside click
-function outsideClickHandler(e) {
-    const userAccountPopup = document.getElementById("user-account-popup");
-    if (e.target === userAccountPopup ) removeUserAccountPopup();
 }

@@ -29,7 +29,9 @@ export async function deleteNodeApi(nodeId) {
         // Check response
         if (!response.ok) {
             checkSessionExpired(responseData);
+            return false;
         }
+        
         // Get new map
         const updatedMap = responseData;
         return updatedMap;

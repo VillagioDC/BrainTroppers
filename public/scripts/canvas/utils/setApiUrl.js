@@ -24,6 +24,9 @@ export function setApiUrl(api) {
         case 'createNewMap':
             url += '/mapCreate';
             break;
+        case 'createMapGetStatus':
+            url += '/mapCreateGetStatus';
+            break;
         case 'renameMap':
             url += '/mapTitleUpdate';
             break;

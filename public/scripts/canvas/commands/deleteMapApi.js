@@ -27,10 +27,12 @@ export async function deleteMapApi(projectId) {
         // Check response
         if (!response.ok) {
             checkSessionExpired(responseData);
+            return false;
         }
         // Get new map
         const newMap = await response.json();
         return newMap;
+        
         // Catch errors
         } catch (error) {
             console.error('Error adding node:', error);

@@ -27,13 +27,15 @@ export async function createMapApi(query) {
         // Check response
         if (!response.ok) {
             checkSessionExpired(responseData);
+            return false;
         }
         // Get new map
         const newMap = responseData;
         return newMap;
+        
         // Catch errors
         } catch (error) {
-            console.error('Error adding node:', error);
+            console.error('Error creating map:', error);
             return false;
     }
 }

@@ -29,10 +29,12 @@ export async function rewriteNodeApi ( {parentId, query} ) {
         // Check response
         if (!response.ok) {
             checkSessionExpired(responseData);
+            return false;
         }
         // Get new map
         const updatedMap = responseData;
         return updatedMap;
+        
         // Catch errors
         } catch (error) {
             console.error('Error rewriting node:', error);

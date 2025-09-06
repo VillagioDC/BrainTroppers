@@ -27,10 +27,12 @@ export async function refreshUserApi(userId) {
         // Check response
         if (!response.ok) {
             checkSessionExpired(responseData);
+            return false;
         }
         // Get new map
         const user = responseData;
         return user;
+        
         // Catch errors
         } catch (error) {
             console.error('Error refreshing user data:', error);
