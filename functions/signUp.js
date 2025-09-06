@@ -9,7 +9,7 @@ const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
-const userSignUp = require('./controller/userSignUp.jsx');
+const userSignUp = require('./auth/userSignUp.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS

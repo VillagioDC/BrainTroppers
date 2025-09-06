@@ -5,7 +5,7 @@
 
 // Functions
 const handlePreflight = require('./utils/handlePreflight.jsx');
-const userResetPassword = require('./controller/userResetPassword.jsx');
+const userResetPassword = require('./auth/userResetPassword.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS

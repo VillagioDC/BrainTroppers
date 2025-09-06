@@ -5,7 +5,7 @@
 const executeDB = require('../mongoDB/executeDB.jsx');
 const generateToken = require('../utils/generateToken.jsx');
 const setSessionExpires = require('../utils/setExpires.jsx')
-const userRefresh = require('./userRefresh.jsx');
+const userRefresh = require('../controller/userRefresh.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
