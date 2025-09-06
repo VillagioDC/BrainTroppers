@@ -2,34 +2,20 @@
 // AUTH NEW PASSWORD MODAL MODULE
 
 // Import modules
-import { removeForgotPasswordModal } from './forgotPasswordModal.js';
-import { removeSignInModal } from './signInModal.js';
-import { removeSignUpModal, switchToSignInClick } from './signUpModal.js';
+import { switchToSignInClick } from './signUpModal.js';
 import { validatePasswordInput } from './validatePassword.js';
-import { handleNewPassword } from './newPasswordHandler.js';
-
-let forgotPasswordModal, signInModal, signUpModal, newPasswordModal;
 
 // Show reset password modal
 export async function showNewPasswordModal(authToken) {
-    // Elements
-    forgotPasswordModal = document.getElementById('forgot-password-modal');
-    signInModal = document.getElementById('sign-in-modal');
-    signUpModal = document.getElementById('sign-up-modal');
-    newPasswordModal = document.getElementById('new-password-modal');
-    // Remove opened modals
-    if (forgotPasswordModal) removeForgotPasswordModal();
-    if (signInModal) removeSignInModal();
-    if (signUpModal) removeSignUpModal();
     // Load reset password modal
-    await loadNewPasswordModal(authToken);
+    const newPasswordModal = await loadNewPasswordModal(authToken);
     if (!newPasswordModal) return;
     // Bind events
     bindNewPasswordModalEvents();
 }
 
 // Load new password modal
-export async function loadNewPasswordModal(authToken) {
+async function loadNewPasswordModal(authToken) {
     try {
         const res = await fetch('./snippets/new-password-modal.html');
         let html = await res.text();
@@ -42,7 +28,7 @@ export async function loadNewPasswordModal(authToken) {
 }
 
 // Bind reset password modal events
-export function bindNewPasswordModalEvents() {
+function bindNewPasswordModalEvents() {
     // Elements
     const closeNewPassword = document.getElementById('close-new-password');
     const switchToSignIn = document.getElementById('switch-to-sign-in');
@@ -51,22 +37,36 @@ export function bindNewPasswordModalEvents() {
     // Event listeners
     if (closeNewPassword) closeNewPassword.addEventListener('click', closeNewPasswordClick);
     if (switchToSignIn) switchToSignIn.addEventListener('click', switchToSignInClick);
-    if (newPasswordForm) newPasswordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await handleNewPassword();
-    });
+    if (newPasswordForm) newPasswordForm.addEventListener('submit', newPasswordSubmitHandler);
     if (passwordInput) passwordInput.addEventListener('input', validatePasswordInput);
+    // Outside click
     document.addEventListener('click', outsideClickHandler);
+    // Esc key
+    document.addEventListener('keydown', escKeyHandler);
+}
+
+// New password submit handler
+async function newPasswordSubmitHandler(e) {
+    e.preventDefault();
+    const { handleNewPassword } = await import('./newPasswordHandler.js');
+    await handleNewPassword();
+    removeNewPasswordModal();
 }
 
 // Close new password modal
-export function closeNewPasswordClick() {
+function closeNewPasswordClick() {
     removeNewPasswordModal();
 }
 
 // Outside click handler
-export function outsideClickHandler(e) {
+function outsideClickHandler(e) {
+    const newPasswordModal = document.getElementById('new-password-modal');
     if (newPasswordModal && e.target.contains(newPasswordModal)) removeNewPasswordModal();
+}
+
+// Esc key handler
+function escKeyHandler(e) {
+    if (e.key === 'Escape') removeNewPasswordModal();
 }
 
 // Remove new password modal
@@ -77,13 +77,12 @@ export function removeNewPasswordModal() {
     if (document.getElementById('switch-to-sign-in'))
         document.getElementById('switch-to-sign-in').removeEventListener('click', switchToSignInClick);
     if (document.getElementById('new-password-form'))
-        document.getElementById('new-password-form').removeEventListener('submit', handleNewPassword);
+        document.getElementById('new-password-form').removeEventListener('submit', newPasswordSubmitHandler);
     if (document.getElementById('new-password'))
         document.getElementById('new-password').removeEventListener('input', validatePasswordInput);
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', escKeyHandler);
     // Remove modal
-    if (newPasswordModal) {
-        newPasswordModal.remove();
-        newPasswordModal = null;
-    }
+    if (document.getElementById('new-password-modal'))
+        document.getElementById('new-password-modal').remove();
 }

@@ -51,7 +51,7 @@ export async function handleSignUp() {
         console.log('Sign up error');
     } else if (result && result.error) {
         // If wrong request or wrong credentials
-        await showNotification(result.error, 'error');
+        await showNotification('Sign up error', 'error');
         console.log(result.error);
     // Handle success
     } else {

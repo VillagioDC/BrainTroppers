@@ -9,7 +9,7 @@ import { showNotification } from '../common/notifications.js';
 export async function initiateGoogleAuth(type) {
     await showNotification(`Feature coming soon!`, 'info');
     return;
-    // Pending
+    // Implement here
     try {
         await showNotification(`Initiating Google ${type === 'sign-in' ? 'Sign In' : 'Sign Up'}...`, 'info', 'wait');
         const result = await apiGoogleAuth(type);

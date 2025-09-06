@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         await Promise.all([
             // Landing page modules
+            import('./index/getStarted.js'),
             import('./index/uiUx.js'),
             import('./index/brainstorm.js'),
             // Authentication module

@@ -2,42 +2,32 @@
 // AUTH FORGOT PASSWORD MODAL MODULE
 
 // Import modules
-import { removeSignInModal, signInBtnClick } from './signInModal.js';
-import { removeSignUpModal } from './signUpModal.js';
-import { handleForgotPassword } from './forgotPasswordHandler.js';
-
-let forgotPasswordModal, signInModal, signUpModal;
+// Lazy imports
 
 // Open forgot password modal
-export async function forgotPasswordClick() {
-    // Elements
-    forgotPasswordModal = document.getElementById('forgot-password-modal');
-    signInModal = document.getElementById('sign-in-modal');
-    signUpModal = document.getElementById('sign-up-modal');
-    // Remove opened modals
-    if (forgotPasswordModal) return;
-    if (signInModal) removeSignInModal();
-    if (signUpModal) removeSignUpModal();
+export async function constructForgotPasswordModal() {
+    // Prevent duplicating modals
+    if (document.getElementById('forgot-password-modal')) return;
     // Load forgot password modal
-    forgotPasswordModal = await loadForgotPasswordModal();
+    await loadForgotPasswordModal();
     bindForgotPasswordModalEvents();
     document.getElementById('reset-email').focus();
 }
 
 // Load forgot password modal
-export async function loadForgotPasswordModal() {
+async function loadForgotPasswordModal() {
     try {
         const res = await fetch('./snippets/forgot-password-modal.html');
         const html = await res.text();
         document.body.insertAdjacentHTML('beforeend', html);
-        return document.getElementById('forgot-password-modal');
+        return;
     } catch (error) {
         console.error('Failed to load forgot-password modal:', error);
     }
 }
 
 // Bind forgot password modal events
-export function bindForgotPasswordModalEvents() {
+function bindForgotPasswordModalEvents() {
     // Elements
     const closeForgotPassword = document.getElementById('close-forgot-password');
     const backToSignInLink = document.getElementById('back-to-sign-in');
@@ -45,27 +35,42 @@ export function bindForgotPasswordModalEvents() {
     // Event listeners
     if (closeForgotPassword) closeForgotPassword.addEventListener('click', closeForgotPasswordClick);
     if (backToSignInLink) backToSignInLink.addEventListener('click', backToSignInLinkClick);
-    if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await handleForgotPassword();
-    });
+    if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', forgotPasswordSubmitHandler);
+    // Outside click
     document.addEventListener('click', outsideClickHandler);
+    // Esc key
+    document.addEventListener('keydown', escKeyHandler);
 }
 
 // Back to sign in link
-export async function backToSignInLinkClick() {
-    if (forgotPasswordModal) removeForgotPasswordModal();
-    await signInBtnClick();
+async function backToSignInLinkClick() {
+    removeForgotPasswordModal();
+    const { constructSignInModal } = await import ('./signInModal.js');
+    constructSignInModal();
+}
+
+// Forgot password modal clicked
+async function forgotPasswordSubmitHandler(e) {
+    e.preventDefault();
+    const { handleForgotPassword } = await import('./forgotPasswordHandler.js');
+    await handleForgotPassword();
+    removeForgotPasswordModal();
 }
 
 // Close forgot password modal
-export function closeForgotPasswordClick() {
+function closeForgotPasswordClick() {
     removeForgotPasswordModal();
 }
 
 // Outside click handler
-export function outsideClickHandler(e) {
+function outsideClickHandler(e) {
+    const forgotPasswordModal = document.getElementById('forgot-password-modal');
     if (forgotPasswordModal && e.target.contains(forgotPasswordModal)) removeForgotPasswordModal();
+}
+
+// Esc key handler
+function escKeyHandler(e) {
+    if (e.key === 'Escape') removeForgotPasswordModal();
 }
 
 // Remove forgot password modal
@@ -77,11 +82,11 @@ export function removeForgotPasswordModal() {
     // Event listeners
     if (closeForgotPassword) closeForgotPassword.removeEventListener('click', closeForgotPasswordClick);
     if (backToSignInLink) backToSignInLink.removeEventListener('click', backToSignInLinkClick);
-    if (forgotPasswordForm) forgotPasswordForm.removeEventListener('submit', handleForgotPassword);
+    if (forgotPasswordForm) forgotPasswordForm.removeEventListener('submit', forgotPasswordSubmitHandler);
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', escKeyHandler);
     // Remove modal
-    if (forgotPasswordModal) {
-        forgotPasswordModal.remove();
-        forgotPasswordModal = null;
+    if (document.getElementById('forgot-password-modal')) {
+        document.getElementById('forgot-password-modal').remove();
     }
 }

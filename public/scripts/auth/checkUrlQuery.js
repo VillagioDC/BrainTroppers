@@ -2,8 +2,7 @@
 // CHECK NEW PASSWORD URL PARAMETER MODULE
 
 // Import modules
-import { showNewPasswordModal } from './newPasswordModal.js';
-import { signInBtnClick } from './signInModal.js';
+// Lazy imports
 
 // Check URL query
 export function checkUrlQuery() {
@@ -26,6 +25,7 @@ async function checkNewPasswordUrlParameter() {
         const cleanedUrl = window.location.origin;
         window.history.replaceState({}, document.title, cleanedUrl);
         // Show new password modal
+        const { showNewPasswordModal } = await import('./newPasswordModal.js');
         await showNewPasswordModal(authToken);
     }
     return;
@@ -43,7 +43,8 @@ async function checkSessionExpiredUrlParameter() {
         const cleanedUrl = window.location.origin;
         window.history.replaceState({}, document.title, cleanedUrl);
         // Show sign in modal
-        await signInBtnClick();
+        const { constructSignInModal } = await import('./signInModal.js');
+        await constructSignInModal();
     }
     return;
 }
