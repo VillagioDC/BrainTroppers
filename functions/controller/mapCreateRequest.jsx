@@ -35,7 +35,7 @@ async function mapCreateRequest({userId, query}) {
         // Check imediate response
         if (response.status !== 202) {
             // Failed
-            log('SERVER WARNING', `Failed to invoke background function: status ${response.status}`);
+            log('SERVER ERROR', `Failed to invoke background function: status ${response.status}`);
             newMap.creationStatus = 'failed';
             await mapUpdate(newMap);
         }

@@ -101,6 +101,8 @@ export async function loadMap(e) {
     braintroop.setMap(map);
     // Rebuild map 
     braintroop.rebuildMap();
+    // Fit map to canvas
+    braintroop.zoomFit();
     // Set active map item
     setActiveMapItem(projectId);
     // Remove notification

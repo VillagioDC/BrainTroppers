@@ -174,7 +174,7 @@ import { pinNode } from './commands/pinNode.js';
 
       // Background click clears selection and cancels pending connection
       this.svg.on("click", (ev) => {
-        this._setSelected(null, null);
+        this._setSelected({type: null, id: null});
         this._cancelPendingConnection();
       });
 
@@ -342,19 +342,6 @@ import { pinNode } from './commands/pinNode.js';
       }
     }
 
-    // -------------------- PERSISTENCE / EVENTS (DOM events emitted) --------------------
-    _persistMapChange() {
-      // Convert to backend payload and emit a "mapchange" DOM CustomEvent with the payload
-      try {
-        const backend = this._convertMapToBackend();
-        // Update lastUpdated
-        if (this.map) this.map.lastUpdated = backend.lastUpdated;
-        this.canvas.dispatchEvent(new CustomEvent("mapchange", { detail: backend }));
-      } catch (e) {
-        console.error("braintroop: failed to prepare map change", e);
-      }
-    }
-
     // -------------------- EMIT SELECTION & NODE MOVE --------------------
     _sanitizeNode(n) {
       // Remove internal d3 references before emitting to host
@@ -404,13 +391,8 @@ import { pinNode } from './commands/pinNode.js';
       this._paintSelection();
     }
 
-    _emitNodeMove(nodeId, x, y) {
-      const detail = { nodeId, x, y };
-      pinNode(detail);
-    }
-    
     // Convenience wrapper to change selected target
-    _setSelected(type, id) {
+    _setSelected({type, id}) {
         // Null selection
         if (type === null || id === null) {
           this.selected = null;
@@ -436,19 +418,52 @@ import { pinNode } from './commands/pinNode.js';
 
       const allNodes = this.map.nodes || [];
 
-      // Build simNodes: objects used by d3.forceSimulation with backref to __mapNode
-      const simNodes = allNodes.map(n => {
-        const sn = {
-          nodeId: n.nodeId,
-          x: n.x !== null ? n.x : (window.innerWidth / 2 + (Math.random() - 0.5) * 200),
-          y: n.y !== null ? n.y : (window.innerHeight / 2 + (Math.random() - 0.5) * 200),
-          __mapNode: n
-        };
-        if (n.locked === true) {
-          sn.fx = (typeof n.x === "number" ? n.x : sn.x);
-          sn.fy = (typeof n.y === "number" ? n.y : sn.y);
-          sn.x = sn.fx; sn.y = sn.fy;
+      // Reuse existing simulation nodes where possible to keep velocities/fx/fy
+      const existingSimNodes = new Map((this.simulation.nodes() || []).map(n => [n.nodeId, n]));
+
+      const simNodes = allNodes.map(mapNode => {
+        const existing = existingSimNodes.get(mapNode.nodeId);
+        const hasLocalStamp = typeof mapNode.lastLocalUpdate === "number" && (Date.now() - mapNode.lastLocalUpdate) < this._localUpdateTTL;
+
+        // Determine coordinates: prefer mapNode.x/y if present AND either it's local recent or source of truth
+        const xPrior = (typeof mapNode.x === "number") ? mapNode.x : null;
+        const yPrior = (typeof mapNode.y === "number") ? mapNode.y : null;
+
+        let sn;
+        if (existing) {
+          // reuse object but update map backref and coordinates if map has a recent local stamp or defined coords
+          sn = existing;
+          sn.__mapNode = mapNode;
+          if (xPrior !== null && yPrior !== null) {
+            // prefer local/time-authoritative coords
+            sn.x = xPrior; sn.y = yPrior;
+            if (mapNode.locked === true) { sn.fx = xPrior; sn.fy = yPrior; }
+            else if (hasLocalStamp) { sn.fx = null; sn.fy = null; } // unlocked local update
+          } else {
+            // if no coords, keep existing sim coords
+            if (mapNode.locked === true) {
+              sn.fx = (typeof mapNode.x === "number" ? mapNode.x : sn.x);
+              sn.fy = (typeof mapNode.y === "number" ? mapNode.y : sn.y);
+              sn.x = sn.fx; sn.y = sn.fy;
+            }
+          }
+        } else {
+          // no existing sim node — create a fresh one
+          const sx = (xPrior !== null) ? xPrior : (window.innerWidth / 2 + 2 * Math.random() * 200);
+          const sy = (yPrior !== null) ? yPrior : (window.innerHeight / 2 + 2 * Math.random() * 200);
+          sn = {
+            nodeId: mapNode.nodeId,
+            x: sx,
+            y: sy,
+            __mapNode: mapNode
+          };
+          if (mapNode.locked === true) {
+            sn.fx = (typeof mapNode.x === "number" ? mapNode.x : sn.x);
+            sn.fy = (typeof mapNode.y === "number" ? mapNode.y : sn.y);
+            sn.x = sn.fx; sn.y = sn.fy;
+          }
         }
+
         return sn;
       });
 
@@ -497,7 +512,7 @@ import { pinNode } from './commands/pinNode.js';
       this.edgesG.selectAll("g.edge-group").selectAll(".edge-hit")
         .on("click", (event, d) => {
           event.stopPropagation();
-          this._setSelected("edge", d.id);
+          this._setSelected({type: "edge", id: d.id});
         });
 
       edgesSel.exit().remove();
@@ -574,13 +589,12 @@ import { pinNode } from './commands/pinNode.js';
               const minMove = Math.ceil(this.gridSpacing / 2);
               const moved = Math.abs(snappedX - d.startX) > minMove || Math.abs(snappedY - d.startY) > minMove;
               if (moved) {
-                mapNode.x = d.x;
-                mapNode.y = d.y;
+                mapNode.x = Math.round(d.x / 5) * 5;
+                mapNode.y = Math.round(d.y / 5) * 5;
                 mapNode.locked = true;
-                this._persistMapChange();
-                this._emitNodeMove(mapNode.nodeId, mapNode.x, mapNode.y);
+                this._updateNodePosition(mapNode.nodeId, mapNode.x, mapNode.y, mapNode.locked);
               }
-              this._setSelected("node", mapNode.nodeId);
+              this._setSelected({type: "node", id: mapNode.nodeId});
             }
             this.simulation.alpha(0.2).restart();
 
@@ -588,16 +602,21 @@ import { pinNode } from './commands/pinNode.js';
               const simNodes = this.simulation.nodes() || [];
               simNodes.forEach(n => {
                 const mapNode2 = n.__mapNode;
+                // Snap to grid
                 if (mapNode2 && !mapNode2.locked) {
+                  // Snap to grid
                   n.x = Math.round(n.x / grid) * grid;
                   n.y = Math.round(n.y / grid) * grid;
-                  n.fx = n.x; n.fy = n.y; n.vx = 0; n.vy = 0;
-                  mapNode2.x = n.x; mapNode2.y = n.y; mapNode2.locked = true;
+                  // Keep nodes unlocked, reset velocity
+                  n.fx = null; n.fy = null; n.vx = 0; n.vy = 0;
+                  // Update positions
+                  mapNode2.x = n.x;
+                  mapNode2.y = n.y;
+                  mapNode2.locked = false;
                 }
               });
-              this._persistMapChange();
+              this.updateMap();
             }, 1000);
-
             this._disableDragForces();
             try { this.svg.style("cursor", "grab"); } catch (e) {}
           })
@@ -644,7 +663,7 @@ import { pinNode } from './commands/pinNode.js';
             const toId = mapNode.nodeId;
             this.setConnection(fromId, toId, "direct");
             this._pendingConnectionFrom = null;
-            this._setSelected("node", mapNode.nodeId);
+            this._setSelected({type: "node", id: mapNode.nodeId});
             return;
           }
         });
@@ -747,16 +766,17 @@ import { pinNode } from './commands/pinNode.js';
       // Ensure node has expected properties and normalized defaults
       return {
         nodeId: String(n.nodeId),
+        parentId: n.parentId || n.parent || null,
         shortName: n.shortName || "",
         content: n.content || "",
         detail: n.detail || "",
         x: typeof n.x === "number" ? n.x : null,
         y: typeof n.y === "number" ? n.y : null,
         locked: !!n.locked,
-        layer: typeof n.layer === "number" ? n.layer : 0,
-        colorSchemeName: n.colorSchemeName || n.colorScheme || "ocean",
+        approved: !!n.approved,
         hidden: !!n.hidden,
-        parentId: n.parentId || n.parent || null
+        colorSchemeName: n.colorSchemeName || n.colorScheme || "ocean",
+        layer: typeof n.layer === "number" ? n.layer : 1,
       };
     }
 
@@ -790,7 +810,7 @@ import { pinNode } from './commands/pinNode.js';
 
       this.simulation.alpha(0.8).restart();
 
-      // After a delay, snap positions to grid and persist
+      // After a delay, snap positions to grid
       setTimeout(() => {
         simNodes.forEach(n => {
           const mapNode = n.__mapNode;
@@ -803,7 +823,6 @@ import { pinNode } from './commands/pinNode.js';
           }
         });
         this._disableDragForces();
-        this._persistMapChange();
         this.updateMap(true);
       }, 2000);
     }
@@ -878,7 +897,7 @@ import { pinNode } from './commands/pinNode.js';
       this.svg.transition().duration(200).call(this.zoom.scaleBy, factor);
     }
 
-    zoomFit(padding = 50) {
+    zoomFit(padding = 100) {
       // Fit viewport to all nodes with given padding
       if (!this.svg || !this.zoom) return;
       const simNodes = (this.simulation && typeof this.simulation.nodes === "function") ? this.simulation.nodes() : [];
@@ -958,7 +977,8 @@ import { pinNode } from './commands/pinNode.js';
           owner: backendMap.owner || null,
           colabs: Array.isArray(backendMap.colabs) ? backendMap.colabs : [],
           userPrompt: backendMap.userPrompt || "",
-          title: backendMap.title || ""
+          title: backendMap.title || "",
+          creationStatus: backendMap.creationStatus || "created"
         };
         const nodes = nodesField.map(n => this._normalizeNode(n));
         const edges = (Array.isArray(backendMap.edges) ? backendMap.edges : []).map(e => this._normalizeEdge(e));
@@ -968,7 +988,8 @@ import { pinNode } from './commands/pinNode.js';
           colabs: Array.isArray(backendMap.colabs) ? backendMap.colabs : [],
           userPrompt: backendMap.userPrompt || "",
           title: backendMap.title || "",
-          lastUpdated: backendMap.lastUpdated || new Date(),
+          creationStatus: backendMap.creationStatus || "created",
+          lastUpdated: backendMap.lastUpdated || new Date(Date.now()),
           nodes,
           edges
         };
@@ -980,7 +1001,8 @@ import { pinNode } from './commands/pinNode.js';
         owner: backendMap.owner || null,
         colabs: Array.isArray(backendMap.colabs) ? backendMap.colabs : [],
         userPrompt: backendMap.userPrompt || "",
-        title: backendMap.title || ""
+        title: backendMap.title || "",
+        creationStatus: backendMap.creationStatus || "created"
       };
 
       const nodes = [];
@@ -993,12 +1015,14 @@ import { pinNode } from './commands/pinNode.js';
           const shortName = n.shortName || "";
           const content = n.content || "";
           const detail = n.detail || "";
-          const colorSchemeName = n.colorScheme || this.currentColorScheme;
-          const layer = typeof n.layer === "number" ? n.layer : 0;
-          const hidden = !!n.hidden;
+          const status = n.status || null;
           const x = typeof n.x === "number" ? n.x : null;
           const y = typeof n.y === "number" ? n.y : null;
           const locked = !!n.locked;
+          const approved = !!n.approved;
+          const hidden = !!n.hidden;
+          const colorSchemeName = n.colorScheme || this.currentColorScheme;
+          const layer = typeof n.layer === "number" ? n.layer : 1;
 
           nodes.push(this._normalizeNode({
             nodeId,
@@ -1006,12 +1030,14 @@ import { pinNode } from './commands/pinNode.js';
             shortName,
             content,
             detail,
+            status,
             x,
             y,
             locked,
-            layer,
-            colorSchemeName,
+            approved,
             hidden,
+            colorSchemeName,
+            layer,
           }));
 
           // If no coordinates at all, center the first node
@@ -1062,7 +1088,8 @@ import { pinNode } from './commands/pinNode.js';
         colabs: this.backendMeta.colabs,
         userPrompt: this.backendMeta.userPrompt,
         title: this.backendMeta.title,
-        lastUpdated: backendMap.lastUpdated || new Date(),
+        creationStatus: this.backendMeta.creationStatus,
+        lastUpdated: backendMap.lastUpdated || new Date(Date.now()),
         nodes,
         edges
       };
@@ -1098,9 +1125,10 @@ import { pinNode } from './commands/pinNode.js';
           x: typeof n.x === "number" ? n.x : null,
           y: typeof n.y === "number" ? n.y : null,
           locked: !!n.locked,
+          approved: !!n.approved,
           hidden: !!n.hidden,
           colorScheme: n.colorSchemeName || this.currentColorScheme,
-          layer: typeof n.layer === "number" ? n.layer : 0
+          layer: typeof n.layer === "number" ? n.layer : 1
         };
       });
 
@@ -1109,15 +1137,17 @@ import { pinNode } from './commands/pinNode.js';
         owner: this.backendMeta?.owner || this.map.owner || null,
         colabs: Array.isArray(this.backendMeta?.colabs) ? this.backendMeta.colabs : (Array.isArray(this.map.colabs) ? this.map.colabs : []),
         userPrompt: this.map.userPrompt || "",
+        creationStatus: this.map.creationStatus || null,
         title: this.map.title || "",
-        lastUpdated: new Date(),
+        lastUpdated: new Date(Date.now()),
+        selectedNode: this.map.selectedNode || null,
         nodes
       };
     }
 
     // -------------------- NODE / EDGE MUTATIONS (internal helpers) --------------------
     // These helpers are used by the public API below. They preserve internal invariants
-    // such as normalizing nodes/edges and calling updateMap/persist as appropriate.
+    // such as normalizing nodes/edges and calling updateMap as appropriate.
 
     // Add temp node
     _addTempNode({parentId, shortName = 'New node'}) {
@@ -1129,17 +1159,16 @@ import { pinNode } from './commands/pinNode.js';
     }
 
     // Add node
-    _addNodeInternal({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, layer = 0, colorSchemeName = this.currentColorScheme } = {}) {
+    _addNodeInternal({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
       if (!parentId) return;
       // Create node
-      const node = this._createNode({ parentId, nodeId, shortName, content, detail, x, y, locked, layer, colorSchemeName });
+      const node = this._createNode({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, hidden, colorSchemeName, layer });
       this.updateMap();
-      this._persistMapChange();
       return node.nodeId;
     }
 
     // Create new node
-    _createNode ({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, layer = 0, colorSchemeName = this.currentColorScheme } = {}) {
+    _createNode ({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
       if (!parentId) return;
       // Create node id
       if (!nodeId) nodeId = `temp_${Date.now()}_${Math.floor(Math.random() * 99)}`;
@@ -1151,8 +1180,8 @@ import { pinNode } from './commands/pinNode.js';
         const parentNode = this.map.nodes.find(n => n.nodeId === parentId);
         const parentX = parentNode ? parentNode.x : window.innerWidth / 2;
         const parentY = parentNode ? parentNode.y : window.innerHeight / 2;
-        x = Math.round(parentX + (Math.random() - 0.5) * this.nodeWidth);
-        y = Math.round(parentY + (Math.random() - 0.5) * this.nodeHeight);
+        x = Math.round(parentX + 2 * Math.random() * this.nodeWidth);
+        y = Math.round(parentY + 2 * Math.random() * this.nodeHeight);
       }
       // Lock node if first node
       locked = false;
@@ -1171,15 +1200,33 @@ import { pinNode } from './commands/pinNode.js';
         x,
         y,
         locked,
+        approved: false,
+        hidden: false,
         colorSchemeName,
         layer: typeof layer === "number" ? layer : this.currentLayer,
-        hidden: false
       };
       // Add node to map
       this.map.nodes.push(this._normalizeNode(node));
       // Set connection
-      this.setConnection(parentId, nodeId, "direct");
+      if (parentId !== 1) {
+        this.setConnection(parentId, nodeId, "direct");
+        this.setConnection(nodeId, parentId, "direct");
+      }
       return node;
+    }
+
+    /**
+     * _updateNodePosition
+     * update node nodeId position at x, y and lock ?
+     */
+    async _updateNodePosition(nodeId, x, y, locked = false) {
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
+      if (!node) return;
+      // Pin node
+      node.x = x;
+      node.y = y;
+      node.locked = locked;
+      if (locked === true) await pinNode(nodeId);
     }
 
     /**
@@ -1216,8 +1263,9 @@ import { pinNode } from './commands/pinNode.js';
           owner: map.owner || this.map.owner || null,
           colabs: Array.isArray(map.colabs) ? map.colabs : (this.map.colabs || []),
           userPrompt: map.userPrompt || this.map.userPrompt || "",
+          creationStatus: map.creationStatus || this.map.creationStatus || "created",
           title: map.title || this.map.title || "",
-          lastUpdated: map.lastUpdated || new Date(),
+          lastUpdated: map.lastUpdated || new Date(Date.now()),
           selectedNode: map.selectedNode || null,
           nodes: Array.isArray(map.nodes) ? map.nodes.map(n => this._normalizeNode(n)) : [],
           edges: Array.isArray(map.edges) ? map.edges.map(e => this._normalizeEdge(e)) : []
@@ -1228,12 +1276,16 @@ import { pinNode } from './commands/pinNode.js';
       this.backendMeta = {
         projectId: this.map.projectId || null,
         owner: this.map.owner || null,
-        colabs: Array.isArray(this.map.colabs) ? this.map.colabs : []
+        colabs: Array.isArray(this.map.colabs) ? this.map.colabs : [],
+        userPrompt: this.map.userPrompt || null,
+        creationStatus: this.map.creationStatus || "created",
+        title: this.map.title || null,
+        lastUpdated: this.map.lastUpdated || new Date(Date.now()),
+        selectedNode: this.map.selectedNode || null
       };
 
       // Re-render and notify host
       this.updateMap(true);
-      this._persistMapChange();
     }
 
     /**
@@ -1246,7 +1298,7 @@ import { pinNode } from './commands/pinNode.js';
       this.map.edges = Array.isArray(this.map.edges) ? this.map.edges : [];
       // Bind and render
       this._bindEdgesAndNodes(forceFull);
-      this.map.lastUpdated = new Date();
+      this.map.lastUpdated = new Date(Date.now());
     }
 
     /**
@@ -1259,32 +1311,62 @@ import { pinNode } from './commands/pinNode.js';
     }
 
     /**
+     * getBackendMap()
+     * get backend schema map
+     */
+    getBackendMap() {
+      return this._convertMapToBackend(this.map);
+    }
+
+    /**
      * deleteMap()
      * - Clear nodes and edges (keeps some meta).
      */
     deleteMap() {
       this.map = { nodes: [], edges: [], title: this.map.title || "", colabs: this.map.colabs || [] };
       this.updateMap(true);
-      this._setSelected(null, null);
-      this._persistMapChange();
+      this._setSelected({type: null, id: null});
     }
 
     /**
      * addTempNode({ parentId, shortName = "New node"})
      * - Creates a temporary new node linked to parentId.
     **/
-    addTempNode({ parentId, shortName = "New node" }) {
+    addTempNode({ parentId = 1, shortName = "New node" }) {
       // Delegate to internal helper but keep public name stable
-      return this._addTempNode({ parentId, shortName });
+      const newNodeId = this._addTempNode({ parentId, shortName });
+      return newNodeId;
     }
 
     /**
      * addNode({ parentId, id, shortName, content, detail, x, y, locked, layer, colorSchemeName })
      * - Creates a new node linked to parentId.
      */
-    addNode({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, layer = 0, colorSchemeName = this.currentColorScheme } = {}) {
+    addNode({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
       // Delegate to internal helper but keep public name stable
-      return this._addNodeInternal({ parentId, nodeId, shortName, content, detail, x, y, locked, layer, colorSchemeName });
+      const newNodeId = this._addNodeInternal({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, hidden, colorSchemeName, layer });
+      return newNodeId;
+    }
+
+    /**
+     * updateNodeInfo({ nodeId, shortName, content, detail})
+     * - Updates the node info (idempotent).
+     */
+    updateNodeInfo({ nodeId, newNodeId, shortName, content, detail }) {
+      if (!nodeId) return;
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
+      if (!node) return;
+      // Node info
+      node.nodeId = newNodeId || node.nodeId;
+      node.shortName = shortName || node.shortName;
+      node.content = content || node.content;
+      node.detail = detail || node.detail;
+      // Edge info
+      this.map.edges.forEach(e => {
+        if (e.source === nodeId) e.source = newNodeId || node.nodeId;
+        if (e.target === nodeId) e.target = newNodeId || node.nodeId;
+      });
+      this.updateMap();
     }
 
     /**
@@ -1297,7 +1379,6 @@ import { pinNode } from './commands/pinNode.js';
       if (this.map.edges.some(e => e.id === edgeId)) return;
       const edge = { id: edgeId, source: nodeFromId, target: nodeToId, type: type === "related" ? "related" : "direct" };
       this.map.edges.push(this._normalizeEdge(edge));
-      this._persistMapChange();
       this.updateMap();
     }
 
@@ -1311,7 +1392,6 @@ import { pinNode } from './commands/pinNode.js';
       const before = this.map.edges.length;
       this.map.edges = (this.map.edges || []).filter(e => !ids.has(e.id));
       if (this.map.edges.length !== before) {
-        this._persistMapChange();
         this.updateMap();
       }
     }
@@ -1324,7 +1404,6 @@ import { pinNode } from './commands/pinNode.js';
       const before = this.map.edges.length;
       this.map.edges = (this.map.edges || []).filter(e => e.id !== edgeId);
       if (this.map.edges.length !== before) {
-        this._persistMapChange();
         this.updateMap();
       }
     }
@@ -1352,7 +1431,6 @@ import { pinNode } from './commands/pinNode.js';
       if (!this.colorSchemes[schemeName]) schemeName = this.currentColorScheme;
       node.colorSchemeName = schemeName;
       this.currentColorScheme = schemeName;
-      this._persistMapChange();
       this.updateMap();
     }
 
@@ -1365,7 +1443,6 @@ import { pinNode } from './commands/pinNode.js';
       this.map.nodes.forEach(n => {
         if (n.layer >= layerId) n.hidden = !n.hidden;
       });
-      this._persistMapChange();
       this.updateMap();
     }
 
@@ -1426,9 +1503,8 @@ import { pinNode } from './commands/pinNode.js';
       if (!nodeExists) { console.warn(`Node ${nodeId} not found`); return; }
       this.map.nodes = (this.map.nodes || []).filter(n => n.nodeId !== nodeId);
       this.map.edges = (this.map.edges || []).filter(e => e.source !== nodeId && e.target !== nodeId);
-      this._persistMapChange();
       this.updateMap(true);
-      this._setSelected(null, null);
+      this._setSelected({type: null, id: null});
     }
 
     /**
@@ -1437,9 +1513,8 @@ import { pinNode } from './commands/pinNode.js';
     deleteEdge(edgeId) {
       if (!edgeId) return;
       this.map.edges = (this.map.edges || []).filter(e => e.id !== edgeId);
-      this._persistMapChange();
       this.updateMap(true);
-      this._setSelected(null, null);
+      this._setSelected({type: null, id: null});
     }
 
     /**
@@ -1451,7 +1526,6 @@ import { pinNode } from './commands/pinNode.js';
       const edge = this.map.edges.find(e => e.id === edgeId) || null;
       if (!edge) return;
       edge.type = edge.type === "direct" ? "related" : "direct";
-      this._persistMapChange();
       this.updateMap(true);
     }
 
@@ -1459,13 +1533,14 @@ import { pinNode } from './commands/pinNode.js';
      * selectElement({ nodeId, edgeId })
      */
     selectElement({ nodeId = null, edgeId = null } = {}) {
-      this._setSelected(nodeId, edgeId);
+      if (nodeId) this._setSelected({type: "node", id: nodeId});
+      if (edgeId) this._setSelected({type: "edge", id: edgeId});
     }
 
     /**
-     * getSelectedNode()
+     * getSelectedNodeId()
      */
-    getSelectedNode() {
+    getSelectedNodeId() {
       return this.selected && this.selected.type === "node" ? this.selected.id : null;
     }
 
@@ -1483,31 +1558,26 @@ import { pinNode } from './commands/pinNode.js';
     updateMeta( { colabs = [], title = ""} = {}) {
       this.map.colabs = Array.isArray(colabs) ? colabs : this.map.colabs;
       this.map.title = title ? title : this.map.title;
-      this.map.lastUpdated = new Date();
-      this._persistMapChange();
+      this.map.lastUpdated = new Date(Date.now());
     }
 
     /**
      * lockNode(nodeId)
      */
     lockNode(nodeId) {
-      const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.locked = true;
-      console.log('Node locked');
       this.updateMap(true);
-      this._persistMapChange();
     }
 
     /**
      * unlockNode(nodeId)
      */
     unlockNode(nodeId) {
-      const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.locked = false;
-      console.log('Node unlocked');
-      this._persistMapChange();
       this.updateMap(true);
     }
 
@@ -1515,45 +1585,39 @@ import { pinNode } from './commands/pinNode.js';
      * approveNode(nodeId)
      */
     approveNode(nodeId) {
-      const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.approved = true;
       this.updateMap(true);
-      this._persistMapChange();
     }
 
     /**
-     * unapproveNode(nodeId)
+     * revokeNode(nodeId)
      */
-    unapproveNode(nodeId) {
-      const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
+    revokeNode(nodeId) {
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.approved = false;
       this.updateMap(true);
-      this._persistMapChange();
     }
 
     /**
      * hideNode(nodeId)
      */
     hideNode(nodeId) {
-      const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.hidden = true;
-      console.log('Node hidden');
       this.updateMap(true);
-      this._persistMapChange();
     }
 
     /**
      * unhideNode(nodeId)
      */
     unhideNode(nodeId) {
-      const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.hidden = false;
-      console.log('Node unhidden');
-      this._persistMapChange();
       this.updateMap(true);
     }
 

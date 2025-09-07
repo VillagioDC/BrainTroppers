@@ -5,7 +5,7 @@
 const executeDB = require('../mongoDB/executeDB.jsx');
 
 /* PARAMETERS
-  no input
+  input {string} - userId
   RETURN {datetime} - expires
 */
 

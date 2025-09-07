@@ -2,20 +2,28 @@
 // No dependencies
 
 // Functions
-const mapRead = require('./mapRead.jsx');
-const mapUpdate = require('./mapUpdate.jsx');
-const getInstructionsTxt = require('../ai/getInstructionsTxt.jsx');
-const constructConversation = require('../ai/constructConversation.jsx');
-const askAIBridge = require('../ai/askAIBridge.jsx');
-const parseJSON = require('../utils/parseJSON.jsx');
-const log = require('../utils/log.jsx');
+const mapRead = require('./controller/mapRead.jsx');
+const mapUpdate = require('./controller/mapUpdate.jsx');
+const getInstructionsTxt = require('./ai/getInstructionsTxt.jsx');
+const constructConversation = require('./ai/constructConversation.jsx');
+const askAIBridge = require('./ai/askAIBridge.jsx');
+const parseJSON = require('./utils/parseJSON.jsx');
+const log = require('./utils/log.jsx');
 
 /* PARAMETERS
     input {string} - projectId
     RETURN void
 */
 
-async function mapCreateBackground({projectId}) {
+exports.handler = async (event) => {
+
+    // Get projectId
+    const body = JSON.parse(event.body);
+    const projectId = body.projectId || null;
+    if (!projectId) {
+        log('SERVER WARNING', 'Missing projectId');
+        return;
+    }
 
     // Fetch the map
     let map = await mapRead(projectId);
@@ -30,7 +38,7 @@ async function mapCreateBackground({projectId}) {
         await mapUpdate(map);
 
         // Set stages
-        const stages = ["brainstorm", "transformer", "parentNode"];
+        const stages = ["brainstorm", "transformer"];
 
         // Set user message from stored prompt
         let userMessage = map.userPrompt;
@@ -51,6 +59,7 @@ async function mapCreateBackground({projectId}) {
             const conversation = constructConversation(instructions, messages);
 
             // Ask AI
+            console.log("Asking AI:", stages[i]);
             userMessage = await askAIBridge(conversation);
 
             // Response
@@ -78,13 +87,12 @@ async function mapCreateBackground({projectId}) {
         map.nodes[i].locked = false;
         map.nodes[i].approved = false;
         map.nodes[i].hidden = false;
-        map.nodes[i].parentNodeColorScheme = null;
+        map.nodes[i].colorScheme = null;
         map.nodes[i].layer = 1;
         }
 
         // Update map
         await mapUpdate(map);
-
         return;
 
     } catch (error) {
@@ -94,5 +102,3 @@ async function mapCreateBackground({projectId}) {
         await mapUpdate(map);
     }
 };
-
-module.exports = mapCreateBackground;

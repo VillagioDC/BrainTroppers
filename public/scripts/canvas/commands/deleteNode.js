@@ -19,7 +19,8 @@ export async function deleteNode() {
         return null;
     };
     // Update canvas
-    braintroop.setMap(updatedMap);
+    braintroop.deleteNode(nodeId);
+    braintroop.updateMap(true);
     // Remove notification
     removeNotification();
 }

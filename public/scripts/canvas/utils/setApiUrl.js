@@ -39,6 +39,9 @@ export function setApiUrl(api) {
         case 'addNewNode':
             url += '/mapAddNode';
             break;
+        case 'addBlankNode':
+            url += '/mapNodeAddBlank';
+            break;
         case 'expandNode':
             url += '/mapExpandNode';
             break;
@@ -50,6 +53,9 @@ export function setApiUrl(api) {
             break;
         case 'updateNode':
             url += '/mapUpdateNode';
+            break;
+        case 'deleteNode':
+            url += '/mapDeleteNode';
             break;
         case 'assignMapToUser':
             url += '/userAssignMap';

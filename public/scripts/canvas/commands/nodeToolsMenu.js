@@ -69,9 +69,11 @@ export function toggleNodeToolsButtons(node) {
     }
     // Approve button
     if (node.approved) {
-        document.getElementById('approve-node-btn').style.color = '#7dbf4f';
+        document.getElementById('approve-node-btn').title = 'Revoke';
+        document.querySelector('.fa-check-circle').style.color = '#7dbf4f';
     } else {
-        document.getElementById('approve-node-btn').style.color = '#e0e0e0';
+        document.getElementById('approve-node-btn').title = 'Approve';
+        document.querySelector('.fa-check-circle').style.color = '#e0e0e0';
     }
 }
 

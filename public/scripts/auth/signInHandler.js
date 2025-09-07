@@ -66,7 +66,7 @@ export async function handleSignIn() {
             // Redirect
             setTimeout(() => {
                 window.location.href = './canvas.html';
-            }, 2000);                    
+            }, 1000);                    
         }
     }
 }

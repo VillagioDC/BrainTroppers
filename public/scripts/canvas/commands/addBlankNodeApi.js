@@ -1,13 +1,13 @@
 // CANVAS MODULES
-// DELETE NODE API MODULE
+// ADD BLANK NODE API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
 import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
-// Create map api
-export async function deleteNodeApi(nodeId) {
+// Add new node api 
+export async function addBlankNodeApi ( {parentId, node} ) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
@@ -17,8 +17,8 @@ export async function deleteNodeApi(nodeId) {
         };
         // Construct body
         const projectId = braintroop.map.projectId;
-        const body = { userId, projectId, nodeId };
-        const url = setApiUrl('deleteNode');
+        const body = { userId, projectId, parentId, node };
+        const url = setApiUrl('addBlankNode');
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -31,14 +31,13 @@ export async function deleteNodeApi(nodeId) {
             checkSessionExpired(responseData);
             return false;
         }
-        
         // Get new map
         const updatedMap = responseData;
         return updatedMap;
         
         // Catch errors
         } catch (error) {
-            console.error('Error updating map:', error);
+            console.error('Error adding new blank node:', error);
             return false;
     }
 }

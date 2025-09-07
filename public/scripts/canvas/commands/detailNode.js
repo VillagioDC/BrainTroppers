@@ -3,7 +3,7 @@
 
 // Import modules
 import { sanitizeInput } from '../utils/validate.js';
-import { deleteNode } from './deleteNode.js';
+import { addBlankdNodeHandler } from './addBlankNode.js';
 import { updateNode } from './updateNode.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
@@ -15,14 +15,16 @@ export async function detailNode() {
 }
 
 // Open detail popup
-export async function openDetailPopup() {
+export async function openDetailPopup(nodeId) {
+    // Check nodeId
+    if (!nodeId) { console.error('No node selected'); return; }
     // Remove existing detail popup
     if (document.getElementById('detail-node-popup'))
         removeDetailPopup();
     // Load detail popup
     await loadDetailPopup();
     // Load detail content
-    loadDetailContent();
+    loadDetailContent(nodeId);
     // Bind detail popup events
     bindDetailPopupEvents();    
     // Show detail popup
@@ -58,12 +60,12 @@ function bindDetailPopupEvents() {
     if (detailEl) detailEl.addEventListener('click', () => editElement('detail'));
     if (submitBtn) submitBtn.addEventListener('click', closeDetailPopup);
     document.addEventListener('click', outsideClickHandler);
+    document.addEventListener('keydown', keydownHandler);
 }
 
 // Load detail content
-function loadDetailContent() {
+function loadDetailContent(nodeId) {
     // Get selected node id
-    let nodeId = braintroop.selected.type === 'node' ? braintroop.selected.id : null;
     if (!nodeId) { console.error('No node selected'); return; }
     // Get node from map
     const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
@@ -115,7 +117,7 @@ function editElement(type) {
             if (textarea.value === 'Content') textarea.value = '';
             break;
         case 'detail':
-            textarea.rows = 10;
+            textarea.rows = 8;
             if (textarea.value === 'Detail') textarea.value = '';
             break;
     }
@@ -153,7 +155,7 @@ function finishEditing(e) {
 
 // Close detail popup
 async function closeDetailPopup() {
-    const nodeId = braintroop.selected.type === 'node' ? braintroop.selected.id : null;
+    const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
     // Get input elements (could be original or textarea)
     const shortNameInput = document.getElementById('detail-node-short-name');
@@ -172,15 +174,7 @@ async function closeDetailPopup() {
     const newDetail = getValue(detailInput);
     // Get original content
     const originalContent = detailPopup ? JSON.parse(detailPopup.dataset.nodeContent) : null;
-    // Check new content empty
-    if (newShortName.trim() === '' && newContent.trim() === '' && newDetail.trim() === '') {
-        // Remove detail popup
-        removeDetailPopup();
-        // Delete node
-        await deleteNode(nodeId);
-        return;
-    }
-    // Check no changes (trim for comparison to ignore whitespace differences)
+    // Check no changes
     if (newShortName === originalContent.shortName.trim() && 
         newContent === originalContent.content.trim() && 
         newDetail === originalContent.detail.trim()) {
@@ -193,9 +187,17 @@ async function closeDetailPopup() {
     removeDetailPopup();
     // Show notification
     await showNotification('Processing...', 'info', 'wait');
-    // Update node
-    const changes = { nodeId, shortname: newShortName, content: newContent, detail: newDetail };
-    await updateNode(changes);
+    // Update node on canvas
+    braintroop.updateNodeInfo({nodeId, shortName: newShortName, content: newContent, detail: newDetail});
+    // If blank node, add node
+    if (nodeId.includes('temp_')) {
+        // Add blank node on DB
+        await addBlankdNodeHandler(nodeId);
+    } else {
+        // Update node on DB
+        const changes = { nodeId, shortName: newShortName, content: newContent, detail: newDetail };
+        await updateNode(changes);
+    }
     // Remove notification
     removeNotification();
 }
@@ -211,7 +213,16 @@ function removeDetailPopup() {
         document.getElementById("detail-node-detail").removeEventListener("click", () => editElement('detail'));
     if (document.getElementById("detail-node-submit"))
         document.getElementById("detail-node-submit").removeEventListener("click", closeDetailPopup);
+    // Remove edit event listeners
+    if (document.getElementById("detail-node-short-name"))
+        document.getElementById("detail-node-short-name").removeEventListener("click", () => editElement('short-name'));
+    if (document.getElementById("detail-node-content"))
+        document.getElementById("detail-node-content").removeEventListener("click", () => editElement('content'));
+    if (document.getElementById("detail-node-detail"))
+        document.getElementById("detail-node-detail").removeEventListener("click", () => editElement('detail'));
+    // Remove event listeners
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', keydownHandler);
     // Remove detail popup container
     if (document.getElementById('detail-node-popup'))
         document.getElementById('detail-node-popup').remove();
@@ -222,6 +233,13 @@ function outsideClickHandler(event) {
     // Element
     const detailPopup = document.getElementById('detail-node-popup');
     if (event.target === detailPopup) {
-        closeDetailPopup();
+        removeDetailPopup();
     } 
+}
+
+// Escape keydown handler
+function keydownHandler(event) {
+    if (event.key === 'Escape') {
+        removeDetailPopup();
+    }
 }

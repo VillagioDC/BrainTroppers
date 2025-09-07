@@ -2,6 +2,7 @@
 // ADD BLANK NODE MODULE
 
 // Import modules
+import { addBlankNodeApi } from './addBlankNodeApi.js';
 import { openDetailPopup } from './detailNode.js';
 
 // Add blank node to selected node
@@ -17,7 +18,37 @@ export async function addBlankNode() {
         detail: ""
     }
     // Add blank node to canvas
-    braintroop.addNode(blankNode);
+    const newNodeId = braintroop.addNode(blankNode);
+    // Select new node
+    braintroop.selectElement({ nodeId: newNodeId });
     // Open detail popup
-    openDetailPopup();
+    openDetailPopup(newNodeId);
+}
+
+export async function addBlankdNodeHandler(nodeId) {
+    // Check nodeId
+    if (!nodeId) { console.warn('Missing node id'); return; };
+    // Get new node
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
+    // Construct new node
+    const newNode = {
+        nodeId: node.nodeId,
+        shortName: node.shortName,
+        content: node.content,
+        detail: node.detail,
+        directLink: [node.parentId],
+        relatedLink: [],
+        x: node.x,
+        y: node.y,
+        locked: false,
+        approved: true,
+        hidden: false,
+        colorScheme: node.colorScheme,
+        layer: node.layer
+    };
+    // Create blank node on DB
+    const updatedMap = await addBlankNodeApi({parentId: node.parentId, node: newNode});
+    // Update node Id
+    const newNodeId = updatedMap.nodes[updatedMap.nodes.length - 1].nodeId;
+    braintroop.updateNodeInfo({nodeId: node.nodeId, newNodeId});
 }

@@ -11,7 +11,7 @@ export async function updateNode(changes) {
     // Check node 
     if (!changes || !changes.nodeId) { console.error('Missing node'); return; }
     // Get map from local storage
-    const map = braintroop.map;
+    const map = braintroop.getBackendMap();
     if (!map) { console.error('Missing map'); return; }
     // Show notification
     showNotification('Processing...', 'info', 'wait');
@@ -23,7 +23,6 @@ export async function updateNode(changes) {
         shortName: changes.shortName || node.shortName,
         content: changes.content || node.content,
         detail: changes.detail || node.detail,
-        status: changes.status || node.status,
         directLink: changes.directLink || node.directLink,
         relatedLink: changes.relatedLink || node.relatedLink,
         x: changes.x || node.x,
@@ -43,8 +42,6 @@ export async function updateNode(changes) {
         showNotification('Error updating node', 'error');
         return null;
     };
-    // Update canvas
-    braintroop.setMap(updatedMap);
     // Remove notification
     removeNotification();
     // Return updated node

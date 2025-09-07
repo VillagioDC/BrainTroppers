@@ -15,7 +15,7 @@ export async function createMapGetStatus(projectId) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         const query = `?projectId=${projectId}&userId=${userId}`;
-        const url = setApiUrl('createMapGetStatus');
+        const url = setApiUrl('createMapGetStatus') + query;
         const response = await fetch(url, {
             method: 'GET',
             headers,

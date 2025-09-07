@@ -51,12 +51,6 @@ exports.handler = async (event) => {
         !nodeId || nodeId.trim().length === 0 || 
         !shortName || shortName.trim().length === 0 ||
         !directLink ||
-        !relatedLink ||
-        !x || x.length === 0 ||
-        !y || y.length === 0 ||
-        !locked ||
-        !approved ||
-        !hidden ||
         !colorScheme || colorScheme.length === 0 ||
         !layer) {          
           log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
@@ -83,16 +77,16 @@ exports.handler = async (event) => {
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50 ||
-        typeof content !== 'string' || content.length > 500 ||
-        typeof detail !== 'string' || detail.length > 500 ||
         typeof shortName !== 'string' || shortName.length > 50 ||
+        (content && (typeof content !== 'string' || content.length > 500)) ||
+        (detail && (typeof detail !== 'string' || detail.length > 500)) ||
         !Array.isArray(directLink) ||
-        !Array.isArray(relatedLink) ||
-        typeof x !== 'number' ||
-        typeof y !== 'number' ||
-        typeof locked !== 'boolean' ||
-        typeof approved !== 'boolean' ||
-        typeof hidden !== 'boolean' ||
+        (relatedLink && !Array.isArray(relatedLink)) ||
+        (x && typeof x !== 'number') ||
+        (y && typeof y !== 'number') ||
+        (locked && typeof locked !== 'boolean') ||
+        (approved && typeof approved !== 'boolean') ||
+        (hidden && typeof hidden !== 'boolean') ||
         typeof colorScheme !== 'string' || colorScheme.length > 50 ||
         typeof layer !== 'number') {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
@@ -140,12 +134,15 @@ exports.handler = async (event) => {
 
     // Update node
     node.shortName = shortName;
-    node.content = content;
-    node.detail = detail;
+    node.content = content || "";
+    node.detail = detail || "";
     node.directLink = directLink;
-    node.relatedLink = relatedLink;
-    node.xy = xy;
-    node.hidden = hidden;
+    node.relatedLink = relatedLink || [];
+    node.x = x || null;
+    node.y = y || null;
+    node.locked = locked || false;
+    node.approved = approved || false;
+    node.hidden = hidden || false;
     node.colorScheme = colorScheme;
     node.layer = layer;
 

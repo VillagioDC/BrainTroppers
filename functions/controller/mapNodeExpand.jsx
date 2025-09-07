@@ -86,7 +86,7 @@ async function mapNodeExpand(map, parentId, query) {
         node.locked = false;
         node.approved = false;
         node.hidden = false;
-        node.colorSchemeName = parentNodeColorScheme;
+        node.colorScheme = parentNodeColorScheme;
         node.layer = parentNodeLayer;
         // Push node
         map.nodes.push(node);

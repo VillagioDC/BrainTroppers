@@ -9,28 +9,28 @@ export async function pinNode() {
     // Node id
     const nodeId = braintroop.selected.id;
     if (!nodeId) { console.warn('No node selected'); return; }
-    // Lock node
+    // Lock node on canvas
     braintroop.lockNode(nodeId);
-    // Update node
-    const changes = { nodeId, locked: true };
+    // Update node on DB
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
+    if (!node) { console.warn('No node found'); return; }
+    const changes = { nodeId, x: node.x, y: node.y, locked: true };
     await updateNode(changes);
     // Toggle node tools
-    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
-    if (node)
-        toggleNodeToolsButtons(node);
+    toggleNodeToolsButtons(node);
 }
 
 export async function unpinNode() {
     // Node id
     const nodeId = braintroop.selected.id;
     if (!nodeId) { console.warn('No node selected'); return; }
-    // Unlock node
+    // Unlock node on canvas
     braintroop.unlockNode(nodeId);
-    // Update node
+    // Update node on DB
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
+    if (!node) { console.warn('No node found'); return; }
     const changes = { nodeId, locked: false };
     await updateNode(changes);
     // Toggle node tools
-    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
-    if (node)
-        toggleNodeToolsButtons(node);
+    toggleNodeToolsButtons(node);
 }

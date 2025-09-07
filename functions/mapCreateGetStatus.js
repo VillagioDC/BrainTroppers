@@ -30,7 +30,7 @@ exports.handler = async (event) => {
   if (nonGetRequest) return nonGetRequest;
 
   try {
-    // Get params
+    // Get params   
     const { projectId, userId } = event.queryStringParameters || {};
     if (!projectId || !userId) {
       log('SERVER WARNING', 'Missing projectId or userId');
@@ -99,10 +99,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        status,
-        map: status === 'created' ? map : null
-      })
+      body: JSON.stringify(map)
     };
 
   } catch (error) {

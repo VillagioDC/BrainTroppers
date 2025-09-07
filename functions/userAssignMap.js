@@ -80,8 +80,8 @@ exports.handler = async (event) => {
         map.lastUpdated = lastUpdatedDate;
 
         // Assign map to user
-        const result = await userAssignMap({ assignedUserId, map });
-        if (!result) {
+        const updatedUser = await userAssignMap({ assignedUserId, map });
+        if (!updatedUser) {
             log('SERVER_ERROR', 'Assigning map to user failed');
             return {
                 statusCode: 500,
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify(result)
+            body: JSON.stringify(updatedUser)
         };
 
     } catch (error) {

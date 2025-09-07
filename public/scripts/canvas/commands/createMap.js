@@ -3,14 +3,14 @@
 
 // Import modules
 import { checkQuery } from '../utils/validate.js';
-import { removeNewMapContainer } from '../interface/newMap.js';
+import { newMapClick, removeNewMapContainer } from '../interface/newMap.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 import { createMapApi } from './createMapApi.js';
 import { createMapGetStatus } from './createMapGetStatus.js';
 import { assignMapToUserApi } from './assignMapToUserApi.js';
 import { createMapItem, setActiveMapItem } from '../interface/mapList.js';
 import { setLocalStorageUser } from '../../common/userLocalStorage.js';
-import { pauseS } from '../utils/pauseS.jsx';
+import { pauseS } from '../utils/pauseS.js';
 
 // Create new map
 export async function createNewMap() {
@@ -27,9 +27,9 @@ export async function createNewMap() {
     // Show notification
     await showNotification('Requesting...', 'info', 'wait');
     // Request creation of map
-    const map = await createMapApi(query);
+    const reqMap = await createMapApi(query);
     // Check error requesting map
-    if (!map || typeof map !== 'object' || !map.projectId) {
+    if (!reqMap || typeof reqMap !== 'object') {
         // Remove temp node (placeholder)
         deleteFirstNode(placeholderNodeId);
         // Show error notification
@@ -38,36 +38,41 @@ export async function createNewMap() {
     };
     // Pooling map
     await showNotification('Creating...', 'info', 'wait');
-    await pauseS(30);
+    await pauseS(40);
     let creationStatus = 'creating';
+    let newMap = {};
     while (creationStatus === 'creating') {
         // Call api
-        const map = await createMapGetStatus(map.projectId);
+        newMap = await createMapGetStatus(reqMap.projectId);
         // Check status
-        if (map && map.creationStatus) {
-            creationStatus = map.creationStatus;
+        if (newMap && newMap.creationStatus) {
+            creationStatus = newMap.creationStatus;
         }
         // Wait
-        await pauseS(10);
+        await pauseS(15);
     }
     // Remove temp node (placeholder)
     deleteFirstNode(placeholderNodeId);
     // Place new map
-    if (map && map.creationStatus === 'created') {
+    if (newMap && newMap.creationStatus === 'created') {
         // Set data
-        braintroop.setMap(map);
+        braintroop.setMap(newMap);
+        braintroop.rebuildMap();
         // Create map item
-        await createMapItem(map);
+        await createMapItem(newMap);
         // Set new map item as active
-        setActiveMapItem(map.projectId);
+        setActiveMapItem(newMap.projectId);
         // Add map to user as owner
-        const updatedUser = await assignMapToUserApi( {map, assignedUserId: map.owner } );
+        const updatedUser = await assignMapToUserApi( {assignedUserId: newMap.owner, map: newMap} );
         // Update user on local storage
         setLocalStorageUser(updatedUser);
         // Remove notification
         removeNotification();
     } else {
+        // Update notification
         showNotification('Error creating map', 'error');
+        // Get back to new map container
+        await newMapClick(null);
     }
 }
 
@@ -77,8 +82,8 @@ function addFirstNode() {
     const parentId = 1;
     const shortName = "New map";
     // Add temp node (create, update)
-    braintroop.addTempNode({parentId, shortName});
-    return parentId;
+    const nodeId = braintroop.addTempNode({parentId, shortName});
+    return nodeId;
 }
 
 // Delete first node (placeholder)

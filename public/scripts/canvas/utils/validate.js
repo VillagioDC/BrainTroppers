@@ -19,5 +19,5 @@ export function checkQuery(queryEl) {
 export function sanitizeInput(input) {
     // Sanitize input
     if (!input || input.trim() === '') return '';
-    return input.replace(/[^\w\s@.-]/gi, '').trim();
+    return input.replace(/[^\w\s@.&-]/gi, '').trim();
 }

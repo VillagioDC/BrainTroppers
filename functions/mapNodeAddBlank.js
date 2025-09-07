@@ -1,5 +1,5 @@
-// ENDPOINT TO CREATE NEW MAP
-// Serverless handler for creating a new map
+// ENDPOINT TO ADD BLANK NODE
+// Serverless handler for adding a blank node
 
 // Dependencies
 
@@ -11,12 +11,13 @@ const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
 const setSessionExpires = require('./utils/setExpires.jsx');
-const mapCreateRequest = require('./controller/mapCreateRequest.jsx');
+const mapRead = require('./controller/mapRead.jsx');
+const mapAddBlankNode = require('./controller/mapAddBlankNode.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {userId, query}} - API call
-    RETURN {object} - body: newMap || error
+    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, parentId, node}} - API call
+    RETURN [{object}] - body: updatedMap || error
 */
 
 exports.handler = async (event) => {
@@ -42,17 +43,19 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, query } = parsedBody;
+    const { userId, projectId, parentId, node } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
-        !query || query.trim().length === 0) {
-        log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-        return {
-          statusCode: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Missing required fields' })
-        };
+        !projectId || projectId.trim().length === 0 ||
+        !parentId || parentId.trim().length === 0 ||
+        !node) {
+      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      return {
+        statusCode: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Missing required fields' })
+      };
     }
 
     // Check token
@@ -69,7 +72,9 @@ exports.handler = async (event) => {
 
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
-        typeof query !== 'string' || query.length > 500) {
+        typeof projectId !== 'string' || projectId.length > 50 ||
+        typeof parentId !== 'string' || parentId.length > 50 ||
+        typeof node !== 'object' ) {
             log('SERVER WARNING', 'Request blocked by anti-malicious check');
             return {
                 statusCode: 400,
@@ -91,27 +96,38 @@ exports.handler = async (event) => {
     // Set session expires
     await setSessionExpires(userId);
 
-    // Create new map request
-    const newMap = await mapCreateRequest({userId, query});
-    if (!newMap) {
-      log('SERVER WARNING', 'Unable to create map');
+    // Read map
+    const map = await mapRead(projectId);
+    if (!map) {
+      log('SERVER WARNING', 'Project not found');
       return {
-        statusCode: 500,
+        statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unable to create map' })
+        body: JSON.stringify({ error: 'Project not found' })
       };
     }
 
-    // Return request response
+    // Create new blank node
+    const updatedMap = await mapAddBlankNode(map, parentId, node);
+    if (!updatedMap) {
+      log('SERVER ERROR', 'Unable to create node');
+      return {
+        statusCode: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Unable to create node' })
+      };
+    }
+
+    // Return success
     return {
-      statusCode: newMap.statusCode,
+      statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: newMap.body // already parsed
+      body: JSON.stringify(updatedMap)
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreateNew endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapNodeAddBlank endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -4,6 +4,7 @@
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
 const generateToken = require('../utils/generateToken.jsx');
+const setSessionToken = require('../utils/setSessionToken.jsx');
 const setSessionExpires = require('../utils/setExpires.jsx')
 const userRefresh = require('../controller/userRefresh.jsx');
 const log = require('../utils/log.jsx');
@@ -53,10 +54,12 @@ async function userSignIn(credentials) {
     }
     // Generate session token
     const sessionToken = generateToken();
+    await setSessionToken(user.userId, sessionToken);
     // Set expires
     const expires = await setSessionExpires(user.userId);
     // Refresh user data
     const refresh = await userRefresh(user.userId);
+
     // Construct authorization
     const auth = {
         userId: user.userId,
