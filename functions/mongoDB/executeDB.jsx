@@ -24,7 +24,7 @@ async function executeDB(operation) {
         // Open the database connection
         db = await openDBCollection(operation.collectionName);
         if (!db) {
-            log("SERVER ERROR", "Unable to open MongoDB connection in executeDB.");
+            log("SERVER ERROR", "Unable to open MongoDB connection @executeDB.");
             return null;
         }
         
@@ -108,7 +108,7 @@ async function executeDB(operation) {
     // Catch errors
     } catch (error) {
         // Log the error
-        log("SERVER ERROR", `Error during MongoDB operation: ${operation.type} on ${operation.collectionName}`, error);
+        log("SERVER ERROR", `Error during MongoDB operation @executeDB: ${operation.type} on ${operation.collectionName}`, error);
 
         // Return failure result
         return null;
@@ -122,7 +122,7 @@ async function executeDB(operation) {
                 await closeDBCollection(db);
             // Catch error
             } catch (closeError) {
-                log("SERVER ERROR", `Error closing DB connection after ${operation.type} on ${operation.collectionName}`, closeError);
+                log("SERVER ERROR", `Error closing DB connection @executeDB after ${operation.type} on ${operation.collectionName}`, closeError);
             }
         }
     }

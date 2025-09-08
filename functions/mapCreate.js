@@ -10,7 +10,6 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
 const mapCreateRequest = require('./controller/mapCreateRequest.jsx');
 const log = require('./utils/log.jsx');
 
@@ -51,7 +50,7 @@ exports.handler = async (event) => {
         return {
           statusCode: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Missing required fields' })
+          body: JSON.stringify({ error: 'Invalid request' })
         };
     }
 
@@ -59,7 +58,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapCreateNew');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,7 +69,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof query !== 'string' || query.length > 500) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapCreateNew');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -81,20 +80,18 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
+      log('SERVER INFO', 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Unauthorized', expired: true })
       };
     }
-    // Set session expires
-    await setSessionExpires(userId);
 
     // Create new map request
     const newMap = await mapCreateRequest({userId, query});
     if (!newMap) {
-      log('SERVER WARNING', 'Unable to create map');
+      log('SERVER ERROR', 'Unable to create map @mapCreateNew');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

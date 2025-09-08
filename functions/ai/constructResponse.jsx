@@ -17,7 +17,7 @@ async function constructAIResponse (response) {
 
     // If no response
     if (!response || !response.content || response.content === "") {
-        log("SERVER DEBUG", "No response from AI @handleMessageToAction");
+        log("SERVER DEBUG", "No response from AI @constructResponse");
         structuredResponse = [ { action: "none", response: null, status: "ignored" } ];
         return structuredResponse;
     }
@@ -27,7 +27,7 @@ async function constructAIResponse (response) {
 
     // Handle parsing error
     if (!jsonResponse) {
-        log("SERVER ERROR", "Unable to parse response from AI @handleMessageToAction", response.content);
+        log("SERVER ERROR", "Unable to parse response from AI @constructResponse", response.content);
         structuredResponse = [ { action: "none", response: null, status: "ignored" } ];
         return structuredResponse;
     }

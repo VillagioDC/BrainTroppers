@@ -27,6 +27,12 @@ export function setApiUrl(api) {
         case 'createMapGetStatus':
             url += '/mapCreateGetStatus';
             break;
+        case 'updateMap':
+            url += '/mapUpdate';
+            break;
+        case 'updateMapGetStatus':
+            url += '/mapUpdateGetStatus';
+            break;
         case 'renameMap':
             url += '/mapTitleUpdate';
             break;
@@ -37,7 +43,7 @@ export function setApiUrl(api) {
             url += '/mapRead';
             break;
         case 'addNewNode':
-            url += '/mapAddNode';
+            url += '/mapNodeAdd';
             break;
         case 'addBlankNode':
             url += '/mapNodeAddBlank';
@@ -53,6 +59,12 @@ export function setApiUrl(api) {
             break;
         case 'updateNode':
             url += '/mapUpdateNode';
+            break;
+        case 'toggleLinkType':
+            url += '/mapToggleLinkType';
+            break;
+        case 'unlinkNode':
+            url += '/mapUnlinkNode';
             break;
         case 'deleteNode':
             url += '/mapDeleteNode';

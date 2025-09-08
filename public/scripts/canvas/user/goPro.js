@@ -29,11 +29,15 @@ async function loadProPlanPopup() {
 // Bind event listeners to pro plan popup
 function bindProPlanPopupEvents() {
     // Add event listeners to pro plan popup
+    // Submit pro plan form
     if (document.getElementById("pro-plan-form"))
         document.getElementById("pro-plan-form").addEventListener("submit", proPlanFormSubmit);
+    // Close pro plan popup
     if (document.getElementById("pro-plan-close"))
         document.getElementById("pro-plan-close").addEventListener("click", removeProPlanPopup);
+    // Outside click handler
     document.addEventListener('click', outsideClickHandler);
+    // Escape key handler
     document.addEventListener('keydown', escapeKeyHandler);
 }
 

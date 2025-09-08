@@ -2,7 +2,7 @@
 // MAP NODE UPDATE MODULE
 
 // Import modules
-import { updateNodeApi } from './updateNodeApi.js';
+import { updateNodeApi } from '../apis/updateNodeApi.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Update map node

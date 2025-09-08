@@ -20,7 +20,7 @@ async function userSendReset(email) {
     });
     // Handle error
     if (!user) {
-        log('SERVER WARNING', 'User not found', email);
+        log('SERVER WARNING', 'User not found @userSendReset', email);
         return {
             statusCode: 404,
             body: JSON.stringify({error: 'User not found'})
@@ -41,7 +41,7 @@ async function userSendReset(email) {
                                                           expires: tokenExpire}}})
     // Handle error
     if (!userUpdate || userUpdate.modifiedCount === 0) {
-        log('SERVER ERROR', 'Unable to update user', email);
+        log('SERVER ERROR', 'Unable to update user @userSendReset', email);
         return {
             statusCode: 500,
             body: JSON.stringify({error: 'Internal server error'})

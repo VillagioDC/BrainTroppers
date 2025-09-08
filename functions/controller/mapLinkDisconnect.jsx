@@ -6,11 +6,16 @@ const log = require('../utils/log.jsx');
 
 /* PARAMETERS
     input {object, string, string} - map, nodeIdFrom, nodeIdTo
-    RETURN {object} - updated map
+    RETURN {object} - updated map || null
 */
 
 async function mapLinkDisconnect(map, nodeIdFrom, nodeIdTo) {
 
+    // Check inputs
+    if (!map || !nodeIdFrom || !nodeIdTo) {
+        log("SERVER ERROR", "Invalid inputs @mapLinkDisconnect.");
+        return null;
+    }
     // Clone nodes array to avoid mutating input
     let nodes = [...map.nodes];
 
@@ -34,10 +39,12 @@ async function mapLinkDisconnect(map, nodeIdFrom, nodeIdTo) {
 
     // Save to database
     const result = await mapUpdate(updatedMap);
-    if (!result || result.modifiedCount === 0) {
+    if (!result || typeof result !== 'object' || result.projectId !== map.projectId) {
         log("SERVER ERROR", "Unable to disconnect nodes @mapLinkDisconnect.");
+        return null;
     }
 
+    // Return updated map
     return updatedMap;
 }
 

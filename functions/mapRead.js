@@ -46,11 +46,11 @@ exports.handler = async (event) => {
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ) {          
-          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+          log('SERVER WARNING', 'Invalid body @mapRead', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Missing required fields' })
+            body: JSON.stringify({ error: 'Invalid request' })
           };
     }
 
@@ -58,7 +58,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapRead');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapRead');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ exports.handler = async (event) => {
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found');
+      log('SERVER WARNING', 'Project not found @mapRead', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

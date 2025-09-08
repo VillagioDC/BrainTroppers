@@ -3,24 +3,33 @@
 
 // Import modules
 import { checkQuery } from "../utils/validate.js";
-import { rewriteNodeApi } from "./rewriteNodeApi.js";
+import { updateMapApi } from "../apis/updateMapApi.js";
+import { rewriteNodeApi } from "../apis/rewriteNodeApi.js";
+import { updateMapGetStatus } from "../poolling/updateMapGetStatus.js";
+import { pauseS } from "../utils/pauseS.js";
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 export async function rewriteNode() {
-  // No action here
-  // Open rewrite node popup
-  openRewriteNodePopup();
+    // Get selected node Id
+    const nodeId = braintroop.getSelectedNodeId();
+    if (!nodeId) { console.error('No node selected'); return; }
+    // Open rewrite node popup
+    openRewriteNodePopup();
 }
 
 async function openRewriteNodePopup() {
     // Check existing popup
-    if (document.getElementById('rewrite-node-popup')) return;
+    if (document.getElementById('rewrite-node-popup'))
+        removeRewritePopup();
     // Load rewrite node popup
     await loadRewriteNode();
     // Bind rewrite popup events
     bindRewritePopupEvents();
     // Load detail content
     loadDetailContent();
+    // Show rewrite popup
+    if (document.getElementById('rewrite-node-popup'))
+        document.getElementById('rewrite-node-popup').style.display = 'flex';
 }
 
 // Load rewrite popup
@@ -43,21 +52,24 @@ function bindRewritePopupEvents() {
     if (document.getElementById("close-rewrite-node-popup"))
         document.getElementById("close-rewrite-node-popup").addEventListener("click", closeRewritePopup);
     // Submit query button
-    if (document.getElementById("rewrite-node-submit"))
-        document.getElementById("rewrite-node-submit").addEventListener("click", closeRewritePopup);
+    if (document.getElementById("rewrite-node-form"))
+        document.getElementById("rewrite-node-form").addEventListener("submit", handleNodeRewrite);
+    // Outside click handler
     document.addEventListener('click', outsideClickHandler);
+    // Keydown handler
+    document.addEventListener('keydown', keydownHandler);
 }
 
 // Load node content
 function loadDetailContent() {
     // Get selected node
-    const nodeID = braintroop.selected.id;
-    if (!nodeID) { console.warn('No node selected'); return; }
-    const node = braintroop.map.nodes.find(n => n.nodeId === nodeID);
+    const nodeId = braintroop.getSelectedNodeId();
+    if (!nodeId) { console.warn('No node selected'); return; }
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
     if (!node) { console.warn('No node found'); return; }
     // Set short name
     const shortName = node ? node.shortName : "Title";
-    const shortNameEl = document.getElementById('rewrite-node-short-name');
+    const shortNameEl = document.getElementById('rewrite-node-title');
     if (shortNameEl) shortNameEl.innerText = shortName;
     // Set content
     const content = node ? node.content : "Content";
@@ -67,6 +79,81 @@ function loadDetailContent() {
     const detail = node ? node.detail : "Detail";
     const detailEl = document.getElementById('rewrite-node-detail');
     if (detailEl) detailEl.innerText = detail;
+}
+
+// Handle node rewrite
+async function handleNodeRewrite(e) {
+    e.preventDefault();
+    // Get selected node
+    const nodeId = braintroop.getSelectedNodeId();
+    if (!nodeId) { console.error('No node selected'); return; }
+    // Element
+    const queryEl = document.getElementById('rewrite-node-query');
+    if (!queryEl) { console.error('Missing query element'); return; };
+    // Check query
+    const query = checkQuery(queryEl);
+    // If valid query
+    if (query) {
+        // Remove rewrite popup
+        removeRewritePopup();
+        // Show notification
+        await showNotification('Requesting...', 'info', 'wait');
+        // Save current map
+        const currentMap = braintroop.getBackendMap();
+        let updatedMap = await updateMapApi(currentMap);
+        // Check error requesting map
+        if (!updatedMap || typeof updatedMap !== 'object') {
+            // Show error notification
+            showNotification('Error creating node', 'error');
+            return;
+        }
+        // Submit query to rewrite node
+        const response = await rewriteNodeApi( { nodeId, query} );
+        // Check error requesting map
+        if (!response || typeof response !== 'object' || !response.statusCode || response.statusCode !== 202) {
+            // Show error notification
+            showNotification('Error rewriting node', 'error');
+            return;
+        };
+        // Get projectId
+        const projectId = braintroop.getProjectId();
+        // Pooling node
+        await showNotification('Creating...', 'info', 'wait');
+        await pauseS(40);
+        let creationStatus = 'creating';
+        updatedMap = {};
+        while (creationStatus === 'creating') {
+            // Call api
+            updatedMap = await updateMapGetStatus(projectId);
+            // Check status
+            if (updatedMap && updatedMap.creationStatus) {
+                creationStatus = updatedMap.creationStatus;
+            }
+            // Wait
+            await pauseS(15);
+        }
+        // Update node
+        if (updatedMap && updatedMap.creationStatus === 'created') {
+            // Set map
+            braintroop.setMap(updatedMap);           
+            // Remove notification
+            removeNotification();
+        } else {
+            // Show error notification
+            showNotification('Error rewriting node', 'error');
+            // Restore map creation status
+            await updateMapApi(currentMap);
+        }
+    } else {
+        // Remove add popup
+        removeAddPopup();
+    }
+}
+
+// Close rewrite popup
+function closeRewritePopup() {
+    // Remove rewrite popup
+    removeRewritePopup();
 }
 
 // Remove rewrite popup
@@ -79,6 +166,7 @@ function removeRewritePopup() {
     if (document.getElementById("rewrite-node-submit"))
         document.getElementById("rewrite-node-submit").removeEventListener("click", closeRewritePopup);
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', keydownHandler);
     // Remove rewrite popup container
     if (document.getElementById('rewrite-node-popup'))
         document.getElementById('rewrite-node-popup').remove();
@@ -91,31 +179,9 @@ function outsideClickHandler(e) {
     if (e.target === rewritePopup) closeRewritePopup();
 }
 
-// Close rewrite popup
-async function closeRewritePopup() {
-    // Check query
-    let query = '';
-    if (document.getElementById('rewrite-node-query'))
-        query = checkQuery('rewrite-node-query');
-    // If valid query
-    if (query) {
-        // Show notification
-        await showNotification('Processing...', 'info', 'wait');
-        // Parent id
-        const parentId = braintroop.selected.id;
-        // Remove rewrite popup
+// Escape keydown handler
+function keydownHandler(event) {
+    if (event.key === 'Escape') {
         removeRewritePopup();
-        // Submit query to rewrite node
-        const updatedMap = await rewriteNodeApi( { parentId, query} );
-        // Update map
-        if (updatedMap) {
-            // Set data
-            braintroop.setData(updatedMap);
-          }
-        // Remove notification
-        removeNotification();
-    } else {
-      // Remove rewrite popup
-      removeRewritePopup();
     }
 }

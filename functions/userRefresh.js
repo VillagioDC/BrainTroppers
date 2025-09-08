@@ -44,17 +44,17 @@ exports.handler = async (event) => {
 
     // Check required fields
     if (!userId ) {
-          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+          log('SERVER WARNING', 'Invalid body @userRefresh', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Missing required fields' })
+            body: JSON.stringify({ error: 'Invalid request' })
           };
     }
 
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @userRefresh');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -66,7 +66,7 @@ exports.handler = async (event) => {
     const result = await userRefresh( userId );
     // Check result
     if (!result || !result.statusCode) {
-      log('SERVER ERROR', 'Refreshing user failed');
+      log('SERVER ERROR', 'Refreshing user failed @userRefresh');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
       };
     }
     if (result.statusCode !== 200) {
-      log('SERVER WARNING', 'Refreshing user failed', result.body);
+      log('SERVER WARNING', 'Refreshing user failed @userRefresh', result.body);
       return {
         statusCode: auth.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -91,7 +91,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in userSignIn endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in userRefresh endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

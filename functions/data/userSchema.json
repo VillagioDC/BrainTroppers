@@ -2,8 +2,14 @@
   "userId": "",
   "email": "",
   "password": "",
+  "authToken": "",
   "name": "",
   "icon": "",
   "plan": "",
-  "maps": []
+  "waitlist": false,
+  "proPlanTrial": null,
+  "maps": [],
+  "theme": "",
+  "sessionToken": "",
+  "expires": null
 }

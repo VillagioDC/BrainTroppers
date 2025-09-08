@@ -45,11 +45,11 @@ exports.handler = async (event) => {
             !map.projectId || map.projectId.trim().length === 0 ||
             !map.title || map.title.trim().length === 0 ||
             !map.lastUpdated) {
-            log('SERVER_WARNING', 'Invalid body', JSON.stringify(body));
+            log('SERVER_WARNING', 'Invalid body @userAssignMap', JSON.stringify(body));
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ error: 'Missing required fields', details: { assignedUserId, map } })
+                body: JSON.stringify({ error: 'Invalid request', details: { assignedUserId, map } })
             };
         }
 
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
             typeof map.projectId !== 'string' || map.projectId.length > 50 ||
             typeof map.title !== 'string' || map.title.length > 50 ||
             typeof map.lastUpdated !== 'string' || map.lastUpdated.length > 50) {
-            log('SERVER_WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER_WARNING', 'Request blocked by anti-malicious check @userAssignMap', JSON.stringify(body));
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ exports.handler = async (event) => {
         // Validate and convert lastUpdated
         const lastUpdatedDate = new Date(map.lastUpdated);
         if (isNaN(lastUpdatedDate.getTime())) {
-            log('SERVER_WARNING', 'Invalid lastUpdated date');
+            log('SERVER_WARNING', 'Invalid lastUpdated date @userAssignMap');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,7 +82,7 @@ exports.handler = async (event) => {
         // Assign map to user
         const updatedUser = await userAssignMap({ assignedUserId, map });
         if (!updatedUser) {
-            log('SERVER_ERROR', 'Assigning map to user failed');
+            log('SERVER_ERROR', 'Assigning map to user failed @userAssignMap');
             return {
                 statusCode: 500,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },

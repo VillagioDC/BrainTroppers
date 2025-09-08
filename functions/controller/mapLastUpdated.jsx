@@ -30,6 +30,7 @@ async function mapLastUpdated(map) {
     // Handle error
     if (!result || result.modifiedCount === 0) {
         log("SERVER ERROR", "Unable to update last change on map @mapLastUpdated.");
+        return map;
     }
 
     // Update user maps

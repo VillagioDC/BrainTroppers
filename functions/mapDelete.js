@@ -10,7 +10,6 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
 const mapDelete = require('./controller/mapDelete.jsx');
 const userDeleteMap = require('./controller/userDeleteMap.jsx');
 const log = require('./utils/log.jsx');
@@ -48,11 +47,11 @@ exports.handler = async (event) => {
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ) {          
-          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+          log('SERVER WARNING', 'Invalid body @mapDelete', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Missing required fields' })
+            body: JSON.stringify({ error: 'Invalid request' })
           };
     }
 
@@ -60,7 +59,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapDelete');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -71,7 +70,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapDelete');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,20 +81,18 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
+      log('SERVER INFO', 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Unauthorized', expired: true })
       };
     }
-    // Set session expires
-    await setSessionExpires(userId);
 
     // Delete map
     const deletedMap = await mapDelete(projectId);
     if (!deletedMap) {
-      log('SERVER WARNING', 'Project not deleted on maps');
+      log('SERVER ERROR', 'Unable to delete map @mapDelete');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -109,7 +106,7 @@ exports.handler = async (event) => {
     // Read map to check if deleted
     const updatedMap = await mapRead(projectId);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to read map on mapDelete');
+      log('SERVER ERROR', 'Unable to read map @mapDelete', projectId);
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

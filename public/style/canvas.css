@@ -157,7 +157,7 @@ body {
   color: var(--text);
   cursor: pointer;
   font-size: 0.9rem;
-  padding: 0.25rem 0.4rem;
+  padding: 0.25rem 0.15rem;
   border-radius: 50%;
   transition: background-color 0.3s, border 0.3s;
 }
@@ -216,7 +216,7 @@ body {
   top: 20px;
   left: 60px;
   z-index: 9000;
-  padding: 0.25rem 0.4rem;
+  padding: 0.25rem 0.15rem;
   border: 1px solid var(--border);
   background: var(--background-shadow);
   color: var(--text);
@@ -311,7 +311,7 @@ body {
   z-index: 9500;
 }
 .tools.link-tools {
-  height: 7.5rem;
+  height: 5.4rem;
 }
 
 .tools-btn {
@@ -519,12 +519,12 @@ body {
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.7rem;
+  padding: 0.4rem 0.7rem;
   font-weight: 400;
   color: var(--text);
   border-radius: 6px;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: all 0.2s;
   gap: 0.5rem;
   font-size: 0.8rem;
   cursor: pointer;
@@ -689,17 +689,23 @@ body {
 }
 
 .popup-content {
+    position: relative;
     display: flex;
     flex-direction: column;
+    width: 80%;
+    max-width: 500px;
+    height: auto;
+    gap: 0.5rem;
+    padding: 1.2rem;
     background-color: var(--background);
     color: var(--text);
-    padding: 1.2rem;
     border: 1px solid var(--primary);
     border-radius: 8px;
-    width: 80%;
-    max-width: 400px;
-    height: auto;
-    position: relative;
+}
+
+.popup-content form {
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 }
 
@@ -723,14 +729,28 @@ body {
     font-size: 1.2rem;
     font-weight: 500;
     color: var(--accent);
-    margin-bottom: 1rem;
     text-align: center;
     cursor: pointer
 }
 
+.popup-content h3 {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--primary);
+    text-align: left;
+}
+
+.popup-content h4 {
+    width: 100%;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--text);
+}
+
 .popup-content p {
     width: 100%;
-    padding: 0.6rem;
+    padding: 0.2rem 0.6rem;
     border: 1px solid var(--background-shadow);   
     border-radius: 4px;
     font-size: 0.9rem;
@@ -755,6 +775,7 @@ body {
 }
 
 .popup-content button {
+    width: 100%;
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));

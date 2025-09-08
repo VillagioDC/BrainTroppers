@@ -19,7 +19,7 @@ async function loadUserSchema() {
         const userStr = fs.readFileSync(filename, 'utf8');
         // Handle error
         if (!userStr) {
-            log("SERVER ERROR", "Unable to read map schema @userSchema");
+            log("SERVER ERROR", "Unable to read user schema @userSchema");
             return null;
         }
 
@@ -31,7 +31,7 @@ async function loadUserSchema() {
 
     // Catch error
     } catch (error) {
-        log("SERVER ERROR", "Unable to load map schema @userSchema", error);
+        log("SERVER ERROR", "Unable to load user schema @userSchema", error);
         return null;
     }
 }

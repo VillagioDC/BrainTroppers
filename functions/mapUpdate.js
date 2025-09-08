@@ -10,7 +10,6 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
 const mapValidate = require('./utils/mapValidate.jsx');
 const mapUpdate = require('./controller/mapUpdate.jsx');
 const log = require('./utils/log.jsx');
@@ -48,11 +47,11 @@ exports.handler = async (event) => {
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !map || typeof map !== 'object' ) {          
-          log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+          log('SERVER WARNING', 'Invalid body @mapUpdate', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Missing required fields' })
+            body: JSON.stringify({ error: 'Invalid body' })
           };
     }
 
@@ -60,7 +59,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapUpdate');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -71,7 +70,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof map !== 'object' ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapUpdate');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,7 +81,7 @@ exports.handler = async (event) => {
     // Validate map
     const isValidMap = mapValidate(map);
     if (!isValidMap) {
-      log('SERVER WARNING', 'Invalid map');
+      log('SERVER WARNING', 'Invalid map @mapUpdate');
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -93,20 +92,18 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
+      log('SERVER INFO', 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Unauthorized', expired: true })
       };
     }
-    // Set session expires
-    await setSessionExpires(userId);
 
     // Update map 
     const updatedMap = await mapUpdate(map);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update map');
+      log('SERVER ERROR', 'Unable to update map @mapUpdate');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -123,7 +120,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapTitleUpdate endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapUpdate endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

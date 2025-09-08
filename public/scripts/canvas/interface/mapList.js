@@ -4,7 +4,7 @@
 // Import modules
 import { getLocalStorageUser } from '../../common/userLocalStorage.js';
 import { removeNewMapContainer } from '../interface/newMap.js';
-import { loadMapApi } from '../commands/loadMapApi.js';
+import { loadMapApi } from '../apis/loadMapApi.js';
 import { popupMapMenu } from './mapListPopup.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 

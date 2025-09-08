@@ -10,13 +10,11 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
-const mapRead = require('./controller/mapRead.jsx');
-const mapRewireNode = require('./controller/mapRewireNode.jsx');
+const mapNodeRewireRequest = require('./controller/mapNodeRewireRequest.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {projectId, nodeId}} - API call
+    input {headers: {Authorization: Bearer <token>}, body: {userId, projectId, nodeId}} - API call
     RETURN {object} - body: updatedMap || error
 */
 
@@ -43,16 +41,17 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { projectId, nodeId } = parsedBody;
+    const { userId, projectId, nodeId } = parsedBody;
 
     // Check required fields
-    if (!projectId || projectId.trim().length === 0 ||
+    if (!userId || userId.trim().length === 0 || 
+        !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid body @mapRewireNode', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Invalid request' })
       };
     }
 
@@ -60,7 +59,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapRewireNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -69,9 +68,10 @@ exports.handler = async (event) => {
     }
 
     // Anti-malicious checks
-    if (typeof projectId !== 'string' || projectId.length > 50 ||
+    if (typeof userId !== 'string' || userId.length > 50 ||
+        typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapRewireNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,31 +82,18 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
+      log('SERVER INFO', 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Unauthorized', expired: true })
       };
     }
-    // Set session expires
-    await setSessionExpires(userId);
 
-    // Read map
-    const map = await mapRead(projectId);
-    if (!map) {
-      log('SERVER WARNING', 'Project not found');
-      return {
-        statusCode: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Project not found' })
-      };
-    }
-
-    // Rewire map
-    const updatedMap = await mapRewireNode(map, nodeId);
+    // Create rewire request
+    const updatedMap = await mapNodeRewireRequest(projectId, nodeId);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to rewire map');
+      log('SERVER ERROR', 'Unable to rewire map @mapRewireNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -116,7 +103,7 @@ exports.handler = async (event) => {
 
     // Return success
     return {
-      statusCode: 200,
+      statusCode: 202,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedMap)
     };

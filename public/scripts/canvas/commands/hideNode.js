@@ -7,7 +7,7 @@ import { toggleNodeToolsButtons } from './nodeToolsMenu.js';
 
 export async function hideNode() {
     // Node id
-    const nodeId = braintroop.selected.id;
+    const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }
     // Hide node
     braintroop.hideNode(nodeId);

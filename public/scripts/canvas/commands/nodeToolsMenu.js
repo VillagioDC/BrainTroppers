@@ -7,6 +7,7 @@ import { addNewNode } from './addNewNode.js';
 import { addBlankNode } from './addBlankNode.js';
 import { expandNode } from './expandNode.js';
 import { rewriteNode } from './rewriteNode.js';
+import { rewireNode } from './rewireNode.js';
 import { pinNode, unpinNode } from './pinNode.js';
 import { approveNode } from './approveNode.js';
 import { hideNode, unhideNode } from './hideNode.js';
@@ -95,6 +96,9 @@ function bindNodeToolsMenuEvents() {
     // Rewrite node button
     if (document.getElementById('rewrite-node-btn'))
         document.getElementById('rewrite-node-btn').addEventListener('click', rewriteNode);
+    // Rewire node button
+    if (document.getElementById('rewire-node-btn'))
+        document.getElementById('rewire-node-btn').addEventListener('click', rewireNode);
     // Pin node button
     if (document.getElementById('pin-node-btn'))
         document.getElementById('pin-node-btn').addEventListener('click', pinNode);
@@ -140,6 +144,9 @@ export function removeNodeToolsMenu() {
     // Rewrite node button
     if (document.getElementById('rewrite-node-btn'))
         document.getElementById('rewrite-node-btn').removeEventListener('click', rewriteNode);
+    // Rewire node button
+    if (document.getElementById('rewire-node-btn'))
+        document.getElementById('rewire-node-btn').removeEventListener('click', rewireNode);
     // Pin node button
     if (document.getElementById('pin-node-btn'))
         document.getElementById('pin-node-btn').removeEventListener('click', pinNode);

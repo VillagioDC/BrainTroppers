@@ -10,9 +10,7 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
-const mapRead = require('./controller/mapRead.jsx');
-const mapNodeExpand = require('./controller/mapNodeExpand.jsx');
+const mapNodeExpandRequest = require('./controller/mapNodeExpandRequest.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
@@ -50,11 +48,11 @@ exports.handler = async (event) => {
         !projectId || projectId.trim().length === 0 ||
         !parentId || parentId.trim().length === 0 ||
         !query || query.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid body @mapExpandNode', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Invalid request' })
       };
     }
 
@@ -62,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapExpandNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -75,7 +73,7 @@ exports.handler = async (event) => {
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof parentId !== 'string' || parentId.length > 50 ||
         typeof query !== 'string' || query.length > 500) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapExpandNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -86,31 +84,18 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
+      log('SERVER INFO', 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Unauthorized', expired: true })
       };
     }
-    // Set session expires
-    await setSessionExpires(userId);
 
-    // Read map
-    const map = await mapRead(projectId);
-    if (!map) {
-      log('SERVER WARNING', 'Project not found');
-      return {
-        statusCode: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Project not found' })
-      };
-    }
-
-    // Expand node based on query
-    const updatedMap = await mapNodeExpand(map, parentId, query);
+    // Expand node request
+    const updatedMap = await mapNodeExpandRequest(projectId, parentId, query);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to expand node');
+      log('SERVER ERROR', 'Unable to expand node @mapExpandNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -120,7 +105,7 @@ exports.handler = async (event) => {
 
     // Return success
     return {
-      statusCode: 200,
+      statusCode: 202,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedMap)
     };

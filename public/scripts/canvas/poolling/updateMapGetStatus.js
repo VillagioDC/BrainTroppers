@@ -1,28 +1,24 @@
 // CANVAS MODULES
-// ADD NODE API MODULE
+// CHECK UPDATE STATUS API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
 import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
-// Add new node api 
-export async function addNewNodeApi ( {parentId, query} ) {
+// Create map api
+export async function updateMapGetStatus(projectId) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
         const headers = {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionToken}`,
         };
-        // Construct body
-        const projectId = braintroop.map.projectId;
-        const body = { userId, projectId, parentId, query };
-        const url = setApiUrl('addNewNode');
+        const query = `?projectId=${projectId}&userId=${userId}`;
+        const url = setApiUrl('updateMapGetStatus') + query;
         const response = await fetch(url, {
-            method: 'POST',
+            method: 'GET',
             headers,
-            body: JSON.stringify(body),
         });
         // Parse response
         const responseData = await response.json();
@@ -31,13 +27,13 @@ export async function addNewNodeApi ( {parentId, query} ) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get new map
+        // Get updated map
         const updatedMap = responseData;
         return updatedMap;
         
         // Catch errors
         } catch (error) {
-            console.error('Error adding new node:', error);
+            console.error('Error creating map:', error);
             return false;
     }
 }

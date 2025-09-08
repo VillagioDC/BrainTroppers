@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     // Get params   
     const { projectId, userId } = event.queryStringParameters || {};
     if (!projectId || !userId) {
-      log('SERVER WARNING', 'Missing projectId or userId');
+      log('SERVER WARNING', 'Invalid body @mapCreateGetStatus');
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     const authHeader = event.headers.Authorization || event.headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapCreateGetStatus');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -53,22 +53,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Check session
-    const isValid = await checkSessionExpired(userId);
-    if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
-      return {
-        statusCode: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Unauthorized', expired: true })
-      };
-    }
-    await setSessionExpires(userId);
-
     // Fetch map
     const map = await mapRead( projectId );
     if (!map) {
-      log('SERVER WARNING', `Map not found: ${projectId}`);
+      log('SERVER WARNING', 'Project not found @mapCreateGetStatus', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -90,9 +78,14 @@ exports.handler = async (event) => {
     // If creating
     if (map.creationStatus === 'requested' || map.creationStatus === 'creating') {
       status = 'creating';
-    // If created or failed
+    // If failed
+    } else if (map.creationStatus === 'failed') {
+      log('SERVER ERROR', `Map creation failed @mapUpdateGetStatus: ${projectId}`);
+      status = 'failed';
+    // If created
     } else {
-      status = map.creationStatus;
+      log('SERVER INFO', "Map created @mapUpdateGetStatus:");
+      status = 'created';
     }
 
     // Return

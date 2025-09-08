@@ -17,7 +17,7 @@ async function userNewPassword(credentials) {
 
     // Check credentials
     if (!credentials || !credentials.email || !credentials.password || !credentials.authToken) {
-        log('SERVER WARNING', 'Missing credentials', credentials);
+        log('SERVER WARNING', 'Missing credentials @userNewPassword', credentials);
         return {
             statusCode: 400,
             body: JSON.stringify({ error: 'Missing credentials' })
@@ -30,7 +30,7 @@ async function userNewPassword(credentials) {
     });
     // Check user
     if (!user) {
-        log('SERVER WARNING', 'User not found', credentials.email);
+        log('SERVER WARNING', 'User not found @userNewPassword', credentials.email);
         return {
                 statusCode: 409,
                 body: JSON.stringify({ error: 'User not found' })
@@ -38,7 +38,7 @@ async function userNewPassword(credentials) {
     }
     // Check auth Token
     if (!user.authToken || user.authToken !== authToken) {
-        log('SERVER WARNING', 'Unauthorized new password request', credentials.email);
+        log('SERVER WARNING', 'Unauthorized new password request @userNewPassword', credentials.email);
         return {
                 statusCode: 401,
                 body: JSON.stringify({ error: 'Unauthorized' })

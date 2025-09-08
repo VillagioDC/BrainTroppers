@@ -46,18 +46,18 @@ exports.handler = async (event) => {
     if (!credentials || 
         !credentials.email || credentials.email.trim().length === 0 ||
         !credentials.password || credentials.password.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid body @signUp', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Invalid request' })
       };
     }
 
     // Anti-malicious checks
     if (typeof credentials.email !== 'string' || credentials.email.length > 50 ||
         typeof credentials.password !== 'string' || credentials.password.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @signUp');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
     const signedUp = await userSignUp(credentials);
     // Check auth
     if (!signedUp || !signedUp.statusCode) {
-      log('SERVER WARNING', 'User sign up failed');
+      log('SERVER WARNING', 'User sign up failed @signUp');
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ exports.handler = async (event) => {
       };
     }
     if (signedUp.statusCode !== 200) {
-      log('SERVER WARNING', 'User sign up failed');
+      log('SERVER WARNING', 'User sign up failed @signUp', JSON.stringify(signedUp.body));
       return {
         statusCode: signedUp.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

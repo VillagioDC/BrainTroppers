@@ -1,5 +1,5 @@
-// ENDPOINT TO REWIRE MAP
-// Serverless handler for rewiring a map
+// ENDPOINT TO UNLINK NODE
+// Serverless handler for unlinking nodes
 
 // Dependencies
 
@@ -10,13 +10,12 @@ const refuseNonPostRequest = require('./utils/refuseNonPostRequest.jsx');
 const handlePostRequest = require('./utils/handlePostRequest.jsx');
 const handleJsonParse = require('./utils/handleJsonParse.jsx');
 const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
-const mapRewire = require('./controller/mapRewire.jsx');
+const mapLinkDisconnect = require('./controller/mapLinkDisconnect.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
-    input {headers: {Authorization: Bearer <token>}, body: {projectId}} - API call
+    input {headers: {Authorization: Bearer <token>}, body: {projectId, nodeFrom, nodeTo}} - API call
     RETURN {object} - body: updatedMap || error
 */
 
@@ -43,23 +42,25 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { projectId } = parsedBody;
+    const { userId, projectId, nodeIdFrom, nodeIdTo } = parsedBody;
 
     // Check required fields
-    if (!projectId || projectId.trim().length === 0 ) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
-      return {
-        statusCode: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
-      };
+    if (!projectId || projectId.trim().length === 0 ||
+        !nodeIdFrom || nodeIdFrom.trim().length === 0 ||
+        !nodeIdTo || nodeIdTo.trim().length === 0) {
+          log('SERVER WARNING', 'Invalid body @mapUnlinkNode', JSON.stringify(body));
+          return {
+            statusCode: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Invalid request' })
+          };
     }
 
     // Check token
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @mapUnlinkNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -68,8 +69,10 @@ exports.handler = async (event) => {
     }
 
     // Anti-malicious checks
-    if (typeof projectId !== 'string' || projectId.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+    if (typeof projectId !== 'string' || projectId.length > 50 ||
+        typeof nodeIdFrom !== 'string' || nodeIdFrom.length > 50 ||
+        typeof nodeIdTo !== 'string' || nodeIdTo.length > 50) {
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapUnlinkNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -80,20 +83,18 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER WARNING', 'Session expired');
+      log('SERVER INFO', 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Unauthorized', expired: true })
       };
     }
-    // Set session expires
-    await setSessionExpires(userId);
 
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found');
+      log('SERVER WARNING', 'Project not found @mapUnlinkNode', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -101,10 +102,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Rewire map
-    const updatedMap = await mapRewire(map);
+    // Disconnect nodes on map
+    const updatedMap = await mapLinkDisconnect(map, nodeIdFrom, nodeIdTo);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to rewire map');
+      log('SERVER ERROR', 'Unable to disconnect nodes on map @mapUnlinkNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -121,7 +122,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapRewire endpoint: ${error.message}`);
+    log('SERVER ERROR', `Error in mapUnlinkNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

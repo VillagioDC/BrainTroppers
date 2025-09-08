@@ -1,0 +1,83 @@
+// FUNCTION TO REWIRE NODE
+// No dependencies
+
+// Functions
+const mapRead = require('./mapRead.jsx');
+const setApiUrl = require('../utils/setApiUrl.jsx');
+const mapUpdate = require('./mapUpdate.jsx');
+const log = require('../utils/log.jsx');
+
+/* PARAMETERS
+    input {string, string} - projectId, nodeId
+    RETURN {object} - map request response
+*/
+
+async function mapNodeRewireRequest(projectId, nodeId) {
+
+    // Check parameters
+    if (!projectId || !nodeId) {
+        log('SERVER ERROR', 'Missing parameters @mapNodeRewireRequest');
+        return;
+    }
+
+    // Kicks off background function
+    try {
+        // Fetch the map
+        let map = await mapRead(projectId);
+        if (!map) {
+            log('SERVER WARNING', "Invalid map for background processing @mapNodeRewireRequest:", projectId);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Unable to rewrite node' })
+            };
+        }
+        if (map.creationStatus !== 'created' && map.creationStatus !== 'failed') {
+            log('SERVER WARNING', "Map creation status already processing @mapNodeRewireRequest:", projectId);
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Unable to rewrite node' })
+            };
+        }
+
+        // Delete map id
+        delete map._id;
+
+        const url = setApiUrl('mapNodeRewire-background');
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ map, nodeId })
+        });
+        // Check imediate response
+        if (response.status !== 202) {
+            // Failed
+            log('SERVER ERROR', `Failed to invoke background function: status ${response.status}`);
+            map.creationStatus = 'failed';
+        } else {
+            map.creationStatus = 'creating';
+        }
+
+        // Update map
+        const updatedMap = await mapUpdate(map);
+
+        // Return
+        return {
+            statusCode: 202,
+            body: JSON.stringify(updatedMap)
+        };
+
+        // Catch error
+    } catch (error) {
+        log('SERVER WARNING', 'Unable to create map @mapNodeRewireRequest', error);
+        if (map) {
+            map.creationStatus = 'failed';
+            await mapUpdate(map);
+        }
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Unable to rewire node' })
+        };
+    }
+}
+
+module.exports = mapNodeRewireRequest;

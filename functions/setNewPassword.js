@@ -47,11 +47,11 @@ exports.handler = async (event) => {
         !credentials.email || credentials.email.trim().length === 0 ||
         !credentials.password || credentials.password.trim().length === 0 ||
         !credentials.authToken || credentials.authToken.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid body @setNewPassword', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Invalid request' })
       };
     }
 
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
     if (typeof credentials.email !== 'string' || credentials.email.length > 50 ||
         typeof credentials.password !== 'string' || credentials.password.length > 50 ||
         typeof credentials.authToken !== 'string' || credentials.authToken.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @setNewPassword', JSON.stringify(body));
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -71,7 +71,7 @@ exports.handler = async (event) => {
     const updated = await userNewPassword(credentials);
     // Check response
     if (!updated || !updated.statusCode) {
-      log('SERVER ERROR', 'User new password error');
+      log('SERVER ERROR', 'User new password error @setNewPassword');
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ exports.handler = async (event) => {
       };
     }
     if (updated.statusCode !== 200) {
-      log('SERVER WARNING', 'User new password failed');
+      log('SERVER ERROR', 'User new password failed @setNewPassword', updated.body);
       return {
         statusCode: signedUp.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

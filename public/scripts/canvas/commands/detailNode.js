@@ -9,7 +9,8 @@ import { showNotification, removeNotification } from '../../common/notifications
 
 export async function detailNode() {
     // Get selected node Id
-    const nodeId = braintroop.selected.id;
+    const nodeId = braintroop.getSelectedNodeId();
+    if (!nodeId) { console.error('No node selected'); return; }
     // Open detail popup
     openDetailPopup(nodeId);
 }
@@ -17,7 +18,7 @@ export async function detailNode() {
 // Open detail popup
 export async function openDetailPopup(nodeId) {
     // Check nodeId
-    if (!nodeId) { console.error('No node selected'); return; }
+    if (!nodeId) { console.warn('No node selected'); return; }
     // Remove existing detail popup
     if (document.getElementById('detail-node-popup'))
         removeDetailPopup();
@@ -47,19 +48,25 @@ async function loadDetailPopup() {
 
 // Bind detail popup events
 function bindDetailPopupEvents() {
-    // Elements
-    const closeBtn = document.getElementById('close-detail-node-popup');
-    const shortName = document.getElementById('detail-node-short-name');
-    const contentEl = document.getElementById('detail-node-content');
-    const detailEl = document.getElementById('detail-node-detail');
-    const submitBtn = document.getElementById('detail-node-submit');
     // Event listeners
-    if (closeBtn) closeBtn.addEventListener('click', closeDetailPopup);
-    if (shortName) shortName.addEventListener('click', () => editElement('short-name'));
-    if (contentEl) contentEl.addEventListener('click', () => editElement('content'));
-    if (detailEl) detailEl.addEventListener('click', () => editElement('detail'));
-    if (submitBtn) submitBtn.addEventListener('click', closeDetailPopup);
+    // Close detail popup
+    if (document.getElementById('close-detail-node-popup'))
+        document.getElementById('close-detail-node-popup').addEventListener('click', closeDetailPopup);
+    // Short name 
+    if (document.getElementById('detail-node-short-name'))
+        document.getElementById('detail-node-short-name').addEventListener('click', () => editElement('short-name'));
+    // Content
+    if (document.getElementById('detail-node-content'))
+        document.getElementById('detail-node-content').addEventListener('click', () => editElement('content'));
+    // Detail
+    if (document.getElementById('detail-node-detail'))
+        document.getElementById('detail-node-detail').addEventListener('click', () => editElement('detail'));
+    // Submit
+    if (document.getElementById('detail-node-form'))
+        document.getElementById('detail-node-form').addEventListener('submit', handleEditNode);
+    // Outside click handler
     document.addEventListener('click', outsideClickHandler);
+    // Keydown handler
     document.addEventListener('keydown', keydownHandler);
 }
 
@@ -73,7 +80,7 @@ function loadDetailContent(nodeId) {
     // Set short name
     const shortName = node ? node.shortName : "Title";
     const shortNameEl = document.getElementById('detail-node-short-name');
-    if (shortNameEl) shortNameEl.innerText = shortName;
+    if (shortNameEl) shortNameEl.innerHTML = shortName;
     // Set content
     const content = node ? node.content : "Content";
     const contentEl = document.getElementById('detail-node-content');
@@ -153,8 +160,10 @@ function finishEditing(e) {
     }
 };
 
-// Close detail popup
-async function closeDetailPopup() {
+// Handle edit node
+async function handleEditNode(e) {
+    e.preventDefault();
+    // Get selected node
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
     // Get input elements (could be original or textarea)
@@ -200,6 +209,12 @@ async function closeDetailPopup() {
     }
     // Remove notification
     removeNotification();
+}
+
+// Close detail popup
+async function closeDetailPopup() {
+    // Remove detail popup
+    removeDetailPopup();
 }
 
 // Remove detail popup

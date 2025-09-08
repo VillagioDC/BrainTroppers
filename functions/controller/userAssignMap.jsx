@@ -17,7 +17,7 @@ async function userAssignMap({ assignedUserId, map }) {
         !map.projectId || typeof map.projectId !== 'string' ||
         !map.title || typeof map.title !== 'string' ||
         !map.lastUpdated || !(map.lastUpdated instanceof Date)) {
-        log("SERVER_ERROR", "Invalid input for assigning map to user", { assignedUserId, map });
+        log("SERVER_ERROR", "Invalid input @userAssignMap", { assignedUserId, map });
         return false;
     }
 
@@ -31,7 +31,7 @@ async function userAssignMap({ assignedUserId, map }) {
     });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER_ERROR", `Failed to assign map to user ${assignedUserId}`);
+        log("SERVER_ERROR", "Failed to assign map to user @userAssignMap", assignedUserId);
         return false;
     }
 
@@ -42,7 +42,7 @@ async function userAssignMap({ assignedUserId, map }) {
     });
     // Handle error
     if (!user) {
-        log("SERVER_ERROR", `Failed to read user ${assignedUserId} after assigning map`);
+        log("SERVER_ERROR", "Failed to read user after assigning map", assignedUserId);
         return false;
     }
 

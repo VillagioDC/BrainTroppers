@@ -3,7 +3,7 @@
 
 // Import modules
 import { unlinkNode } from "./unlinkNode.js";
-import { directLink, relatedLink } from "./toggleLinkType.js";
+import { toggleLinkType } from "./toggleLinkType.js";
 
 export async function openLinkToolsMenu(edge) {
     // Check edgeId
@@ -39,7 +39,7 @@ async function loadLinkToolsMenu(edge) {
 }
 
 // Toggle edge tool buttons
-function toggleLinkToolsButtons(edge) {
+export function toggleLinkToolsButtons(edge) {
     // Element
     if (!edge || !edge.type) { console.warn('No valid edge provided for toggling buttons'); return; }
     // Directed/related button
@@ -60,10 +60,10 @@ function bindLinkToolsMenuEvents() {
         document.getElementById('unlink-node-btn').addEventListener('click', unlinkNode);
     // Direct link button
     if (document.getElementById('direct-link-btn'))
-        document.getElementById('direct-link-btn').addEventListener('click', directLink);
+        document.getElementById('direct-link-btn').addEventListener('click', toggleLinkType);
     // Related link button
     if (document.getElementById('related-link-btn'))
-        document.getElementById('related-link-btn').addEventListener('click', relatedLink);
+        document.getElementById('related-link-btn').addEventListener('click', toggleLinkType);
     // Bind click outside event handler
     document.addEventListener('click', outsideClickHandler);
 }
@@ -76,10 +76,10 @@ export function removeLinkToolsMenu() {
         document.getElementById('unlink-node-btn').removeEventListener('click', unlinkNode);
     // Direct link button
     if (document.getElementById('direct-link-btn'))
-        document.getElementById('direct-link-btn').removeEventListener('click', directLink);
+        document.getElementById('direct-link-btn').removeEventListener('click', toggleLinkType);
     // Related link button
     if (document.getElementById('related-link-btn'))
-        document.getElementById('related-link-btn').removeEventListener('click', relatedLink);
+        document.getElementById('related-link-btn').removeEventListener('click', toggleLinkType);
     document.removeEventListener('click', outsideClickHandler);
     // Remove popup container
     if (document.getElementById('link-tools')) {

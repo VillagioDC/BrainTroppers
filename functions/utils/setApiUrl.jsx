@@ -21,9 +21,21 @@ function setApiUrl(api) {
         case 'mapCreate-background':
             url += '/mapCreate-background';
             break;
+        case 'mapNodeAdd-background':
+            url += '/mapNodeAdd-background';
+            break;
+        case 'mapNodeExpand-background':
+            url += '/mapNodeExpand-background';
+            break;
+        case 'mapNodeRewrite-background':
+            url += '/mapNodeRewrite-background';
+            break;
+        case 'mapNodeRewire-background':
+            url += '/mapNodeRewire-background';
+            break;
         default:
             url = '';
-            log('SERVER ERROR', 'Invalid API call', api);
+            log('SERVER ERROR', 'Invalid API call @setApiUrl', api);
     }
     // Return URL
     return url;

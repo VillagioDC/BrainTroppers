@@ -3,33 +3,35 @@
 
 // Import modules
 import { checkQuery } from '../utils/validate.js';
-import { addNewNodeApi } from './addNewNodeApi.js'
+import { updateMapApi } from '../apis/updateMapApi.js';
+import { addNewNodeApi } from '../apis/addNewNodeApi.js'
+import { updateMapGetStatus } from '../poolling/updateMapGetStatus.js';
+import { openNodeToolsMenu } from './nodeToolsMenu.js';
+import { pauseS } from '../utils/pauseS.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Add node to selected node
 export async function addNewNode() {
     // Get selected node Id
-    const parentId = braintroop.selected.id;
-    // Add node
-    const blankNode = {
-        parentId,
-        shortName: "New node",
-        content: "",
-        detail: ""
-    }
-    // Add blank node to canvas
-    braintroop.addNode(blankNode);
+    const parentId = braintroop.getSelectedNodeId();
+    if (!parentId) { console.error('No node selected'); return; }
     // Open add new node popup
     openNewNodePopup();
 }
 
 async function openNewNodePopup() {
-    // Check existing popup
-    if (document.getElementById('add-node-popup')) return;
+    // Remove existing popup
+    if (document.getElementById('add-node-popup'))
+        removeAddPopup();
     // Load add new node popup
     await loadAddPopup();
     // Bind add popup events
     bindAddPopupEvents();
+    // Load detail content
+    loadDetailContent();
+    // Show add popup
+    if (document.getElementById('add-node-popup'))
+        document.getElementById('add-node-popup').style.display = 'flex';
 }
 
 // Load add popup
@@ -49,47 +51,119 @@ async function loadAddPopup() {
 function bindAddPopupEvents() {
     // Event listeners
     // Close add popup button
-    if (document.getElementById("close-add-node-popup"))
+    if(document.getElementById('close-add-node-popup'))
         document.getElementById("close-add-node-popup").addEventListener("click", closeAddPopup);
     // Submit query button
-    if (document.getElementById("add-node-submit"))
-        document.getElementById("add-node-submit").addEventListener("click", closeAddPopup);
+    if (document.getElementById('add-node-form'))
+        document.getElementById("add-node-form").addEventListener("submit", handleAddNode);
+    // Outside click handler
     document.addEventListener('click', outsideClickHandler);
+    // Keydown handler
+    document.addEventListener('keydown', keydownHandler);
 }
 
-// Close add popup
-async function closeAddPopup() {
+// Load node content
+function loadDetailContent() {
+    // Get selected node
+    const nodeId = braintroop.getSelectedNodeId();
+    if (!nodeId) { console.warn('No node selected'); return; }
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
+    if (!node) { console.warn('No node found'); return; }
+    // Set short name
+    const shortName = node ? node.shortName : "Title";
+    const shortNameEl = document.getElementById('add-node-title');
+    if (shortNameEl) shortNameEl.innerText = shortName;
+    // Set content
+    const content = node ? node.content : "Content";
+    const contentEl = document.getElementById('add-node-content');
+    if (contentEl) contentEl.innerText = content;
+    // Set detail
+    const detail = node ? node.detail : "Detail";
+    const detailEl = document.getElementById('add-node-detail');
+    if (detailEl) detailEl.innerText = detail;
+}
+
+// Handle add popup
+async function handleAddNode(e) {
+    e.preventDefault();    
+    // Get parent node
+    const parentId = braintroop.getSelectedNodeId();
+    if (!parentId) { console.error('No node selected'); return; }
+    // Element
+    const queryEl = document.getElementById('add-node-query');
+    if (!queryEl) { console.error('Missing query element'); return; };
     // Check query
-    let query = '';
-    if (document.getElementById('add-node-query'))
-        query = checkQuery('add-node-query');
+    const query = checkQuery(queryEl);
     // If valid query
     if (query) {
-        // Show notification
-        await showNotification('Processing...', 'info', 'wait');
-        // Parent id
-        const parentId = braintroop.selected.id;
-        const node = { parentId, shortName: 'New node'}
         // Remove add popup
         removeAddPopup();
-        // Add node with temp id
-        const nodeId = addTempNode( {node} );
-        // Submit query to add node
-        const updatedMap = await addNewNodeApi( {parentId, query} );
-        // Remove temp node
-        if (!updatedMap)
-        braintroop.deleteNode(nodeId);
-        // Update node
-        if (updatedMap) {
-            // Set data
-            braintroop.setData(updatedMap);
+        // Show notification
+        await showNotification('Requesting...', 'info', 'wait');
+        // Save current map
+        const currentMap = braintroop.getBackendMap();
+        let updatedMap = await updateMapApi(currentMap);
+        // Check error requesting map
+        if (!updatedMap || typeof updatedMap !== 'object') {
+            // Show error notification
+            showNotification('Error creating node', 'error');
+            return;
         }
-        // Remove notification
-        removeNotification();
+        // New node
+        const newNode = { parentId, shortName: 'New node'}
+        // Add node with temp id
+        const newNodeId = braintroop.addTempNode(newNode);
+        // Submit query to add node
+        const response = await addNewNodeApi( {parentId, query} );
+        // Check error requesting map
+        if (!response || typeof response !== 'object' || !response.statusCode || response.statusCode !== 202) {
+            // Remove temp node (placeholder)
+            braintroop.deleteNode(newNodeId);
+            // Show error notification
+            showNotification('Error creating node', 'error');
+            return;
+        };
+        // Get projectId
+        const projectId = braintroop.getProjectId();
+        // Pooling node
+        await showNotification('Creating...', 'info', 'wait');
+        await pauseS(40);
+        let creationStatus = 'creating';
+        updatedMap = {};
+        while (creationStatus === 'creating') {
+            // Call api
+            updatedMap = await updateMapGetStatus(projectId);
+            // Check status
+            if (updatedMap && updatedMap.creationStatus) {
+                creationStatus = updatedMap.creationStatus;
+            }
+            // Wait
+            await pauseS(15);
+        }
+        // Remove temp node
+        braintroop.deleteNode(newNodeId);
+        // Update node
+        if (updatedMap && updatedMap.creationStatus === 'created') {
+            // Set map
+            braintroop.setMap(updatedMap);           
+            // Remove notification
+            removeNotification();
+        } else {
+            // Show error notification
+            showNotification('Error creating node', 'error');
+            // Restore map creation status
+            await updateMapApi(currentMap);
+        }
     } else {
         // Remove add popup
         removeAddPopup();
     }
+}
+
+// Close add popup
+async function closeAddPopup() {
+    // Remove add popup
+    removeAddPopup();
 }
 
 // Remove add popup
@@ -99,9 +173,10 @@ function removeAddPopup() {
     if (document.getElementById("close-add-node-popup"))
         document.getElementById("close-add-node-popup").removeEventListener("click", closeAddPopup);
     // Submit query button
-    if (document.getElementById("add-node-submit"))
-        document.getElementById("add-node-submit").removeEventListener("click", closeAddPopup);
+    if (document.getElementById("add-node-form"))
+        document.getElementById("add-node-form").removeEventListener("submit", handleAddNode);
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', keydownHandler);
     // Remove add popup container
     if (document.getElementById('add-node-popup'))
         document.getElementById('add-node-popup').remove();
@@ -110,5 +185,12 @@ function removeAddPopup() {
 // Outside click handler
 function outsideClickHandler(e) {
     const addNewNodePopup = document.getElementById('add-node-popup');
-    if (e.target === addNewNodePopup) closeAddPopup();
+    if (e.target === addNewNodePopup) removeAddPopup();
+}
+
+// Escape keydown handler
+function keydownHandler(event) {
+    if (event.key === 'Escape') {
+        removeAddPopup();
+    }
 }

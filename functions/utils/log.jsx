@@ -15,6 +15,7 @@ function log(type, message, detail) {
         "yellow": "\x1b[33m",
         "orange": "\x1b[33m",
         "red": "\x1b[31m",
+        "purple": "\x1b[35m",
         "gray": "\x1b[90m",
         "reset": "\x1b[0m"
     }
@@ -34,7 +35,7 @@ function log(type, message, detail) {
             if (detail) console.log(`${color.gray}${detail}${color.reset}`);
             break;
         case "SERVER DEBUG":
-            console.log(`${color.yellow}${type}${color.reset}: ${message}`);
+            console.log(`${color.purple}${type}${color.reset}: ${message}`);
             if (detail) console.log(`${color.gray}${detail}${color.reset}`);
             break;
         case "SERVER WARNING":

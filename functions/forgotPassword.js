@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     // Check required fields
     if (!credentials || 
         !credentials.email || credentials.email.trim().length === 0 ) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid credentials @forgotPassword', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ exports.handler = async (event) => {
 
     // Anti-malicious checks
     if (typeof credentials.email !== 'string' || credentials.email.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @forgotPassword', JSON.stringify(body));
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -67,7 +67,7 @@ exports.handler = async (event) => {
     const response = await userSendReset(credentials.email);
     // Check response
     if (!response) {
-      log('SERVER ERROR', 'Failed sending password reset email');
+      log('SERVER ERROR', 'Failed sending password reset email @forgotPassword', JSON.stringify(response));
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

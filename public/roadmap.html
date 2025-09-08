@@ -35,19 +35,19 @@
     header {
       background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
-      padding: 3rem 2rem;
+      padding: 1rem;
       text-align: center;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     header h1 {
-      font-size: 2.5rem;
+      font-size: 1.5rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
     }
 
     header p {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 300;
       opacity: 0.9;
     }
@@ -56,7 +56,7 @@
       max-width: 1200px;
       margin: 3rem auto;
       position: relative;
-      padding: 2rem 1rem;
+      padding: 1rem;
     }
 
     .timeline::before {
@@ -74,7 +74,7 @@
     .day-section {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 3rem;
+      margin-bottom: 0.5rem;
       position: relative;
       animation: fadeInUp 0.6s ease-out;
     }
@@ -108,7 +108,7 @@
       border: 2px solid var(--card-bg);
       border-radius: 50%;
       z-index: 10;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .day-section:nth-child(even) .day-card::before {
@@ -120,7 +120,7 @@
     }
 
     .day-number {
-      font-size: 1.5rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--primary);
       margin-bottom: 0.5rem;
@@ -131,7 +131,7 @@
 
     .day-number::before {
       content: '📅';
-      font-size: 1.2rem;
+      font-size: 1rem;
     }
 
     .tasks {
@@ -142,9 +142,9 @@
     .tasks li {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.5rem;
       margin-bottom: 0.4rem;
-      font-size: 1rem;
+      font-size: 0.8rem;
       color: var(--text-light);
     }
 
@@ -491,7 +491,7 @@
           <li class="completed">Create set new password function (backend)</li>
           <li class="completed">Implement token auth for new password</li>
           <li class="completed">Review frontend map functions to always handle updated map</li>
-          <li class="completed">>> new-map✔️, add-node✔️, approve-node✔️, delete-node✔️, detail-node✔️, expand-node✔️, rewrite-node✔️, rename-title✔️</li>
+          <li class="completed">- new-map✔️, add-node✔️, approve-node✔️, delete-node✔️, detail-node✔️, expand-node✔️, rewrite-node✔️, rename-title✔️</li>
           <li class="completed">Sort maps by last update on map list</li>
           <li class="completed">Create mapRewire api call (frontend)</li>
           <li class="completed">Create mapRewire endpoint (backend)</li>
@@ -522,13 +522,13 @@
       <div class="day-card">
         <span class="day-number">Aug 24</span>
         <ul class="tasks">
-          <li class="complete">Convert index scripts into modules/granulate code</li>
-          <li class="complete">Convert canvas scripts into modules/granulate code</li>
-          <li class="complete">Create function to automatically set localhost or production .env</li>
-          <li class="complete">Add user authToken to set new password</li>
-          <li class="complete">Toggle theme button between dark and light</li>
-          <li class="complete">Create toggle themes function</li>
-          <li class="complete">Create zoom fit element</li>
+          <li class="completed">Convert index scripts into modules/granulate code</li>
+          <li class="completed">Convert canvas scripts into modules/granulate code</li>
+          <li class="completed">Create function to automatically set localhost or production .env</li>
+          <li class="completed">Add user authToken to set new password</li>
+          <li class="completed">Toggle theme button between dark and light</li>
+          <li class="completed">Create toggle themes function</li>
+          <li class="completed">Create zoom fit element</li>
         </ul>
       </div>
     </div>
@@ -537,16 +537,16 @@
       <div class="day-card">
         <span class="day-number">Aug 25</span>
         <ul class="tasks">
-          <li class="complete">Refine zoom fit function</li>
-          <li class="complete">Review command tools</li>
-          <li class="complete">Fix nodes position locking</li>
-          <li class="complete">Fix drag&drog snapping</li>
-          <li class="complete">Review canvas magnetic distancing</li>
-          <li class="complete">Fix map list popup</li>
-          <li class="complete">Create canvas call with node or edge</li>
-          <li class="complete">Create function to popup node tools</li>
-          <li class="complete">Adjust node tools anchor position to screen position</li>
-          <li class="complete">Create function to popup edge tools</li>
+          <li class="completed">Refine zoom fit function</li>
+          <li class="completed">Review command tools</li>
+          <li class="completed">Fix nodes position locking</li>
+          <li class="completed">Fix drag&drog snapping</li>
+          <li class="completed">Review canvas magnetic distancing</li>
+          <li class="completed">Fix map list popup</li>
+          <li class="completed">Create canvas call with node or edge</li>
+          <li class="completed">Create function to popup node tools</li>
+          <li class="completed">Adjust node tools anchor position to screen position</li>
+          <li class="completed">Create function to popup edge tools</li>
         </ul>
       </div>
     </div>
@@ -660,32 +660,43 @@
           <li class="completed">Debug node function: hide/unhide node</li>
           <li class="completed">Debug node function: approve/revoke node</li>
           <li class="completed">Debug node function: delete node</li>
-          <li class="in-progress">Equalize AI instructions</li>
-          <li class="in-progress">Debug add node</li>
-          <li class="in-progress">Debug expand node functions</li>
-          <li class="in-progress">Debug rewrite node functions</li>
-          <li class="in-progress">Debug rewire node functions</li>
-          <li class="in-progress">Rewrite node connect</li>
-          <li class="in-progress">Debug node connect functions</li>
-          <li class="in-progress">Build first level PDF export functionality</li>
-          <li class="in-progress">Generate simplified PDF with node content only</li>
-          <li class="in-progress">Generate detailed PDF with full node details</li>
-          <li class="in-progress">Style PDF with readable fonts and layout</li>
-          <li class="in-progress">Create PDF export function</li>
-          <li class="in-progress">Create share modal</li>
-          <li class="in-progress">Create share function (frontend)</li>
-          <li class="in-progress">Create share function (backend)</li>
         </ul>
       </div>
     </div>
     <!-- Day 26 -->
     <div class="day-section">
       <div class="day-card">
-        <span class="day-number">Day 26</span>
+        <span class="day-number">Sept 07</span>
         <ul class="tasks">
-          <li class="in-progress">Create account details modal</li>
-          <li class="in-progress">Create account details function (frontend)</li>
-          <li class="in-progress">Create account details endpoint (backend)</li>
+          <li class="completed">Update user JSON schema</li>
+          <li class="completed">Equalize AI instructions for nodes</li>
+          <li class="completed">Equalize AI instructions for connections</li>
+          <li class="completed">Review add new node function (frontent)</li>
+          <li class="completed">Review add new node function (backend)</li>
+          <li class="completed">Create add new node background function (backend)</li>
+          <li class="completed">Review unlink node function (frontend)</li>
+          <li class="completed">Review unlink node function (backend)</li>
+          <li class="completed">Debug link function: unlink node</li>
+          <li class="completed">Review direct/indirect node function (frontend)</li>
+          <li class="completed">Review direct/indirect node function (backend)</li>
+          <li class="completed">Debug link function: direct/indirect link</li>
+          <li class="completed">Update font awesome 7.0.1</li>
+          <li class="completed">Update strong/weak link icon</li>
+          <li class="completed">Organize pooling folder</li>
+          <li class="completed">Organize API folder</li>
+          <li class="completed">Adjust log errors (backend)</li>
+          <li class="completed">Debug add new node</li>
+          <li class="completed">Review expand node function (frontend)</li>
+          <li class="completed">Review expand node function (backend)</li>
+          <li class="completed">Debug expand node functions</li>
+          <li class="completed">Review rewrite node functions (frontend)</li>
+          <li class="completed">Review rewrite node functions (backend)</li>
+          <li class="completed">Debug rewrite node functions</li>
+          <li class="completed">Review rewire node functions (frontend)</li>
+          <li class="completed">Review rewire node functions (backend)</li>
+          <li class="completed">Debug rewire node functions</li>
+          <li class="completed">Adjust detail, add and expand html and css</li>
+          <li class="completed">Reduce size of map passed to AI</li>
         </ul>
       </div>
     </div>
@@ -694,13 +705,12 @@
       <div class="day-card">
         <span class="day-number">Day 27</span>
         <ul class="tasks">
-          <li class="in-progress">Review landing page features</li>
-          <li class="in-progress">Create self-remove-unwanted-text LLM function</li>
-          <li class="in-progress">Implement JWT-based authentication</li>
-          <li class="in-progress">Protect backend routes with auth middleware</li>
-          <li class="in-progress">Secure API endpoints against unauthorized access</li>
-          <li class="in-progress">Convert frontend functions to import modules</li>
-          <li class="in-progress">Sanitize inputs to prevent XSS attacks</li>
+          <li class="in-progress">Rewrite node connect</li>
+          <li class="in-progress">Debug node connect functions</li>
+          <li class="in-progress">Review delete node function to link nodes (backend)</li>
+          <li class="in-progress">Generate PDF with nodes only</li>
+          <li class="in-progress">Generate PNG with nodes only</li>
+          <li class="in-progress">Generate detailed text with full node details (AI assisted)</li>
         </ul>
       </div>
     </div>
@@ -709,8 +719,18 @@
       <div class="day-card">
         <span class="day-number">Day 28</span>
         <ul class="tasks">
-          <li class="in-progress">Set up environment variables for production</li>
-          <li class="in-progress">Deploy latest build to Netlify</li>
+          <li class="in-progress">Improve account details modal</li>
+          <li class="in-progress">Improve account details function (frontend)</li>
+          <li class="in-progress">Improve account details endpoint (backend)</li>
+          <li class="in-progress">Create color scheme modal</li>
+          <li class="in-progress">Create color scheme function (frontend)</li>
+          <li class="in-progress">Create color scheme endpoint (backend)</li>
+          <li class="in-progress">Create layer modal</li>
+          <li class="in-progress">Create layer function (frontend)</li>
+          <li class="in-progress">Create layer endpoint (backend)</li>
+          <li class="in-progress">Create share modal</li>
+          <li class="in-progress">Create share function (frontend)</li>
+          <li class="in-progress">Create share function (backend)</li>
         </ul>
       </div>
     </div>
@@ -718,6 +738,32 @@
     <div class="day-section">
       <div class="day-card">
         <span class="day-number">Day 29</span>
+        <ul class="tasks">
+          <li class="in-progress">Review landing page features</li>
+          <li class="in-progress">Create self-remove-unwanted-text LLM function</li>
+          <li class="in-progress">Security review level 1</li>
+          <li class="in-progress">Implement JWT-based authentication</li>
+          <li class="in-progress">Protect backend routes with auth middleware</li>
+          <li class="in-progress">Secure API endpoints against unauthorized access</li>
+          <li class="in-progress">Convert frontend functions to import modules</li>
+          <li class="in-progress">Sanitize inputs to prevent XSS attacks</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 30 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 30</span>
+        <ul class="tasks">
+          <li class="in-progress">Set up environment variables for production</li>
+          <li class="in-progress">Deploy latest build to Netlify</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 31 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 31</span>
         <ul class="tasks">
           <li class="in-progress">Conduct internal QA testing of all features</li>
           <li class="in-progress">Fix bugs found during testing</li>

@@ -20,7 +20,7 @@ async function userResetPassword(query) {
     });
     // Handle error
     if (!user) {
-        log('SERVER WARNING', 'Token not found', query);
+        log('SERVER WARNING', 'Token not found @userResetPassword', query);
         return {
             statusCode: 404,
             body: JSON.stringify({error: 'Bad request'})
@@ -38,7 +38,7 @@ async function userResetPassword(query) {
                                                           expires: null}}})
     // Handle error
     if (!userUpdate || userUpdate.modifiedCount === 0) {
-        log('SERVER ERROR', 'Unable to update user', user.userId);
+        log('SERVER ERROR', 'Unable to update user @userResetPassword', user.userId);
         return {
             statusCode: 500,
             body: JSON.stringify({error: 'Internal server error'})

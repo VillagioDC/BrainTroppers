@@ -17,7 +17,7 @@ async function userSignUp(credentials) {
 
     // Check credentials
     if (!credentials || !credentials.email || !credentials.password) {
-        log('SERVER WARNING', 'Missing credentials', credentials);
+        log('SERVER WARNING', 'Missing credentials @userSignUp', credentials);
         return {
             statusCode: 400,
             body: JSON.stringify({ error: 'Missing credentials' })
@@ -30,7 +30,7 @@ async function userSignUp(credentials) {
     });
     // Check user
     if (user) {
-        log('SERVER WARNING', 'User already exists', credentials.email);
+        log('SERVER INFO', 'User already exists', credentials.email);
         return {
                 statusCode: 409,
                 body: JSON.stringify({ error: 'User already exists' })

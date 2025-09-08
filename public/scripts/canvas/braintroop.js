@@ -1537,11 +1537,23 @@ import { pinNode } from './commands/pinNode.js';
       if (edgeId) this._setSelected({type: "edge", id: edgeId});
     }
 
+    /** 
+     * getProjectId()
+     */
+    getProjectId() { return this.map.projectId; }
+
     /**
      * getSelectedNodeId()
      */
     getSelectedNodeId() {
       return this.selected && this.selected.type === "node" ? this.selected.id : null;
+    }
+
+    /**
+     * getSelectedEdgeId()
+     */
+    getSelectedEdgeId() {
+      return this.selected && this.selected.type === "edge" ? this.selected.id : null;
     }
 
     /**

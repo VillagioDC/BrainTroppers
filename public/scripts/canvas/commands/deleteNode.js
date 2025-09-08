@@ -2,13 +2,13 @@
 // DELETE NODE MODULE
 
 // Import modules
-import { deleteNodeApi } from './deleteNodeApi.js';
+import { deleteNodeApi } from '../apis/deleteNodeApi.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Delete node
 export async function deleteNode() {
     // Get node id
-    let nodeId = braintroop.selected.type === 'node' ? braintroop.selected.id : null;
+    let nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
     // Show notification
     await showNotification('Processing...', 'info', 'wait');

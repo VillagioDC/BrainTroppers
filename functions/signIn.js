@@ -46,18 +46,18 @@ exports.handler = async (event) => {
     if (!credentials || 
         !credentials.email || credentials.email.trim().length === 0 ||
         !credentials.password || credentials.password.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid body @signIn', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Invalid request' })
       };
     }
 
     // Anti-malicious checks
     if (typeof credentials.email !== 'string' || credentials.email.length > 50 ||
         typeof credentials.password !== 'string' || credentials.password.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check');
+            log('SERVER WARNING', 'Request blocked by anti-malicious check @signIn');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
     const auth = await userSignIn(credentials);
     // Check auth
     if (!auth || !auth.statusCode) {
-      log('SERVER WARNING', 'User sign in failed');
+      log('SERVER WARNING', 'User sign in failed @signIn');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ exports.handler = async (event) => {
       };
     }
     if (auth.statusCode !== 200) {
-      log('SERVER WARNING', 'User sign in failed');
+      log('SERVER WARNING', 'User sign in failed @signIn', JSON.stringify(auth.body));
       return {
         statusCode: auth.statusCode,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

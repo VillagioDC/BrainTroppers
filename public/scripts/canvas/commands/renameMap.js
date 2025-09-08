@@ -3,7 +3,7 @@
 
 // Import modules
 import { removeMapMenu } from '../interface/mapListPopup.js';
-import { renameMapApi } from './renameMapApi.js';
+import { renameMapApi } from '../apis/renameMapApi.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Rename map

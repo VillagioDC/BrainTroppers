@@ -2,13 +2,14 @@
 // ADD BLANK NODE MODULE
 
 // Import modules
-import { addBlankNodeApi } from './addBlankNodeApi.js';
+import { addBlankNodeApi } from '../apis/addBlankNodeApi.js';
 import { openDetailPopup } from './detailNode.js';
 
 // Add blank node to selected node
 export async function addBlankNode() {
     // Get selected node Id
-    const parentId = braintroop.selected.id;
+    const parentId = braintroop.getSelectedNodeId();
+    if (!parentId) { console.error('No node selected'); return; }
 
     // Add blank node
     const blankNode = {

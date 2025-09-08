@@ -3,7 +3,7 @@
 
 // Import modules
 import { removeMapFromMapList } from '../interface/mapList.js';
-import { deleteMapApi } from './deleteMapApi.js';
+import { deleteMapApi } from '../apis/deleteMapApi.js';
 import { showNotification } from '../../common/notifications.js'
 import { removeMapMenu } from '../interface/mapListPopup.js';
 

@@ -1,5 +1,5 @@
 // CANVAS MODULES
-// REWIRE NODE API MODULE
+// REWRITE NODE API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
@@ -7,7 +7,7 @@ import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
 // Add new node api 
-export async function rewireNodeApi ( {nodeId} ) {
+export async function rewriteNodeApi ( {nodeId, query} ) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
@@ -16,9 +16,9 @@ export async function rewireNodeApi ( {nodeId} ) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         // Construct body
-        const projectId = braintroop.map.projectId;
-        const body = { userId, projectId, nodeId };
-        const url = setApiUrl('rewireNode');
+        const projectId = braintroop.getProjectId();
+        const body = { userId, projectId, nodeId, query };
+        const url = setApiUrl('rewriteNode');
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -37,7 +37,7 @@ export async function rewireNodeApi ( {nodeId} ) {
         
         // Catch errors
         } catch (error) {
-            console.error('Error rewiring node:', error);
+            console.error('Error rewriting node:', error);
             return false;
     }
 }

@@ -44,11 +44,11 @@ exports.handler = async (event) => {
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ) {
-      log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+      log('SERVER WARNING', 'Invalid body @userWaitlist', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Invalid request' })
       };
     }
 
@@ -56,7 +56,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token');
+      log('SERVER WARNING', 'Missing token @userWaitlist');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -67,7 +67,7 @@ exports.handler = async (event) => {
 
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ) {
-        log('SERVER WARNING', 'Request blocked by anti-malicious check');
+        log('SERVER WARNING', 'Request blocked by anti-malicious check @userWaitlist');
         return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ exports.handler = async (event) => {
     const registered = await userRegisterWaitlist(userId);
     // Check auth
     if (!registered) {
-      log('SERVER ERROR', 'Error registering user at waitlist');
+      log('SERVER ERROR', 'Error registering user at waitlist @userWaitlist');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

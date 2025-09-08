@@ -5,9 +5,10 @@
 import { checkQuery } from '../utils/validate.js';
 import { newMapClick, removeNewMapContainer } from '../interface/newMap.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
-import { createMapApi } from './createMapApi.js';
-import { createMapGetStatus } from './createMapGetStatus.js';
-import { assignMapToUserApi } from './assignMapToUserApi.js';
+import { createMapApi } from '../apis/createMapApi.js';
+import { createMapGetStatus } from '../poolling/createMapGetStatus.js';
+import { assignMapToUserApi } from '../apis/assignMapToUserApi.js';
+import { deleteMapApi } from '../apis/deleteMapApi.js';
 import { createMapItem, setActiveMapItem } from '../interface/mapList.js';
 import { setLocalStorageUser } from '../../common/userLocalStorage.js';
 import { pauseS } from '../utils/pauseS.js';
@@ -71,6 +72,8 @@ export async function createNewMap() {
     } else {
         // Update notification
         showNotification('Error creating map', 'error');
+        // Remove map on database
+        await deleteMapApi(reqMap.projectId);
         // Get back to new map container
         await newMapClick(null);
     }

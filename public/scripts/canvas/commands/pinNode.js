@@ -7,7 +7,7 @@ import { toggleNodeToolsButtons } from './nodeToolsMenu.js';
 
 export async function pinNode() {
     // Node id
-    const nodeId = braintroop.selected.id;
+    const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }
     // Lock node on canvas
     braintroop.lockNode(nodeId);
@@ -22,7 +22,7 @@ export async function pinNode() {
 
 export async function unpinNode() {
     // Node id
-    const nodeId = braintroop.selected.id;
+    const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }
     // Unlock node on canvas
     braintroop.unlockNode(nodeId);

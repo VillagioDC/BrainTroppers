@@ -1,5 +1,5 @@
 // CANVAS MODULES
-// REWRITE NODE API MODULE
+// EXPAND NODE API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
@@ -7,7 +7,7 @@ import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
 // Add new node api 
-export async function rewriteNodeApi ( {parentId, query} ) {
+export async function expandNodeApi ( {parentId, query} ) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
@@ -16,9 +16,9 @@ export async function rewriteNodeApi ( {parentId, query} ) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         // Construct body
-        const projectId = braintroop.map.projectId;
+        const projectId = braintroop.getProjectId();
         const body = { userId, projectId, parentId, query };
-        const url = setApiUrl('rewriteNode');
+        const url = setApiUrl('expandNode');
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -37,7 +37,7 @@ export async function rewriteNodeApi ( {parentId, query} ) {
         
         // Catch errors
         } catch (error) {
-            console.error('Error rewriting node:', error);
+            console.error('Error expanding node:', error);
             return false;
     }
 }

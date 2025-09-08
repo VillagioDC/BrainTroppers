@@ -3,23 +3,18 @@
 
 // Import modules
 import { checkQuery } from '../utils/validate.js';
-import { expandNodeApi } from './expandNodeApi.js';
+import { updateMapApi } from '../apis/updateMapApi.js';
+import { expandNodeApi } from '../apis/expandNodeApi.js';
+import { updateMapGetStatus } from '../poolling/updateMapGetStatus.js';
+import { pauseS } from '../utils/pauseS.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 export async function expandNode() {
-  // Get selected node Id
-  const parentId = braintroop.selected.id;
-  // Add node
-  const blankNode = {
-    parentId,
-    shortName: "New node",
-    content: "",
-    detail: ""
-  }
-  // Add blank node to canvas
-  braintroop.addNode(blankNode);
-  // Open expand node popup
-  openExpandNodePopup();
+    // Get selected node Id
+    const parentId = braintroop.getSelectedNodeId();
+    if (!parentId) { console.error('No node selected'); return; }
+    // Open expand node popup
+    openExpandNodePopup();
 }
 
 async function openExpandNodePopup() {
@@ -31,6 +26,9 @@ async function openExpandNodePopup() {
     bindExpandPopupEvents();
     // Load detail content
     loadDetailContent();
+    // Show expand popup
+    if (document.getElementById('expand-node-popup'))
+        document.getElementById('expand-node-popup').style.display = 'flex';
 }
 
 // Load expand popup
@@ -53,21 +51,24 @@ function bindExpandPopupEvents() {
     if (document.getElementById("close-expand-node-popup"))
         document.getElementById("close-expand-node-popup").addEventListener("click", closeExpandPopup);
     // Submit query button
-    if (document.getElementById("expand-node-submit"))
-        document.getElementById("expand-node-submit").addEventListener("click", closeExpandPopup);
+    if (document.getElementById("expand-node-form"))
+        document.getElementById("expand-node-form").addEventListener("submit", handleExpandNode);
+    // Outside click handler
     document.addEventListener('click', outsideClickHandler);
+    // Keydown handler
+    document.addEventListener('keydown', keydownHandler);
 }
 
 // Load node content
 function loadDetailContent() {
     // Get selected node
-    const nodeID = braintroop.selected.id;
-    if (!nodeID) { console.warn('No node selected'); return; }
-    const node = braintroop.map.nodes.find(n => n.nodeId === nodeID);
+    const nodeId = braintroop.getSelectedNodeId();
+    if (!nodeId) { console.warn('No node selected'); return; }
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
     if (!node) { console.warn('No node found'); return; }
     // Set short name
     const shortName = node ? node.shortName : "Title";
-    const shortNameEl = document.getElementById('expand-node-short-name');
+    const shortNameEl = document.getElementById('expand-node-title');
     if (shortNameEl) shortNameEl.innerText = shortName;
     // Set content
     const content = node ? node.content : "Content";
@@ -77,6 +78,88 @@ function loadDetailContent() {
     const detail = node ? node.detail : "Detail";
     const detailEl = document.getElementById('expand-node-detail');
     if (detailEl) detailEl.innerText = detail;
+}
+
+// Close expand popup
+function closeExpandPopup() {
+    // Remove expand popup
+    removeExpandPopup();
+}
+
+// Handle expand node
+async function handleExpandNode(e) {
+    e.preventDefault();
+    // Get parent node
+    const parentId = braintroop.getSelectedNodeId();
+    if (!parentId) { console.error('No node selected'); return; }
+    // Element
+    const queryEl = document.getElementById('expand-node-query');
+    if (!queryEl) { console.error('Missing query element'); return; };
+    // Check query
+    const query = checkQuery(queryEl);
+    // If valid query
+    if (query) {
+        // Remove expand popup
+        removeExpandPopup();
+        // Show notification
+        await showNotification('Requesting...', 'info', 'wait');
+        // Save current map
+        const currentMap = braintroop.getBackendMap();
+        let updatedMap = await updateMapApi(currentMap);
+        // Check error requesting map
+        if (!updatedMap || typeof updatedMap !== 'object') {
+            // Show error notification
+            showNotification('Error creating node', 'error');
+            return;
+        }
+        // New node
+        const newNode = { parentId, shortName: 'New node'}
+        // Add node with temp id
+        const newNodeId = braintroop.addTempNode(newNode);
+        // Submit query to expand node
+        const response = await expandNodeApi( { parentId, query} );
+        if (!response || typeof response !== 'object' || !response.statusCode || response.statusCode !== 202) {
+            // Remove temp node (placeholder)
+            braintroop.deleteNode(newNodeId);
+            // Show error notification
+            showNotification('Error expanding node', 'error');
+            return;
+        };
+        // Get projectId
+        const projectId = braintroop.getProjectId();
+        // Pooling node
+        await showNotification('Creating...', 'info', 'wait');
+        await pauseS(40);
+        let creationStatus = 'creating';
+        updatedMap = {};
+        while (creationStatus === 'creating') {
+            // Call api
+            updatedMap = await updateMapGetStatus(projectId);
+            // Check status
+            if (updatedMap && updatedMap.creationStatus) {
+                creationStatus = updatedMap.creationStatus;
+            }
+            // Wait
+            await pauseS(15);
+        }
+        // Remove temp node
+        braintroop.deleteNode(newNodeId);
+        // Update node
+        if (updatedMap && updatedMap.creationStatus === 'created') {
+            // Set map
+            braintroop.setMap(updatedMap);           
+            // Remove notification
+            removeNotification();
+        } else {
+            // Show error notification
+            showNotification('Error expanding node', 'error');
+            // Restore map creation status
+            await updateMapApi(currentMap);
+        }
+    } else {
+        // Remove add popup
+        removeAddPopup();
+    }
 }
 
 // Remove expand popup
@@ -89,6 +172,7 @@ function removeExpandPopup() {
     if (document.getElementById("expand-node-submit"))
         document.getElementById("expand-node-submit").removeEventListener("click", closeExpandPopup);
     document.removeEventListener('click', outsideClickHandler);
+    document.removeEventListener('keydown', keydownHandler);
     // Remove expand popup container
     if (document.getElementById('expand-node-popup'))
         document.getElementById('expand-node-popup').remove();
@@ -98,39 +182,12 @@ function removeExpandPopup() {
 function outsideClickHandler(e) {
     // Close expand popup
     const expandPopup = document.getElementById('expand-node-popup');
-    if (e.target === expandPopup) closeExpandPopup();
+    if (e.target === expandPopup) removeExpandPopup();
 }
 
-// Close expand popup
-async function closeExpandPopup() {
-    // Check query
-    let query = '';
-    if (document.getElementById('expand-node-query'))
-        query = checkQuery('expand-node-query');
-    // If valid query
-    if (query) {
-        // Show notification
-        await showNotification('Processing...', 'info', 'wait');
-        // Parent id
-        const parentId = braintroop.selected.id;
-        const node = { parentId, shortName: 'New node'}
-        // Remove expand popup
+// Escape keydown handler
+function keydownHandler(event) {
+    if (event.key === 'Escape') {
         removeExpandPopup();
-        // Add node with temp ip
-        const nodeId = addTempNode( {node} );
-        // Submit query to expand node
-        const updatedMap = await expandNodeApi( { parentId, query} );
-        // Remove temp node
-        if (!updatedMap)
-            braintroop.deleteNode(nodeId);
-        if (updatedMap) {
-            // Set data
-            braintroop.setData(updatedMap);
-          }
-        // Remove notification
-        removeNotification();
-    } else {
-      // Remove expand popup
-      removeExpandPopup();
     }
 }
