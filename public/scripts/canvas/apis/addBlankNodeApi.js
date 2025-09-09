@@ -16,7 +16,7 @@ export async function addBlankNodeApi ( {parentId, node} ) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         // Construct body
-        const projectId = braintroop.map.projectId;
+        const projectId = braintroop.getProjectId();
         const body = { userId, projectId, parentId, node };
         const url = setApiUrl('addBlankNode');
         const response = await fetch(url, {

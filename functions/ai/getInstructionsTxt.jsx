@@ -21,7 +21,7 @@ async function getInstructionsTxt(role) {
 
     // Handle unexisting file error
     if (!fs.existsSync(filePath)) {
-        log("SERVER ERROR", "Unable to find the instructions file @getInstructions.", filePath);
+        log("ERROR", "Unable to find the instructions file @getInstructions.", filePath);
         return null;
     }
 
@@ -30,7 +30,7 @@ async function getInstructionsTxt(role) {
 
     // Handle reading file error
     if (!instructionsString) {
-        log("SERVER ERROR", "Unable to get instructions from file @getInstructions.");
+        log("ERROR", "Unable to get instructions from file @getInstructions.");
         return null;
     }
 

@@ -24,7 +24,7 @@ async function mapNodeUpdate(map, node) {
                                      update: { $set: { 'nodes.$': node } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update node on map @mapNodeUpdate.");
+        log("ERROR", "Unable to update node on map @mapNodeUpdate.");
     }
 
     // Last update

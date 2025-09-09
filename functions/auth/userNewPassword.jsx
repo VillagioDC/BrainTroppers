@@ -17,7 +17,7 @@ async function userNewPassword(credentials) {
 
     // Check credentials
     if (!credentials || !credentials.email || !credentials.password || !credentials.authToken) {
-        log('SERVER WARNING', 'Missing credentials @userNewPassword', credentials);
+        log("WARNING", 'Missing credentials @userNewPassword', credentials);
         return {
             statusCode: 400,
             body: JSON.stringify({ error: 'Missing credentials' })
@@ -30,7 +30,7 @@ async function userNewPassword(credentials) {
     });
     // Check user
     if (!user) {
-        log('SERVER WARNING', 'User not found @userNewPassword', credentials.email);
+        log("WARNING", 'User not found @userNewPassword', credentials.email);
         return {
                 statusCode: 409,
                 body: JSON.stringify({ error: 'User not found' })
@@ -38,7 +38,7 @@ async function userNewPassword(credentials) {
     }
     // Check auth Token
     if (!user.authToken || user.authToken !== authToken) {
-        log('SERVER WARNING', 'Unauthorized new password request @userNewPassword', credentials.email);
+        log("WARNING", 'Unauthorized new password request @userNewPassword', credentials.email);
         return {
                 statusCode: 401,
                 body: JSON.stringify({ error: 'Unauthorized' })
@@ -53,7 +53,7 @@ async function userNewPassword(credentials) {
                                                      authToken: null }}});
     // Check insert error
     if (!result) {
-        log('SERVER ERROR', 'Unable to update user password @userNewPassword.');
+        log("ERROR", 'Unable to update user password @userNewPassword.');
         return {
             statusCode: 500,
             body: JSON.stringify({ error: 'Password update error' })

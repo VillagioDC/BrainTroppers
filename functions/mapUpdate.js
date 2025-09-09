@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !map || typeof map !== 'object' ) {          
-          log('SERVER WARNING', 'Invalid body @mapUpdate', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapUpdate', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapUpdate');
+      log("WARNING", 'Missing token @mapUpdate');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof map !== 'object' ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapUpdate');
+            log("WARNING", 'Request blocked by anti-malicious check @mapUpdate');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -81,7 +81,7 @@ exports.handler = async (event) => {
     // Validate map
     const isValidMap = mapValidate(map);
     if (!isValidMap) {
-      log('SERVER WARNING', 'Invalid map @mapUpdate');
+      log("WARNING", 'Invalid map @mapUpdate');
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -103,7 +103,7 @@ exports.handler = async (event) => {
     // Update map 
     const updatedMap = await mapUpdate(map);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update map @mapUpdate');
+      log("ERROR", 'Unable to update map @mapUpdate');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -120,7 +120,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapUpdate endpoint: ${error.message}`);
+    log("ERROR", `Error in mapUpdate endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

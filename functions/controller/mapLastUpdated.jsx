@@ -15,7 +15,7 @@ async function mapLastUpdated(map) {
 
     // Check input
     if (!map || typeof map !== 'object' || !map.projectId) {
-        log("SERVER ERROR", "Unable to update map @mapLastUpdated.");
+        log("ERROR", "Unable to update map @mapLastUpdated.");
         return null;
     }
 
@@ -29,7 +29,7 @@ async function mapLastUpdated(map) {
                                      update: { $set: { lastUpdated: map.lastUpdated } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update last change on map @mapLastUpdated.");
+        log("ERROR", "Unable to update last change on map @mapLastUpdated.");
         return map;
     }
 

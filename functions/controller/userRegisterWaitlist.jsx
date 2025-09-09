@@ -25,7 +25,7 @@ async function userRegisterWaitlist(userId) {
                                                        proPlanTrial: expiration} } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update last change on user @userRegisterWaitlist.");
+        log("ERROR", "Unable to update last change on user @userRegisterWaitlist.");
         return null;
     }
 

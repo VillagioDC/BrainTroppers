@@ -3,7 +3,7 @@
 
 // Import modules
 import { updateNode } from './updateNode.js';
-import { toggleNodeToolsButtons } from './nodeToolsMenu.js';
+import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
 export async function approveNode() {
     // Node id

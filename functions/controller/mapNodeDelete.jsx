@@ -13,9 +13,27 @@ const log = require('../utils/log.jsx');
 
 async function mapNodeDelete(map, nodeId) {
 
+    // Check inputs
+    if (!map || !nodeId) {
+        log("ERROR", "Invalid inputs @mapNodeDelete.");
+        return null;
+    }
+
+    // Clone nodes array to avoid mutating input
+    let nodes = [...map.nodes];
+
+    // Disconnect node
+    nodes = nodes.map(node => ({
+        ...node,
+        directLink: node.directLink.filter(id => id !== nodeId),
+        relatedLink: node.relatedLink.filter(id => id !== nodeId)
+    }));
+
     // Update map without deleted node
-    const nodes = map.nodes.filter(node => node.nodeId !== nodeId);
-    let updatedMap = { ...map, nodes };
+    nodes = nodes.filter(node => node.nodeId !== nodeId);
+
+    // Reconstruct map
+    map = { ...map, nodes };
 
     // Delete node on database
     const result = await executeDB({ collectionName: 'maps',
@@ -24,11 +42,11 @@ async function mapNodeDelete(map, nodeId) {
                                      update: { $pull: { nodes: { nodeId: nodeId } } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to delete node on map @mapNodeDelete.");
+        log("ERROR", "Unable to delete node on map @mapNodeDelete.");
     }
 
     // Last update
-    updatedMap = await mapLastUpdated(updatedMap);
+    const updatedMap = await mapLastUpdated(map);
 
     // Return
     return updatedMap;

@@ -49,7 +49,7 @@ exports.handler = async (event) => {
         !nodeIdFrom || nodeIdFrom.trim().length === 0 ||
         !nodeIdTo || nodeIdTo.trim().length === 0 ||
         !linkType || linkType.trim().length === 0) {
-          log('SERVER WARNING', 'Invalid body @mapToggleLinkType', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapToggleLinkType', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -61,7 +61,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapToggleLinkType');
+      log("WARNING", 'Missing token @mapToggleLinkType');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
         typeof nodeIdFrom !== 'string' || nodeIdFrom.length > 50 ||
         typeof nodeIdTo !== 'string' || nodeIdTo.length > 50 ||
         typeof linkType !== 'string' || (linkType !== 'direct' && linkType !== 'related')) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapToggleLinkType');
+            log("WARNING", 'Request blocked by anti-malicious check @mapToggleLinkType');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -85,7 +85,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ exports.handler = async (event) => {
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found @mapToggleLinkType', projectId);
+      log("WARNING", 'Project not found @mapToggleLinkType', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -107,7 +107,7 @@ exports.handler = async (event) => {
     // Disconnect nodes on map
     const updatedMap = await mapLinkToggleType(map, nodeIdFrom, nodeIdTo, linkType);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to toggle link type @mapToggleLinkType');
+      log("ERROR", 'Unable to toggle link type @mapToggleLinkType');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -124,7 +124,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in maptogglelinktype endpoint: ${error.message}`);
+    log("ERROR", `Error in maptogglelinktype endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

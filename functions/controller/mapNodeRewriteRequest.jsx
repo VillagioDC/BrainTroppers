@@ -16,7 +16,7 @@ async function mapNodeRewriteRequest(projectId, nodeId, query) {
 
     // Check parameters
     if (!projectId || !nodeId || !query) {
-        log('SERVER ERROR', 'Missing parameters @mapNodeRewriteRequest');
+        log("ERROR", 'Missing parameters @mapNodeRewriteRequest');
         return;
     }
 
@@ -25,14 +25,14 @@ async function mapNodeRewriteRequest(projectId, nodeId, query) {
         // Fetch the map
         let map = await mapRead(projectId);
         if (!map) {
-            log('SERVER WARNING', "Invalid map for background processing @mapNodeRewriteRequest:", projectId);
+            log("WARNING", "Invalid map for background processing @mapNodeRewriteRequest:", projectId);
             return {
                 statusCode: 500,
                 body: JSON.stringify({ error: 'Unable to rewrite node' })
             };
         }
         if (map.creationStatus !== 'created' && map.creationStatus !== 'failed') {
-            log('SERVER WARNING', "Map creation status already processing @mapNodeRewriteRequest:", projectId);
+            log("WARNING", "Map creation status already processing @mapNodeRewriteRequest:", projectId);
             return {
                 statusCode: 400,
                 body: JSON.stringify({ error: 'Unable to rewrite node' })
@@ -51,7 +51,7 @@ async function mapNodeRewriteRequest(projectId, nodeId, query) {
         // Check imediate response
         if (response.status !== 202) {
             // Failed
-            log('SERVER ERROR', `Failed to invoke background function: status ${response.status}`);
+            log("ERROR", `Failed to invoke background function: status ${response.status}`);
             map.creationStatus = 'failed';
         } else {
             map.creationStatus = 'creating';
@@ -68,7 +68,7 @@ async function mapNodeRewriteRequest(projectId, nodeId, query) {
 
         // Catch error
     } catch (error) {
-        log('SERVER WARNING', 'Unable to create map @mapNodeRewriteRequest', error);
+        log("WARNING", 'Unable to create map @mapNodeRewriteRequest', error);
         if (map) {
             map.creationStatus = 'failed';
             await mapUpdate(map);

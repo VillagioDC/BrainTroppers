@@ -16,7 +16,7 @@ export async function deleteNodeApi(nodeId) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         // Construct body
-        const projectId = braintroop.map.projectId;
+        const projectId = braintroop.getProjectId();
         const body = { userId, projectId, nodeId };
         const url = setApiUrl('deleteNode');
         const response = await fetch(url, {

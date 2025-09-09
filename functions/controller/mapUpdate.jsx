@@ -14,7 +14,7 @@ async function mapUpdate(map) {
 
     // Check input
     if (!map || typeof map !== 'object' || !map.projectId) {
-        log("SERVER ERROR", "Unable to update map @updateMap.");
+        log("ERROR", "Unable to update map @updateMap.");
         return null;
     }
 
@@ -28,7 +28,7 @@ async function mapUpdate(map) {
                                      replacement: { ...map } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update map @updateMap.");
+        log("ERROR", "Unable to update map @updateMap.");
     }
 
     // Return

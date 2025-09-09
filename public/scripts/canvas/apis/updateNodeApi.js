@@ -16,7 +16,7 @@ export async function updateNodeApi(node) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         // Construct body
-        const projectId = braintroop.map.projectId;
+        const projectId = braintroop.getProjectId();
         const body = { userId, projectId, nodeId: node.nodeId, shortName: node.shortName, content: node.content, detail: node.detail, directLink: node.directLink, relatedLink: node.relatedLink, x: node.x, y: node.y, locked: node.locked, approved: node.approved, hidden: node.hidden, colorScheme: node.colorScheme, layer: node.layer };
         const url = setApiUrl('updateNode');
         const response = await fetch(url, {

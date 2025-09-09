@@ -23,7 +23,7 @@ async function userLastUpdated(map) {
                                      update: { $set: { 'maps.$.lastUpdated': lastUpdated } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update last change on user @userLastUpdated.");
+        log("ERROR", "Unable to update last change on user @userLastUpdated.");
         return null;
     }
 

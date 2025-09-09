@@ -27,7 +27,7 @@ async function cleanDatabase() {
 
     // Catch error
     } catch (error) {
-        log("SERVER ERROR", `Error deleting collection @cleanDatabase`, error);
+        log("ERROR", `Error deleting collection @cleanDatabase`, error);
         return { success: false, data: null, error: error.message };
     }
 }

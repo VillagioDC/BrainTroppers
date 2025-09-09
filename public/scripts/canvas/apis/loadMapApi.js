@@ -35,7 +35,7 @@ export async function loadMapApi(projectId) {
         
     // Catch errors
     } catch (error) {
-        console.error('Error adding node:', error);
+        console.error('Error loading map:', error);
         return false;
     }
 }

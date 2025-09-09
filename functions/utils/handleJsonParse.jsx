@@ -17,7 +17,7 @@ function handleJsonParse(body, corsHeaders) {
         parsedBody = JSON.parse(body);
     // Catch error
     } catch (error) {      
-        log('SERVER WARNING', 'Invalid request @handleJsonParse', JSON.stringify(body));
+        log("WARNING", 'Invalid request @handleJsonParse', JSON.stringify(body));
         return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

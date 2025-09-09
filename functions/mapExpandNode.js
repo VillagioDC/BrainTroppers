@@ -48,7 +48,7 @@ exports.handler = async (event) => {
         !projectId || projectId.trim().length === 0 ||
         !parentId || parentId.trim().length === 0 ||
         !query || query.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body @mapExpandNode', JSON.stringify(body));
+      log("WARNING", 'Invalid body @mapExpandNode', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapExpandNode');
+      log("WARNING", 'Missing token @mapExpandNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -73,7 +73,7 @@ exports.handler = async (event) => {
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof parentId !== 'string' || parentId.length > 50 ||
         typeof query !== 'string' || query.length > 500) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapExpandNode');
+            log("WARNING", 'Request blocked by anti-malicious check @mapExpandNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -84,7 +84,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -95,7 +95,7 @@ exports.handler = async (event) => {
     // Expand node request
     const updatedMap = await mapNodeExpandRequest(projectId, parentId, query);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to expand node @mapExpandNode');
+      log("ERROR", 'Unable to expand node @mapExpandNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -112,7 +112,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapExpandNode endpoint: ${error.message}`);
+    log("ERROR", `Error in mapExpandNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -18,7 +18,7 @@ async function mapDelete(projectId) {
                                      filter: { projectId: projectId  } });
     // Handle error
     if (!result || result.deletedCount === 0) {
-        log("SERVER ERROR", "Unable to delete map @deleteMap.");
+        log("ERROR", "Unable to delete map @deleteMap.");
         return false;
     }
 

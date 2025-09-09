@@ -48,7 +48,7 @@ exports.handler = async (event) => {
     if (!projectId || projectId.trim().length === 0 ||
         !nodeFrom || nodeFrom.trim().length === 0 ||
         !nodeTo || nodeTo.trim().length === 0) {
-          log('SERVER WARNING', 'Invalid body @mapConnectNode', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapConnectNode', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapConnectNode');
+      log("WARNING", 'Missing token @mapConnectNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
     if (typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeFrom !== 'string' || nodeFrom.length > 50 ||
         typeof nodeTo !== 'string' || nodeTo.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapConnectNode');
+            log("WARNING", 'Request blocked by anti-malicious check @mapConnectNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found @mapConnectNode', projectId);
+      log("WARNING", 'Project not found @mapConnectNode', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ exports.handler = async (event) => {
     // Connect nodes on map
     const updatedMap = await mapLinkConnect(map, nodeFrom, nodeTo);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to conect nodes on map @mapConnectNode');
+      log("ERROR", 'Unable to conect nodes on map @mapConnectNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -122,7 +122,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapLinkConnect endpoint: ${error.message}`);
+    log("ERROR", `Error in mapLinkConnect endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

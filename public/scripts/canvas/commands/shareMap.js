@@ -5,7 +5,8 @@
 import { removeMapMenu } from '../interface/mapListPopup.js';
 
 // Share map
-export function shareMap() {
+export function shareMap(e) {
+    e.stopPropagation();
     // Get current map item
     const mapPopup = document.getElementById('map-menu-popup');
     const projectId = mapPopup.dataset.projectId;

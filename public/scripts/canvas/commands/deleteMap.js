@@ -28,7 +28,7 @@ export async function deleteMap() {
     if (result && result.error)
         showNotification(result.error, 'error');
     if (result && result.message)
-        showNotification(result.message, 'success');
+        showNotification(result.success, 'success');
     // Remove map menu
     removeMapMenu();
 }

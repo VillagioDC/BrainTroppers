@@ -15,7 +15,7 @@ async function askAIBridge(constructedConversation) {
     // Handle input error
     if (!constructedConversation || typeof constructedConversation !== "object") {
         const input = `constructedConversation: ${typeof constructedConversation}`;
-        log("SERVER ERROR", "Invalid input @askAIBridge.", input);
+        log("ERROR", "Invalid input @askAIBridge.", input);
         return null;
     }
 
@@ -28,7 +28,7 @@ async function askAIBridge(constructedConversation) {
 
         // Check AI response
         if (!response || !response.content) {
-            log("SERVER ERROR", "Unable to provide complete response @askAIBridge", response);
+            log("ERROR", "Unable to provide complete response @askAIBridge", response);
             return null;
         };
 
@@ -39,7 +39,7 @@ async function askAIBridge(constructedConversation) {
         return content;
 
     } catch (error) {
-        log("SERVER ERROR", "Unable to provide response from AI @askAIBridge", error);
+        log("ERROR", "Unable to provide response from AI @askAIBridge", error);
         return null;
     }
 }

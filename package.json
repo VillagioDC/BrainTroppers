@@ -12,6 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "@langchain/core": "^0.3.73",
+    "@supabase/supabase-js": "^2.57.2",
+    "docx": "^9.5.1",
     "dotenv": "^17.2.2",
     "langchain-llm7": "^2025.4.291003",
     "mongodb": "^6.16.0",

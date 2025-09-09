@@ -18,7 +18,7 @@ async function mapAddBlankNode(map, parentId, node) {
     if (!map || typeof map !== "object" ||
         !parentId || typeof parentId !== "string" ||
         !node || typeof node !== "object") {
-        log("SERVER ERROR", "Invalid input @mapAddBlankNode.");
+        log("ERROR", "Invalid input @mapAddBlankNode.");
         return null;
     }
 

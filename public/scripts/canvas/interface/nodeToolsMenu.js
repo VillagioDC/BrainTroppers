@@ -2,18 +2,19 @@
 // NODE TOOLS MENU MODULE
 
 // Import modules
-import { detailNode } from './detailNode.js';
-import { addNewNode } from './addNewNode.js';
-import { addBlankNode } from './addBlankNode.js';
-import { expandNode } from './expandNode.js';
-import { rewriteNode } from './rewriteNode.js';
-import { rewireNode } from './rewireNode.js';
-import { pinNode, unpinNode } from './pinNode.js';
-import { approveNode } from './approveNode.js';
-import { hideNode, unhideNode } from './hideNode.js';
-import { layerNode } from './layerNode.js';
-import { openColorSchemePopup } from './colorSchemeNode.js';
-import { deleteNode } from './deleteNode.js';
+import { detailNode } from '../commands/detailNode.js';
+import { addNewNode } from '../commands/addNewNode.js';
+import { addBlankNode } from '../commands/addBlankNode.js';
+import { expandNode } from '../commands/expandNode.js';
+import { rewriteNode } from '../commands/rewriteNode.js';
+import { linkNode } from '../commands/linkNode.js';
+import { rewireNode } from '../commands/rewireNode.js';
+import { pinNode, unpinNode } from '../commands/pinNode.js';
+import { approveNode } from '../commands/approveNode.js';
+import { hideNode, unhideNode } from '../commands/hideNode.js';
+import { layerNode } from '../commands/layerNode.js';
+import { openColorSchemePopup } from '../commands/colorSchemeNode.js';
+import { deleteNode } from '../commands/deleteNode.js';
 
 export async function openNodeToolsMenu(selectedNode) {
     // Get selected node
@@ -96,6 +97,9 @@ function bindNodeToolsMenuEvents() {
     // Rewrite node button
     if (document.getElementById('rewrite-node-btn'))
         document.getElementById('rewrite-node-btn').addEventListener('click', rewriteNode);
+    // Link node button
+    if (document.getElementById('link-node-btn'))
+        document.getElementById('link-node-btn').addEventListener('click', linkNode);
     // Rewire node button
     if (document.getElementById('rewire-node-btn'))
         document.getElementById('rewire-node-btn').addEventListener('click', rewireNode);
@@ -144,6 +148,9 @@ export function removeNodeToolsMenu() {
     // Rewrite node button
     if (document.getElementById('rewrite-node-btn'))
         document.getElementById('rewrite-node-btn').removeEventListener('click', rewriteNode);
+    // Link node button
+    if (document.getElementById('link-node-btn'))
+        document.getElementById('link-node-btn').removeEventListener('click', linkNode);
     // Rewire node button
     if (document.getElementById('rewire-node-btn'))
         document.getElementById('rewire-node-btn').removeEventListener('click', rewireNode);
@@ -180,6 +187,7 @@ export function removeNodeToolsMenu() {
 
 // Click outside event handler
 function outsideClickHandler(event) {
+    return;
     const toolsMenu = document.getElementById('node-tools');
     if (!toolsMenu.contains(event.target)) removeNodeToolsMenu();
 }

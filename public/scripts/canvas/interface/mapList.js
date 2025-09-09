@@ -119,10 +119,25 @@ export async function createMapItem(newMap) {
     const raw = await response.text();
     // Replace map title
     const html = raw.replace('{{Title}}', newMap.title);
-    // Leave {{projectId}} as placeholder
+    // Replace map projectId
+    html.replace('{{projectId}}', newMap.projectId);
     // Insert HTML on sidebar map ul
     const mapList = document.getElementById('map-list');
     mapList.insertAdjacentHTML('afterbegin', html);
+    // Remove all event listeners
+    removeAllEventListeners();
+    // Add event listeners
+    bindMapItemEvents();
+}
+
+// Remove all event listeners
+function removeAllEventListeners() {
+    // Elements
+    const mapItems = document.querySelectorAll('.map-item');
+    const mapItemsBtns = document.querySelectorAll('.map-menu-btn');
+    // Event listeners
+    mapItems.forEach(map => {map.removeEventListener('click', loadMap);});
+    mapItemsBtns.forEach(btn => {btn.removeEventListener('click', popupMapMenu);});
 }
 
 // Set map item as active

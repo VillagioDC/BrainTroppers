@@ -1,8 +1,9 @@
 // BrainTroop Interactive Mind Map Canvas using D3.js v7
 // Reorganized & documented version
 
-import { openNodeToolsMenu, removeNodeToolsMenu } from './commands/nodeToolsMenu.js';
-import { openLinkToolsMenu, removeLinkToolsMenu } from './commands/linkToolsMenu.js'
+import { openNodeToolsMenu, removeNodeToolsMenu } from './interface/nodeToolsMenu.js';
+import { openLinkToolsMenu, removeLinkToolsMenu } from './interface/linkToolsMenu.js';
+import { endLinkCommand } from './commands/linkNode.js';
 import { pinNode } from './commands/pinNode.js';
 
 (function () {
@@ -11,8 +12,7 @@ import { pinNode } from './commands/pinNode.js';
     throw new Error("d3.js v7 is required by braintroop.js");
   }
 
-  /**
-   * braintroop class
+  /* braintroop class
    * - Responsible for rendering an interactive mindmap on an SVG canvas using D3 v7.
    * - Internals are grouped by: CONFIG, D3 INIT, GRID, FORCES, BINDING (nodes/edges),
    *   RENDER / TICK logic, PERSISTENCE & CONVERSION utilities, and PUBLIC API.
@@ -167,7 +167,10 @@ import { pinNode } from './commands/pinNode.js';
         .scaleExtent([0.2, 5])
         .on("start", (event) => { this.svg.style("cursor", "grabbing"); })
         .on("zoom", (event) => { this.g.attr("transform", event.transform); })
-        .on("end", (event) => { this.svg.style("cursor", "grab"); });
+        .on("end", (event) => { 
+          if (this._pendingConnectionFrom) { this.svg.style("cursor", "crosshair"); }
+          else { this.svg.style("cursor", "grab"); }
+        });
 
       // Attach zoom behavior to the svg
       this.svg.call(this.zoom);
@@ -513,6 +516,8 @@ import { pinNode } from './commands/pinNode.js';
         .on("click", (event, d) => {
           event.stopPropagation();
           this._setSelected({type: "edge", id: d.id});
+          // Cancel pending connections
+          if (this._pendingConnectionFrom) this._cancelPendingConnection();
         });
 
       edgesSel.exit().remove();
@@ -659,11 +664,13 @@ import { pinNode } from './commands/pinNode.js';
           const mapNode = d.__mapNode;
           if (this._pendingConnectionFrom) {
             // If user previously started a connection, create it now
-            const fromId = this._pendingConnectionFrom;
-            const toId = mapNode.nodeId;
-            this.setConnection(fromId, toId, "direct");
+            const nodeIdFrom = this._pendingConnectionFrom;
+            const nodeIdTo = mapNode.nodeId;
+            this.setConnection(nodeIdFrom, nodeIdTo, "direct");
             this._pendingConnectionFrom = null;
-            this._setSelected({type: "node", id: mapNode.nodeId});
+            this._setSelected({type: "node", id: nodeIdFrom});
+            // End link command
+            endLinkCommand({nodeIdFrom, nodeIdTo});
             return;
           }
         });
@@ -877,11 +884,15 @@ import { pinNode } from './commands/pinNode.js';
       // Mark pending connection start from currently selected node
       if (!this.selected || this.selected.type !== "node") return;
       this._pendingConnectionFrom = this.selected.id;
+      // Change cursor to indicate connection in progress
+      this.svg.style("cursor", "crosshair");
     }
 
     _cancelPendingConnection() {
       // Clear pending connection state
       this._pendingConnectionFrom = null;
+      // End link command
+      endLinkCommand({nodeIdFrom: null, nodeIdTo: null});
     }
 
     // -------------------- RESIZE, ZOOM & FIT --------------------
@@ -1096,7 +1107,8 @@ import { pinNode } from './commands/pinNode.js';
     }
 
     _convertMapToBackend() {
-      // Convert canvas schema to backend schema for host consumption (emitted on mapchange)
+      // Convert canvas schema to backend schema for host consumption
+      // Direct and related links
       const directLinks = {};
       const relatedLinks = {};
       (this.map.edges || []).forEach(e => {
@@ -1215,10 +1227,7 @@ import { pinNode } from './commands/pinNode.js';
       return node;
     }
 
-    /**
-     * _updateNodePosition
-     * update node nodeId position at x, y and lock ?
-     */
+    // Update node nodeId position at x, y and lock ?
     async _updateNodePosition(nodeId, x, y, locked = false) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1229,10 +1238,7 @@ import { pinNode } from './commands/pinNode.js';
       if (locked === true) await pinNode(nodeId);
     }
 
-    /**
-     * destroy()
-     * - Cleans up event listeners and resources
-     */
+    // Cleans up event listeners and resources
     destroy() {
       window.removeEventListener("resize", this._onResizeBound);
       if (this.svg) {
@@ -1245,11 +1251,7 @@ import { pinNode } from './commands/pinNode.js';
     // -------------------- PUBLIC API --------------------
     // Grouped at bottom for clarity. These are the functions intended for host usage.
 
-    /**
-     * setMap(map)
-     * - Accepts either backend schema or canvas schema.
-     * - Auto-detects backend vs canvas and normalizes to internal canvas schema.
-     */
+    //setMap(map) - Auto-detects backend vs canvas and normalizes to internal canvas schema.
     setMap(map) {
       if (!map) return;
       const looksLikeBackend = Array.isArray(map.nodes) && map.nodes.length > 0 && (map.nodes[0].hasOwnProperty("nodeId") || map.hasOwnProperty("projectId"));
@@ -1288,10 +1290,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * updateMap(forceFull = false)
-     * - Rebind nodes & edges and refresh visuals.
-     */
+    // Rebind nodes & edges and refresh visuals.
     updateMap(forceFull = false) {
       // Ensure arrays exist
       this.map.nodes = Array.isArray(this.map.nodes) ? this.map.nodes : [];
@@ -1301,57 +1300,39 @@ import { pinNode } from './commands/pinNode.js';
       this.map.lastUpdated = new Date(Date.now());
     }
 
-    /**
-     * rebuildMap()
-     * - Trigger a physics/force-based rebuild and then snap nodes to grid.
-     */
+    // Trigger a physics/force-based rebuild and then snap nodes to grid.
     rebuildMap() {
       if (!this.simulation) return;
       this._rebuildMap();
     }
 
-    /**
-     * getBackendMap()
-     * get backend schema map
-     */
+    // Get backend schema map
     getBackendMap() {
       return this._convertMapToBackend(this.map);
     }
 
-    /**
-     * deleteMap()
-     * - Clear nodes and edges (keeps some meta).
-     */
+    //Clear nodes and edges (keeps some meta).
     deleteMap() {
       this.map = { nodes: [], edges: [], title: this.map.title || "", colabs: this.map.colabs || [] };
       this.updateMap(true);
       this._setSelected({type: null, id: null});
     }
 
-    /**
-     * addTempNode({ parentId, shortName = "New node"})
-     * - Creates a temporary new node linked to parentId.
-    **/
+    // Creates a temporary new node linked to parentId
     addTempNode({ parentId = 1, shortName = "New node" }) {
       // Delegate to internal helper but keep public name stable
       const newNodeId = this._addTempNode({ parentId, shortName });
       return newNodeId;
     }
 
-    /**
-     * addNode({ parentId, id, shortName, content, detail, x, y, locked, layer, colorSchemeName })
-     * - Creates a new node linked to parentId.
-     */
+    // Creates a new node linked to parentId
     addNode({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
       // Delegate to internal helper but keep public name stable
       const newNodeId = this._addNodeInternal({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, hidden, colorSchemeName, layer });
       return newNodeId;
     }
 
-    /**
-     * updateNodeInfo({ nodeId, shortName, content, detail})
-     * - Updates the node info (idempotent).
-     */
+    // Updates the node info
     updateNodeInfo({ nodeId, newNodeId, shortName, content, detail }) {
       if (!nodeId) return;
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
@@ -1369,10 +1350,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap();
     }
 
-    /**
-     * setConnection(nodeFromId, nodeToId, type = "direct")
-     * - Create an edge between two nodes (idempotent).
-     */
+    // Create an edge between two nodes
     setConnection(nodeFromId, nodeToId, type = "direct") {
       if (!nodeFromId || !nodeToId) return;
       const edgeId = `edge-${nodeFromId}-${nodeToId}`;
@@ -1382,10 +1360,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap();
     }
 
-    /**
-     * disconnect(nodeFromId, nodeToId)
-     * - Remove edges both directions between two nodes.
-     */
+    // Remove edges both directions between two nodes
     disconnect(nodeFromId, nodeToId) {
       if (!nodeFromId || !nodeToId) return;
       const ids = new Set([`edge-${nodeFromId}-${nodeToId}`, `edge-${nodeToId}-${nodeFromId}`]);
@@ -1396,9 +1371,7 @@ import { pinNode } from './commands/pinNode.js';
       }
     }
 
-    /**
-     * removeEdge(edgeId)
-     */
+    // Remove Edge
     removeEdge(edgeId) {
       if (!edgeId) return;
       const before = this.map.edges.length;
@@ -1408,9 +1381,7 @@ import { pinNode } from './commands/pinNode.js';
       }
     }
 
-    /**
-     * setTheme(themeName)
-     */
+    // Set theme
     setTheme(themeName) {
       if (!this.palette[themeName]) return;
       this.currentTheme = themeName;
@@ -1422,9 +1393,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * setColorScheme(nodeId, schemeName)
-     */
+    // setColorScheme(nodeId, schemeName)
     setColorScheme(nodeId, schemeName) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1434,10 +1403,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap();
     }
 
-    /**
-     * toggleLayer(layerId)
-     * - Toggles hidden state for nodes whose layer >= layerId
-     */
+    // Toggles hidden state for nodes whose layer >= layerId
     toggleLayer(layerId) {
       if (typeof layerId !== "number") return;
       this.map.nodes.forEach(n => {
@@ -1446,57 +1412,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap();
     }
 
-    /**
-     * export(type = "png" | "svg")
-     * - Exports the current SVG to PNG or SVG file.
-     */
-    export(type = "png") {
-      if (this.map.nodes.length === 0) return;
-      const svgNode = this.svg.node();
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svgNode);
-
-      const mapTitle = (this.map && this.map.title) ? this.map.title.replace(/\s+/g, "_") : "braintroop_map";
-      const filename = `Braintroop_${mapTitle}_${Date.now()}`;
-
-      if (type === "svg") {
-        const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${filename}.svg`;
-        a.click();
-        URL.revokeObjectURL(url);
-        return;
-      }
-
-      const img = new Image();
-      const svg64 = btoa(unescape(encodeURIComponent(svgString)));
-      const url = 'data:image/svg+xml;base64,' + svg64;
-      img.onload = () => {
-        const canvasEl = document.createElement("canvas");
-        const bbox = svgNode.getBoundingClientRect();
-        canvasEl.width = bbox.width * 2;
-        canvasEl.height = bbox.height * 2;
-        const ctx = canvasEl.getContext("2d");
-        ctx.fillStyle = this.palette[this.currentTheme].canvas.bg || "#ffffff";
-        ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
-        ctx.drawImage(img, 0, 0, canvasEl.width, canvasEl.height);
-        canvasEl.toBlob(blob => {
-          const url2 = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url2;
-          a.download = `${filename}.png`;
-          a.click();
-          URL.revokeObjectURL(url2);
-        });
-      };
-      img.src = url;
-    }
-
-    /**
-     * deleteNode(nodeId)
-     */
+    // Delete node
     deleteNode(nodeId) {
       if (!nodeId) return;
       const nodeExists = this.map.nodes.some(n => n.nodeId === nodeId);
@@ -1507,9 +1423,7 @@ import { pinNode } from './commands/pinNode.js';
       this._setSelected({type: null, id: null});
     }
 
-    /**
-     * deleteEdge(edgeId)
-     */
+    // Delete edge
     deleteEdge(edgeId) {
       if (!edgeId) return;
       this.map.edges = (this.map.edges || []).filter(e => e.id !== edgeId);
@@ -1517,10 +1431,7 @@ import { pinNode } from './commands/pinNode.js';
       this._setSelected({type: null, id: null});
     }
 
-    /**
-     * toggleEdgeType(edgeId)
-     * - Toggles the type of the edge between "direct" and "indirect"
-     */
+    // Toggles the type of the edge between "direct" and "indirect"
     toggleEdgeType(edgeId) {
       if (!edgeId) return;
       const edge = this.map.edges.find(e => e.id === edgeId) || null;
@@ -1529,53 +1440,39 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * selectElement({ nodeId, edgeId })
-     */
+    // SelectElement ({ nodeId, edgeId })
     selectElement({ nodeId = null, edgeId = null } = {}) {
       if (nodeId) this._setSelected({type: "node", id: nodeId});
       if (edgeId) this._setSelected({type: "edge", id: edgeId});
     }
 
-    /** 
-     * getProjectId()
-     */
+    // Get current project id
     getProjectId() { return this.map.projectId; }
 
-    /**
-     * getSelectedNodeId()
-     */
+    // Get selected node id
     getSelectedNodeId() {
       return this.selected && this.selected.type === "node" ? this.selected.id : null;
     }
 
-    /**
-     * getSelectedEdgeId()
-     */
+    // Get selected edge id
     getSelectedEdgeId() {
       return this.selected && this.selected.type === "edge" ? this.selected.id : null;
     }
 
-    /**
-     * getNodeXY(nodeId)
-     */
+    // Get node xy
     getNodeXY(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId) || null;
       return node ? { x: node.x, y: node.y } : null;
     }
 
-    /**
-     * updateMeta({ colabs, title })
-     */
+    // Update meta
     updateMeta( { colabs = [], title = ""} = {}) {
       this.map.colabs = Array.isArray(colabs) ? colabs : this.map.colabs;
       this.map.title = title ? title : this.map.title;
       this.map.lastUpdated = new Date(Date.now());
     }
 
-    /**
-     * lockNode(nodeId)
-     */
+    // Lock node
     lockNode(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1583,9 +1480,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * unlockNode(nodeId)
-     */
+    // Unlock node
     unlockNode(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1593,9 +1488,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * approveNode(nodeId)
-     */
+    // Approve node
     approveNode(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1603,9 +1496,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * revokeNode(nodeId)
-     */
+    // Revoke node
     revokeNode(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1613,9 +1504,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * hideNode(nodeId)
-     */
+    // Hide node
     hideNode(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1623,9 +1512,7 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * unhideNode(nodeId)
-     */
+    // Unhide node
     unhideNode(nodeId) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
@@ -1633,10 +1520,8 @@ import { pinNode } from './commands/pinNode.js';
       this.updateMap(true);
     }
 
-    /**
-     * get internal/setters used by UI - small helpers below (kept minimal)
-     */
-    _startConnection() {
+    // Start node connection
+    startConnection() {
       this._startConnectionFromSelected();
     }
 

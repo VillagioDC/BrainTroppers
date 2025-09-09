@@ -13,7 +13,7 @@ function removeUnwantedLines(rawContent) {
 
     // Handle input error
     if (!rawContent || typeof rawContent !== "string") {
-        log("SERVER ERROR", "Invalid input @removeUnwantedLines.");
+        log("ERROR", "Invalid input @removeUnwantedLines.");
         return null;
     }
 

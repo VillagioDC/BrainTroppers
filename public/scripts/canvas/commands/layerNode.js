@@ -4,6 +4,6 @@
 // Import modules
 import { showNotification } from "../../common/notifications.js";
 
-export async function layerNode() {
+export async function layerNode(e) {
     showNotification('Coming soon', 'info');
 }

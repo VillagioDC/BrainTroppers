@@ -3,10 +3,10 @@
 
 // Import modules
 import { toggleLinkTypeApi } from "../apis/toggleLinkTypeApi.js";
-import { toggleLinkToolsButtons } from "./linkToolsMenu.js";
+import { toggleLinkToolsButtons } from "../interface/linkToolsMenu.js";
 import { showNotification, removeNotification } from "../../common/notifications.js";
 
-export async function toggleLinkType() {
+export async function toggleLinkType(e) {
     // Get selected edge
     const selectedEdgeId = braintroop.getSelectedEdgeId();
     if (!selectedEdgeId) { console.warn("No edge selected"); return; }

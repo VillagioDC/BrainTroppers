@@ -16,7 +16,7 @@ async function openDBCollection(collectionName) {
 
     // Handle input error
     if (!collectionName || typeof collectionName !== "string") {
-        log("SERVER ERROR", "Invalid collection name @openDBCollection.");
+        log("ERROR", "Invalid collection name @openDBCollection.");
         return null;
     }
 
@@ -26,7 +26,7 @@ async function openDBCollection(collectionName) {
 
     // Handle environment variables error
     if (!uri || !databaseName) {
-        log("SERVER ERROR", "Missing MongoDB environment variables @openDBCollection.");
+        log("ERROR", "Missing MongoDB environment variables @openDBCollection.");
         return null;
     }
 
@@ -37,7 +37,7 @@ async function openDBCollection(collectionName) {
 
         // Handle connection error
         if (!client) {
-            log("SERVER ERROR", "Unable to connect to MongoDB service @openDBCollection.");
+            log("ERROR", "Unable to connect to MongoDB service @openDBCollection.");
             return null;
         }   
 
@@ -46,7 +46,7 @@ async function openDBCollection(collectionName) {
 
         // Handle connection error
         if (!database) {
-            log("SERVER ERROR", `Unable to connect to MongoDB database ${databaseName} @openDBCollection.`);
+            log("ERROR", `Unable to connect to MongoDB database ${databaseName} @openDBCollection.`);
             return null;
         }
 
@@ -55,7 +55,7 @@ async function openDBCollection(collectionName) {
 
         // Handle connection error
         if (!collection) {
-            log("SERVER ERROR", `Unable to connect to MongoDB collection ${collectionName} @openDBCollection.`);
+            log("ERROR", `Unable to connect to MongoDB collection ${collectionName} @openDBCollection.`);
             return null;
         }
 
@@ -66,7 +66,7 @@ async function openDBCollection(collectionName) {
         return db;
         
     } catch (error) {
-        log("SERVER ERROR", "Unable to connect to MongoDB database @openDBCollection.", error);
+        log("ERROR", "Unable to connect to MongoDB database @openDBCollection.", error);
         return null;
     }
 }

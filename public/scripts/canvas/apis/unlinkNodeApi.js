@@ -1,5 +1,5 @@
 // CANVAS MODULES
-// UNLINK NODE API MODULE
+// UNLINK NODES API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';

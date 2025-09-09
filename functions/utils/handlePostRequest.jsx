@@ -14,7 +14,7 @@ function handlePostRequest(event, corsHeaders) {
     // Handle post request
     const { headers, body } = event;
     if (!headers || typeof headers !== 'object' || !body || typeof body !== 'string') {
-      log('SERVER WARNING', 'Invalid POST request @handlePostRequest', event);
+      log("WARNING", 'Invalid POST request @handlePostRequest', event);
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

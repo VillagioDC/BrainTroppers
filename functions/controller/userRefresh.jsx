@@ -14,7 +14,7 @@ async function userRefresh( userId ) {
 
     // Check new map
     if (!userId || typeof userId !== 'string') {
-        log("SERVER ERROR", "Unable to refresh user data @userRefresh.");
+        log("ERROR", "Unable to refresh user data @userRefresh.");
         return false;
     }
     // Load user data
@@ -23,7 +23,7 @@ async function userRefresh( userId ) {
                                  filter: { 'userId': userId } });
     // Handle error
     if (!user) {
-        log("SERVER ERROR", "Unable to find user @userRefresh.");
+        log("ERROR", "Unable to find user @userRefresh.");
         return false;
     }
 
@@ -38,19 +38,29 @@ async function userRefresh( userId ) {
     });
 
     // Prevent null
-    const userMaps = Array.isArray(user.maps) ? user.maps : [];
     const ownedMaps = Array.isArray(owned) ? owned : [];
     const colabMaps = Array.isArray(colab) ? colab : [];
 
     // Construct user map list without duplicates
     const mapList = Array.from(
-        new Map([...userMaps, ...ownedMaps, ...colabMaps]
-            .map(map => [map.projectId, map])
-        ).values()
-    );
+    new Map([...ownedMaps, ...colabMaps]
+        .map(map => [map.projectId, map])
+    ).values()
+    ).map(({ projectId, title, lastUpdated }) => ({ projectId, title, lastUpdated }));
+
     // Refresh user data
     user.maps = mapList; 
 
+    // Update user map list 
+    const result = await executeDB({ collectionName: 'users',
+                                     type: 'updateOne',
+                                     filter: { 'userId': userId },
+                                     update: { $set: { 'maps': mapList } } });
+    // Handle error
+    if (!result || result.modifiedCount === 0) {
+        log("ERROR", "Unable to refresh user data @userRefresh.");
+        return false;
+    }
     // Return
     return user;
 }

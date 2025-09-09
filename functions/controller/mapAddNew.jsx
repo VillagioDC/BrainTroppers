@@ -41,7 +41,7 @@ async function mapAddNew({userId, query}) {
 
     // Handle error
     if (!result || result.insertedCount === 0) {
-        log("SERVER ERROR", "Unable to add new map @mapAddNew.");
+        log("ERROR", "Unable to add new map @mapAddNew.");
         return null;
     }
 

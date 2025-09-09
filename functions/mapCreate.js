@@ -46,7 +46,7 @@ exports.handler = async (event) => {
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !query || query.trim().length === 0) {
-        log('SERVER WARNING', 'Invalid body', JSON.stringify(body));
+        log("WARNING", 'Invalid body', JSON.stringify(body));
         return {
           statusCode: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -58,7 +58,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapCreateNew');
+      log("WARNING", 'Missing token @mapCreateNew');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof query !== 'string' || query.length > 500) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapCreateNew');
+            log("WARNING", 'Request blocked by anti-malicious check @mapCreateNew');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -80,7 +80,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -91,7 +91,7 @@ exports.handler = async (event) => {
     // Create new map request
     const newMap = await mapCreateRequest({userId, query});
     if (!newMap) {
-      log('SERVER ERROR', 'Unable to create map @mapCreateNew');
+      log("ERROR", 'Unable to create map @mapCreateNew');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -108,7 +108,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreateNew endpoint: ${error.message}`);
+    log("ERROR", `Error in mapCreateNew endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

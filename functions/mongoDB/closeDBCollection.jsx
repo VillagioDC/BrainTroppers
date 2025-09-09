@@ -13,7 +13,7 @@ async function closeDBCollection(db) {
 
     // Handle input error
     if (!db || !db.client || !(db.client instanceof MongoClient)) {
-        log("SERVER ERROR", "Wrong input to close MongoDB connection @closeDBCollection.");
+        log("ERROR", "Wrong input to close MongoDB connection @closeDBCollection.");
         return false;
     }
 
@@ -26,7 +26,7 @@ async function closeDBCollection(db) {
 
     // Catch error
     } catch (error) {
-        log("SERVER ERROR", "Unable to close MongoDB connection @closeDBCollection.", error);
+        log("ERROR", "Unable to close MongoDB connection @closeDBCollection.", error);
     }
 }
 

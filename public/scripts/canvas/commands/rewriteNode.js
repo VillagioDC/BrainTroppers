@@ -9,7 +9,7 @@ import { updateMapGetStatus } from "../poolling/updateMapGetStatus.js";
 import { pauseS } from "../utils/pauseS.js";
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
-export async function rewriteNode() {
+export async function rewriteNode(e) {
     // Get selected node Id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }

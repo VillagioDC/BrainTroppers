@@ -7,7 +7,8 @@ import { renameMapApi } from '../apis/renameMapApi.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Rename map
-export async function renameMap() {
+export async function renameMap(e) {
+    e.stopPropagation();
     // Get current map item
     const mapList = document.getElementById('map-list');
     const popupMapMenu = document.getElementById('map-menu-popup');

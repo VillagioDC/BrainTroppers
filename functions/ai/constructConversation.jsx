@@ -15,7 +15,7 @@ function constructConversation(instructions, messages) {
     // Handle input error
     if (!instructions || !messages) {
         const input = `instruction ${typeof instructions}, messages: ${typeof messages}`;
-        log("SERVER ERROR", "Invalid input @constructConversation.", input);
+        log("ERROR", "Invalid input @constructConversation.", input);
         return null;
     };
 

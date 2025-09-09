@@ -11,11 +11,11 @@ export async function renameMapApi(newTitle) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
-        const { projectId } = JSON.parse(braintroop.map.projectId());
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${sessionToken}`,
         };
+        const projectId = braintroop.getProjectId();
         const body = { userId, projectId, newTitle };
         const url = setApiUrl('renameMap');
         const response = await fetch(url, {

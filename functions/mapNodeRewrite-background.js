@@ -8,6 +8,7 @@ const getInstructionsTxt = require('./ai/getInstructionsTxt.jsx');
 const constructConversation = require('./ai/constructConversation.jsx');
 const askAIBridge = require('./ai/askAIBridge.jsx');
 const parseJSON = require('./utils/parseJSON.jsx');
+const sanitizeMapLinks = require('./utils/sanitizeMapLinks.jsx');
 const mapUpdate = require('./controller/mapUpdate.jsx');
 const log = require('./utils/log.jsx');
 
@@ -22,7 +23,7 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const { map, nodeId, query } = body;
     if (!map || !nodeId || !query) {
-        log('SERVER WARNING', 'Invalid body @mapNodeRewrite-background');
+        log("WARNING", 'Invalid body @mapNodeRewrite-background');
         return;
     }
 
@@ -60,7 +61,7 @@ exports.handler = async (event) => {
             const conversation = constructConversation(instructions, messages);        
 
             // Ask AI
-            log('SERVER DEBUG', `Asking AI @mapNodeRewrite-background: ${stages[i]}`);
+            log("DEBUG", `Asking AI @mapNodeRewrite-background: ${stages[i]}`);
             userMessage = await askAIBridge(conversation);
 
             // Response
@@ -75,7 +76,7 @@ exports.handler = async (event) => {
         // Parse response
         const jsonResponse = parseJSON(response);
         if (!jsonResponse || jsonResponse.length === 0) {
-            log("SERVER ERROR", "Unable to parse response from AI @mapNodeRewrite-background", response);
+            log("ERROR", "Unable to parse response from AI @mapNodeRewrite-background", response);
             map.creationStatus = 'failed';
             await mapUpdate(map);
             return;
@@ -89,19 +90,22 @@ exports.handler = async (event) => {
         map.nodes[i].approved = false;
         map.nodes[i].hidden = false;
         
+        // Sanitize map links
+        map = sanitizeMapLinks(map);
+
         // Update creation status
         map.creationStatus = 'created';
 
         // Update map
         const updatedMap = await mapUpdate(map);
         if (!updatedMap) {
-            log('SERVER WARNING', 'Unable to update map @mapNodeRewrite-background');
+            log("WARNING", 'Unable to update map @mapNodeRewrite-background');
             return;
         }
         return;
 
     } catch (error) {
-        log('SERVER ERROR', `Error in background node creation @mapNodeRewrite-background for ${map.projectId}: ${error.message}`);
+        log("ERROR", `Error in background node creation @mapNodeRewrite-background for ${map.projectId}: ${error.message}`);
         // Update to 'failed' on error
         map.creationStatus = 'failed';
         await mapUpdate(map);

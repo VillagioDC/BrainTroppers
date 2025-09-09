@@ -1,4 +1,4 @@
-// FUNCTION TO APPROVE NODE ON MAP
+// FUNCTION TO CONNECT TWO NODES
 // No dependencies
 
 // Functions
@@ -12,21 +12,32 @@ const log = require('../utils/log.jsx');
 
 async function mapLinkConnect(map, nodeIdFrom, nodeIdTo) {
 
-    // Create links between nodes
+    // Check inputs
+    if (!map || !nodeIdFrom || !nodeIdTo) {
+        log("ERROR", "Invalid inputs @mapLinkConnect.");
+        return null;
+    }
+
     // Clone nodes array to avoid mutating input
     let nodes = [...map.nodes];
 
     // Update nodeFrom
     let nodeFrom = { ...nodes.find(n => n.nodeId === nodeIdFrom) };
-    if (!nodeFrom.relatedLink.includes(nodeIdTo)) {
-        nodeFrom.relatedLink = [...nodeFrom.relatedLink, nodeIdTo];
+    // Include direct link
+    if (!nodeFrom.directLink.includes(nodeIdTo)) {
+        nodeFrom.directLink = [...nodeFrom.relatedLink, nodeIdTo];
     }
+    // Exclude indirect link
+    nodeFrom.relatedLink = nodeFrom.relatedLink.filter(id => id !== nodeIdTo);
 
     // Update nodeTo
     let nodeTo = { ...nodes.find(n => n.nodeId === nodeIdTo) };
-    if (!nodeTo.relatedLink.includes(nodeIdFrom)) {
-        nodeTo.relatedLink = [...nodeTo.relatedLink, nodeIdFrom];
+    // Include direct link
+    if (!nodeTo.directLink.includes(nodeIdFrom)) {
+        nodeTo.directLink = [...nodeTo.relatedLink, nodeIdFrom];
     }
+    // Exclude indirect link
+    nodeTo.relatedLink = nodeTo.relatedLink.filter(id => id !== nodeIdFrom);
 
     // Replace updated nodes in array
     nodes = nodes.map(n => {
@@ -40,9 +51,9 @@ async function mapLinkConnect(map, nodeIdFrom, nodeIdTo) {
 
     // Update entire map on database
     const result = await mapUpdate(updatedMap);
-    // Handle error
-    if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to connect nodes @mapLinkConnect.");
+    if (!result || typeof result !== 'object' || result.projectId !== map.projectId) {
+        log("ERROR", "Unable to disconnect nodes @mapLinkConnect.");
+        return null;
     }
 
     // Return

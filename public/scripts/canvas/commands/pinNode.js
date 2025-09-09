@@ -3,9 +3,9 @@
 
 // Import modules
 import { updateNode } from './updateNode.js';
-import { toggleNodeToolsButtons } from './nodeToolsMenu.js';
+import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
-export async function pinNode() {
+export async function pinNode(e) {
     // Node id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }
@@ -20,7 +20,7 @@ export async function pinNode() {
     toggleNodeToolsButtons(node);
 }
 
-export async function unpinNode() {
+export async function unpinNode(e) {
     // Node id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }

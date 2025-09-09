@@ -8,6 +8,7 @@ const getInstructionsTxt = require('./ai/getInstructionsTxt.jsx');
 const constructConversation = require('./ai/constructConversation.jsx');
 const askAIBridge = require('./ai/askAIBridge.jsx');
 const parseJSON = require('./utils/parseJSON.jsx');
+const sanitizeMapLinks = require('./utils/sanitizeMapLinks.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
@@ -21,18 +22,18 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const projectId = body.projectId || null;
     if (!projectId) {
-        log('SERVER WARNING', 'Missing projectId @mapCreate-background', JSON.stringify(body));
+        log("WARNING", 'Missing projectId @mapCreate-background', JSON.stringify(body));
         return;
     }
 
     // Fetch the map
     let map = await mapRead(projectId);
     if (!map) {
-      log('SERVER ERROR', 'Project not found @mapCreate-background', projectId);
+      log("ERROR", 'Project not found @mapCreate-background', projectId);
       return;
     }
     if (map.creationStatus !== 'requested') {
-      log('SERVER WARNING', 'Map already processing @mapCreate-background:', map.creationStatus);
+      log("WARNING", 'Map already processing @mapCreate-background:', map.creationStatus);
       return;
     }
 
@@ -63,7 +64,7 @@ exports.handler = async (event) => {
             const conversation = constructConversation(instructions, messages);
 
             // Ask AI
-            log('SERVER DEBUG', `Asking AI @mapCreate-background: ${stages[i]}`);
+            log("DEBUG", `Asking AI @mapCreate-background: ${stages[i]}`);
             userMessage = await askAIBridge(conversation);
 
             // Response
@@ -95,12 +96,15 @@ exports.handler = async (event) => {
             map.nodes[i].layer = 1;
         }
 
+        // Sanitize map links
+        map = sanitizeMapLinks(map);
+
         // Update map
         await mapUpdate(map);
         return;
 
     } catch (error) {
-        log('SERVER ERROR', `Error in background map creation for ${projectId}: ${error.message}`);
+        log("ERROR", `Error in background map creation for ${projectId}: ${error.message}`);
         // Update to 'failed' on error
         map.creationStatus = 'failed';
         await mapUpdate(map);

@@ -48,7 +48,7 @@ exports.handler = async (event) => {
         !projectId || projectId.trim().length === 0 ||
         !parentId || parentId.trim().length === 0 ||
         !query || query.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body @mapNodeAdd', JSON.stringify(body));
+      log("WARNING", 'Invalid body @mapNodeAdd', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapNodeAdd');
+      log("WARNING", 'Missing token @mapNodeAdd');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -73,7 +73,7 @@ exports.handler = async (event) => {
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof parentId !== 'string' || parentId.length > 50 ||
         typeof query !== 'string' || query.length > 500) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapNodeAdd');
+            log("WARNING", 'Request blocked by anti-malicious check @mapNodeAdd');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -84,7 +84,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -95,7 +95,7 @@ exports.handler = async (event) => {
     // Create new node request
     const updatedMap = await mapNodeAddRequest(projectId, parentId, query);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to create node @mapNodeAdd');
+      log("ERROR", 'Unable to create node @mapNodeAdd');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -112,7 +112,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapAddNode endpoint: ${error.message}`);
+    log("ERROR", `Error in mapAddNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

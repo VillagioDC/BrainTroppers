@@ -83,7 +83,7 @@ exports.handler = async (event) => {
     
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in resetPassword endpoint: ${error.message}`);
+    log("ERROR", `Error in resetPassword endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

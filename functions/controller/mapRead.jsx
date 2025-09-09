@@ -18,7 +18,7 @@ async function mapRead(projectId) {
                                      filter: { projectId: projectId  } });
     // Handle error
     if (!result || !result.projectId || result.projectId !== projectId) {
-        log("SERVER ERROR", "Unable to read map @readMap", projectId);
+        log("ERROR", "Unable to read map @readMap", projectId);
         return null;
     }
 

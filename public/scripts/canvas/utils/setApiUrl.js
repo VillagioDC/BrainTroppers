@@ -42,6 +42,9 @@ export function setApiUrl(api) {
         case 'loadMap':
             url += '/mapRead';
             break;
+        case 'exportMap':
+            url += '/mapExport';
+            break;
         case 'addNewNode':
             url += '/mapNodeAdd';
             break;
@@ -62,6 +65,9 @@ export function setApiUrl(api) {
             break;
         case 'toggleLinkType':
             url += '/mapToggleLinkType';
+            break;
+        case 'linkNode':
+            url += '/mapLinkNode';
             break;
         case 'unlinkNode':
             url += '/mapUnlinkNode';

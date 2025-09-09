@@ -48,7 +48,7 @@ exports.handler = async (event) => {
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ||
         !newTitle || newTitle.trim().length === 0 ) {          
-          log('SERVER WARNING', 'Invalid body @mapTitleUpdate', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapTitleUpdate', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapTitleUpdate');
+      log("WARNING", 'Missing token @mapTitleUpdate');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof newTitle !== 'string' || newTitle.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapTitleUpdate');
+            log("WARNING", 'Request blocked by anti-malicious check @mapTitleUpdate');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found @mapTitleUpdate', projectId);
+      log("WARNING", 'Project not found @mapTitleUpdate', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ exports.handler = async (event) => {
     // Update map title
     const updatedMap = await mapTitleUpdate(map, newTitle);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to update title on map @mapTitleUpdate');
+      log("ERROR", 'Unable to update title on map @mapTitleUpdate');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -122,7 +122,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapTitleUpdate endpoint: ${error.message}`);
+    log("ERROR", `Error in mapTitleUpdate endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

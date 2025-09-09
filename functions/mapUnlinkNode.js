@@ -48,7 +48,7 @@ exports.handler = async (event) => {
     if (!projectId || projectId.trim().length === 0 ||
         !nodeIdFrom || nodeIdFrom.trim().length === 0 ||
         !nodeIdTo || nodeIdTo.trim().length === 0) {
-          log('SERVER WARNING', 'Invalid body @mapUnlinkNode', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapUnlinkNode', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapUnlinkNode');
+      log("WARNING", 'Missing token @mapUnlinkNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
     if (typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeIdFrom !== 'string' || nodeIdFrom.length > 50 ||
         typeof nodeIdTo !== 'string' || nodeIdTo.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapUnlinkNode');
+            log("WARNING", 'Request blocked by anti-malicious check @mapUnlinkNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found @mapUnlinkNode', projectId);
+      log("WARNING", 'Project not found @mapUnlinkNode', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ exports.handler = async (event) => {
     // Disconnect nodes on map
     const updatedMap = await mapLinkDisconnect(map, nodeIdFrom, nodeIdTo);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to disconnect nodes on map @mapUnlinkNode');
+      log("ERROR", 'Unable to disconnect nodes on map @mapUnlinkNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -122,7 +122,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapUnlinkNode endpoint: ${error.message}`);
+    log("ERROR", `Error in mapUnlinkNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

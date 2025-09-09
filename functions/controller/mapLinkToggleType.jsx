@@ -14,7 +14,7 @@ async function mapLinkToggleType(map, nodeIdFrom, nodeIdTo, linkType) {
 
     // Check inputs
     if (!map || !nodeIdFrom || !nodeIdTo || !linkType) {
-        log("SERVER ERROR", "Invalid inputs @mapLinkToggleType.");
+        log("ERROR", "Invalid inputs @mapLinkToggleType.");
         return null;
     }
     // Clone nodes array to avoid mutating input
@@ -54,7 +54,7 @@ async function mapLinkToggleType(map, nodeIdFrom, nodeIdTo, linkType) {
     // Save to database
     const result = await mapUpdate(updatedMap);
     if (!result || typeof result !== 'object' || result.projectId !== map.projectId) {
-        log("SERVER ERROR", "Unable to update links @mapLinkToggleType.");
+        log("ERROR", "Unable to update links @mapLinkToggleType.");
         return null;
     }
 

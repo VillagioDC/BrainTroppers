@@ -3,9 +3,9 @@
 
 // Import modules
 import { updateNode } from './updateNode.js';
-import { toggleNodeToolsButtons } from './nodeToolsMenu.js';
+import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
-export async function hideNode() {
+export async function hideNode(e) {
     // Node id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }

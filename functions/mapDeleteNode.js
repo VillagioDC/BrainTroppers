@@ -48,7 +48,7 @@ exports.handler = async (event) => {
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0) {
-          log('SERVER WARNING', 'Invalid body @mapDeleteNode', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapDeleteNode', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapDeleteNode');
+      log("WARNING", 'Missing token @mapDeleteNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapDeleteNode');
+            log("WARNING", 'Request blocked by anti-malicious check @mapDeleteNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
     // Read map
     const map = await mapRead(projectId);
     if (!map) {
-      log('SERVER WARNING', 'Project not found @mapDeleteNode', projectId);
+      log("WARNING", 'Project not found @mapDeleteNode', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ exports.handler = async (event) => {
     // Delete map node
     const updatedMap = await mapNodeDelete(map, nodeId);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to delete node on map @mapDeleteNode');
+      log("ERROR", 'Unable to delete node on map @mapDeleteNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -122,7 +122,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapDeleteNode endpoint: ${error.message}`);
+    log("ERROR", `Error in mapDeleteNode endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     // Get params   
     const { projectId, userId } = event.queryStringParameters || {};
     if (!projectId || !userId) {
-      log('SERVER WARNING', 'Invalid body @mapCreateGetStatus');
+      log("WARNING", 'Invalid body @mapCreateGetStatus');
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     const authHeader = event.headers.Authorization || event.headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token) {
-      log('SERVER WARNING', 'Missing token @mapCreateGetStatus');
+      log("WARNING", 'Missing token @mapCreateGetStatus');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -56,7 +56,7 @@ exports.handler = async (event) => {
     // Fetch map
     const map = await mapRead( projectId );
     if (!map) {
-      log('SERVER WARNING', 'Project not found @mapCreateGetStatus', projectId);
+      log("WARNING", 'Project not found @mapCreateGetStatus', projectId);
       return {
         statusCode: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -80,11 +80,11 @@ exports.handler = async (event) => {
       status = 'creating';
     // If failed
     } else if (map.creationStatus === 'failed') {
-      log('SERVER ERROR', `Map creation failed @mapUpdateGetStatus: ${projectId}`);
+      log("ERROR", `Map creation failed @mapUpdateGetStatus: ${projectId}`);
       status = 'failed';
     // If created
     } else {
-      log('SERVER INFO', "Map created @mapUpdateGetStatus:");
+      log("INFO", "Map created @mapUpdateGetStatus:");
       status = 'created';
     }
 
@@ -96,7 +96,7 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
-    log('SERVER ERROR', `Error in mapCreateGetStatus endpoint: ${error.message}`);
+    log("ERROR", `Error in mapCreateGetStatus endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

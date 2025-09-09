@@ -32,9 +32,13 @@ export async function showNotification(message, type = 'success', action = null)
         msg.textContent = message;
         popup.classList.remove('success', 'error', 'info');
         popup.classList.add(type);
-        icon.classList.remove('fa-spinner', 'spinning', 'fa-check-circle', 'fa-times-circle', 'fa-info-circle');
+        icon.classList.remove('fa-spinner', 'spinning', 'fa-solic', 'fa-hand', 'fa-check-circle', 'fa-times-circle', 'fa-info-circle');
+        // Set action icons
         if (action === 'wait') {
             icon.classList.add('fa-spinner', 'spinning');
+        } else if (action === 'connect') {
+            icon.classList.remove('fas');
+            icon.classList.add('fa-solid','fa-hand','info');
         } else {
             icon.classList.add(
                 type === 'success' ? 'fa-check-circle' :
@@ -48,7 +52,7 @@ export async function showNotification(message, type = 'success', action = null)
             notificationTimeout = null;
         }
         // Set timeout
-        if (action !== 'wait') {
+        if (action !== 'wait' && action !== 'connect') {
             notificationTimeout = setTimeout(() => {
                 popup.remove();
             }, 3000);

@@ -12,7 +12,7 @@ function sanitizeMap({map, type}) {
 
     // Check map
     if (!map || typeof map !== 'object') {
-        log("SERVER ERROR", "Invalid input @sanitizeMap.");
+        log("ERROR", "Invalid input @sanitizeMap.");
         return null;
     }
 

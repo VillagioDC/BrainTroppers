@@ -27,14 +27,14 @@ export async function handleForgotPassword() {
         return;
     }
     // Call API
-    await showNotification('Reseting access', 'info', 'wait');
+    await showNotification('Reseting access', "INFO", 'wait');
     const result = await apiForgotPassword(email);
     // Handle result
     if (!result) {
         // Error
         await showNotification('Password reset failed', 'error');
     } else if (result && result.error) {
-        await showNotification(result.error, 'error');
+        await showNotification(result.error, "ERROR");
     } else {
         // Pending
         await showNotification('Verification email sent', 'success');

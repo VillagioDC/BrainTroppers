@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     if (!userId || userId.trim().length === 0 || 
         !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0) {
-      log('SERVER WARNING', 'Invalid body @mapRewireNode', JSON.stringify(body));
+      log("WARNING", 'Invalid body @mapRewireNode', JSON.stringify(body));
       return {
         statusCode: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapRewireNode');
+      log("WARNING", 'Missing token @mapRewireNode');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -71,7 +71,7 @@ exports.handler = async (event) => {
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapRewireNode');
+            log("WARNING", 'Request blocked by anti-malicious check @mapRewireNode');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,7 +82,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -93,7 +93,7 @@ exports.handler = async (event) => {
     // Create rewire request
     const updatedMap = await mapNodeRewireRequest(projectId, nodeId);
     if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to rewire map @mapRewireNode');
+      log("ERROR", 'Unable to rewire map @mapRewireNode');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -110,7 +110,7 @@ exports.handler = async (event) => {
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapRewire endpoint: ${error.message}`);
+    log("ERROR", `Error in mapRewire endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -17,7 +17,7 @@ async function mapCreateRequest({userId, query}) {
     // Generate  new map and add to database
     let newMap = await mapAddNew({userId, query});
     if (!newMap) {
-        log('SERVER WARNING', 'Unable to create map @mapCreateRequest');
+        log("WARNING", 'Unable to create map @mapCreateRequest');
         return {
         statusCode: 500,
         body: JSON.stringify({ error: 'Unable to create map' })
@@ -35,7 +35,7 @@ async function mapCreateRequest({userId, query}) {
         // Check imediate response
         if (response.status !== 202) {
             // Failed
-            log('SERVER ERROR', "Failed to invoke background function @mapCreateRequest", `status: ${response.status}`);
+            log("ERROR", "Failed to invoke background function @mapCreateRequest", `status: ${response.status}`);
             newMap.creationStatus = 'failed';
             await mapUpdate(newMap);
         }
@@ -48,7 +48,7 @@ async function mapCreateRequest({userId, query}) {
 
         // Catch error
     } catch (error) {
-        log('SERVER ERROR', 'Unable to create map @mapCreateRequest', error);
+        log("ERROR", 'Unable to create map @mapCreateRequest', error);
         newMap.creationStatus = 'failed';
         await mapUpdate(newMap);
         return {

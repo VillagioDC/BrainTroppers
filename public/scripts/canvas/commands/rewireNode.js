@@ -9,7 +9,7 @@ import { pauseS } from '../utils/pauseS.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
 // Rewire node
-export async function rewireNode() {
+export async function rewireNode(e) {
     // Get selected node Id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }

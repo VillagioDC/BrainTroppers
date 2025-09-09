@@ -6,7 +6,6 @@ import { checkQuery } from '../utils/validate.js';
 import { updateMapApi } from '../apis/updateMapApi.js';
 import { addNewNodeApi } from '../apis/addNewNodeApi.js'
 import { updateMapGetStatus } from '../poolling/updateMapGetStatus.js';
-import { openNodeToolsMenu } from './nodeToolsMenu.js';
 import { pauseS } from '../utils/pauseS.js';
 import { showNotification, removeNotification } from '../../common/notifications.js';
 
@@ -126,7 +125,7 @@ async function handleAddNode(e) {
         // Get projectId
         const projectId = braintroop.getProjectId();
         // Pooling node
-        await showNotification('Creating...', 'info', 'wait');
+        await showNotification('Creating...', "INFO", 'wait');
         await pauseS(40);
         let creationStatus = 'creating';
         updatedMap = {};

@@ -26,7 +26,7 @@ async function mapTitleUpdate(map, title) {
 
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to update title on map @mapTitleUpdate.");
+        log("ERROR", "Unable to update title on map @mapTitleUpdate.");
     }
 
     // Last update

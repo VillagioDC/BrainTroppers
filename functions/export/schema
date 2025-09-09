@@ -1,0 +1,15 @@
+{
+  projectId: String,          // project Id
+  title: String,              // project title
+  lastUpdated: Date,          // last update date
+  nodes: [{  
+    nodeId: String,           // node id
+    shortName: String,        // short name
+    content: String,          // node content  
+    detail: String,           // node detailed description
+    x: Number ,               // x coordinate
+    y: Number,                // y coordinate
+    hidden: Boolean,          // visibility
+    colorScheme: String,      // color scheme
+  }]
+}

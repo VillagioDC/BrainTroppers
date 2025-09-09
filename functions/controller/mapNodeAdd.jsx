@@ -23,7 +23,7 @@ async function mapNodeAdd(map, node) {
                                      update: { $push: { nodes: node } } });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to add new node on map @mapNodeAdd.");
+        log("ERROR", "Unable to add new node on map @mapNodeAdd.");
     }
 
     // Last update

@@ -3,8 +3,8 @@
 
 // Import modules
 import { renameMap } from '../commands/renameMap.js';
+import { exportMap } from '../commands/exportMap.js';
 import { shareMap } from '../commands/shareMap.js';
-import { downloadMap } from '../commands/downloadMap.js';
 import { deleteMap } from '../commands/deleteMap.js';
 
 // Popup map menu
@@ -43,11 +43,45 @@ async function loadMapMenu(currentMapItem) {
 
 // Add event listeners to map menu items
 function bindMapPopupMenuListeners() {
-    document.getElementById('map-item-rename').addEventListener('click', renameMap);
-    document.getElementById('map-item-share').addEventListener('click', shareMap);
-    document.getElementById('map-item-download').addEventListener('click', downloadMap);
-    document.getElementById('map-item-delete').addEventListener('click', deleteMap);
+    // Rename
+    if (document.getElementById('map-item-rename'))
+        document.getElementById('map-item-rename').addEventListener('click', renameMap);
+    // Export PDF
+    if (document.getElementById('map-item-pdf'))
+        document.getElementById('map-item-pdf').addEventListener('click', exportPdfMap);
+    // Export PNG
+    if (document.getElementById('map-item-image'))
+        document.getElementById('map-item-image').addEventListener('click', exportPngMap);
+    // Export DOC
+    if (document.getElementById('map-item-doc'))
+        document.getElementById('map-item-doc').addEventListener('click', exportDocxMap);
+    // Share
+    if (document.getElementById('map-item-share'))
+        document.getElementById('map-item-share').addEventListener('click', shareMap);
+    // Delete
+    if (document.getElementById('map-item-delete'))
+        document.getElementById('map-item-delete').addEventListener('click', deleteMap);
+    // Add outside click handler
     document.addEventListener('click', outsideClickHandler);
+    // Escape key handler
+    document.addEventListener('keydown', keydownHandler);
+}
+
+// Export map handlers
+async function exportPngMap(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    await exportMap({type: 'png'});
+}
+async function exportPdfMap(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    await exportMap({type: 'pdf'});
+}
+async function exportDocxMap(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    await exportMap({type: 'docx'});
 }
 
 // Remove map menu HTML
@@ -55,13 +89,20 @@ export async function removeMapMenu() {
     // Remove event listeners from map menu items
     if (document.getElementById('map-item-rename'))
         document.getElementById('map-item-rename').removeEventListener('click', renameMap);
+    if (document.getElementById('map-item-pdf'))
+        document.getElementById('map-item-pdf').removeEventListener('click', exportPdfMap);
+    if (document.getElementById('map-item-image'))
+        document.getElementById('map-item-image').removeEventListener('click', exportPngMap);
+    if (document.getElementById('map-item-doc'))
+        document.getElementById('map-item-doc').removeEventListener('click', exportDocxMap);
     if (document.getElementById('map-item-share'))
         document.getElementById('map-item-share').removeEventListener('click', shareMap);
-    if (document.getElementById('map-item-download'))
-        document.getElementById('map-item-download').removeEventListener('click', downloadMap);
     if (document.getElementById('map-item-delete'))
         document.getElementById('map-item-delete').removeEventListener('click', deleteMap);
+    // Outside click handler
     document.removeEventListener('click', outsideClickHandler);
+    // Escape key handler
+    document.removeEventListener('keydown', keydownHandler);
     // Remove popup container
     if (document.getElementById('map-menu-popup'))
         document.getElementById('map-menu-popup').remove();
@@ -69,8 +110,15 @@ export async function removeMapMenu() {
 
 // Outside click handler
 function outsideClickHandler(e) {
-    const mapMenuPopup = document.getElementById('map-item-rename');
+    const mapMenuPopup = document.getElementById('map-menu-popup');
     if (!mapMenuPopup || !mapMenuPopup.contains(e.target)) {
+        removeMapMenu();
+    }
+}
+
+// Escape key handler
+function keydownHandler(e) {
+    if (e.key === 'Escape') {
         removeMapMenu();
     }
 }

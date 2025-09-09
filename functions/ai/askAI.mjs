@@ -13,7 +13,7 @@ async function askAI(constructedConversation) {
     // Handle input error
     if (!constructedConversation || typeof constructedConversation !== "object") {
         const input = `constructedConversation: ${typeof constructedConversation}`; 
-        console.error("SERVER ERROR: Invalid input @askAI.", input);
+        console.error("ERROR: Invalid input @askAI.", input);
         return null;
     }
 
@@ -55,7 +55,7 @@ async function askAI(constructedConversation) {
 
     // Catch error
     } catch (error) {
-        console.error("SERVER ERROR: Unable to ask LLM7 AI @askAI.", error);
+        console.error("ERROR: Unable to ask LLM7 AI @askAI.", error);
         return null;
     }
 }

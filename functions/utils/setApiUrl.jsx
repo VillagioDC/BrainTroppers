@@ -35,7 +35,7 @@ function setApiUrl(api) {
             break;
         default:
             url = '';
-            log('SERVER ERROR', 'Invalid API call @setApiUrl', api);
+            log("ERROR", 'Invalid API call @setApiUrl', api);
     }
     // Return URL
     return url;

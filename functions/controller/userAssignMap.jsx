@@ -11,27 +11,28 @@ const log = require('../utils/log.jsx');
 */
 
 async function userAssignMap({ assignedUserId, map }) {
+
     // Validate inputs
     if (!assignedUserId || typeof assignedUserId !== 'string' ||
         !map || typeof map !== 'object' ||
         !map.projectId || typeof map.projectId !== 'string' ||
         !map.title || typeof map.title !== 'string' ||
         !map.lastUpdated || !(map.lastUpdated instanceof Date)) {
-        log("SERVER_ERROR", "Invalid input @userAssignMap", { assignedUserId, map });
-        return false;
+            log("ERROR", "Invalid input @userAssignMap", { assignedUserId, map });
+            return false;
     }
+
+    const mapMeta = { projectId: map.projectId, title: map.title, lastUpdated: map.lastUpdated };
 
     // Add new map to user
     const result = await executeDB({ collectionName: 'users',
                                      type: 'updateOne',
                                      filter: { userId: assignedUserId },
-                                     update: { $push: { maps: { projectId: map.projectId,
-                                                                title: map.title,
-                                                                lastUpdated: map.lastUpdated }} }
+                                     update: { $push: { maps: mapMeta} }
     });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER_ERROR", "Failed to assign map to user @userAssignMap", assignedUserId);
+        log("ERROR", "Failed to assign map to user @userAssignMap", assignedUserId);
         return false;
     }
 
@@ -42,11 +43,11 @@ async function userAssignMap({ assignedUserId, map }) {
     });
     // Handle error
     if (!user) {
-        log("SERVER_ERROR", "Failed to read user after assigning map", assignedUserId);
+        log("ERROR", "Failed to read user after assigning map", assignedUserId);
         return false;
     }
 
-    // Return
+    // Return user
     return user;
 }
 

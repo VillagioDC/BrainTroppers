@@ -17,7 +17,7 @@ const log = require('../utils/log.jsx');
 async function userSignIn(credentials) {
     // Check credentials
     if (!credentials || !credentials.email || !credentials.password) {
-        log('SERVER WARNING', 'Missing credentials @userSignIn', credentials);
+        log("WARNING", 'Missing credentials @userSignIn', credentials);
         return {
             statusCode: 400,
             body: JSON.stringify({ error: 'Missing credentials' })
@@ -30,7 +30,7 @@ async function userSignIn(credentials) {
     });
     // Check user
     if (!user) {
-        log('SERVER INFO', 'User not found @userSignIn', credentials.email);
+        log("INFO", 'User not found @userSignIn', credentials.email);
         return {
             statusCode: 404,
             body: JSON.stringify({ error: 'User not found' })
@@ -38,7 +38,7 @@ async function userSignIn(credentials) {
     }
     // Check confirmation pending
     if (user.authToken !== null) {
-        log('SERVER INFO', 'User not confirmed @userSignIn', credentials.email);
+        log("INFO", 'User not confirmed @userSignIn', credentials.email);
         return {
             statusCode: 401,
             body: JSON.stringify({ error: 'Verify your email' })
@@ -46,7 +46,7 @@ async function userSignIn(credentials) {
     }
     // Check password
     if (user.password !== credentials.password) {
-        log('SERVER INFO', 'Incorrect password @userSignIn', credentials.email);
+        log("INFO", 'Incorrect password @userSignIn', credentials.email);
         return {
             statusCode: 401,
             body: JSON.stringify({ error: 'Incorrect password' })

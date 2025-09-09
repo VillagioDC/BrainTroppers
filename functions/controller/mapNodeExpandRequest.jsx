@@ -16,7 +16,7 @@ async function mapNodeExpandRequest(projectId, parentId, query) {
 
     // Check parameters
     if (!projectId || !parentId || !query) {
-        log('SERVER ERROR', 'Missing parameters @mapNodeExpandRequest');
+        log("ERROR", 'Missing parameters @mapNodeExpandRequest');
         return;
     }
 
@@ -25,14 +25,14 @@ async function mapNodeExpandRequest(projectId, parentId, query) {
         // Fetch the map
         let map = await mapRead(projectId);
         if (!map) {
-            log('SERVER WARNING', "Invalid map for background processing @mapNodeExpandRequest:", projectId);
+            log("WARNING", "Invalid map for background processing @mapNodeExpandRequest:", projectId);
             return {
                 statusCode: 500,
                 body: JSON.stringify({ error: 'Unable to rewrite node' })
             };
         }
         if (map.creationStatus !== 'created' && map.creationStatus !== 'failed') {
-            log('SERVER WARNING', "Map creation status already processing @mapNodeExpandRequest:", projectId);
+            log("WARNING", "Map creation status already processing @mapNodeExpandRequest:", projectId);
             return {
                 statusCode: 400,
                 body: JSON.stringify({ error: 'Unable to rewrite node' })
@@ -51,7 +51,7 @@ async function mapNodeExpandRequest(projectId, parentId, query) {
         // Check imediate response
         if (response.status !== 202) {
             // Failed
-            log('SERVER ERROR', `Failed to invoke background function: status ${response.status}`);
+            log("ERROR", `Failed to invoke background function: status ${response.status}`);
             map.creationStatus = 'failed';
         } else {
             map.creationStatus = 'creating';
@@ -68,7 +68,7 @@ async function mapNodeExpandRequest(projectId, parentId, query) {
 
         // Catch error
     } catch (error) {
-        log('SERVER WARNING', 'Unable to create map @mapNodeExpandRequest', error);
+        log("WARNING", 'Unable to create map @mapNodeExpandRequest', error);
         if (map) {
             map.creationStatus = 'failed';
             await mapUpdate(map);

@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const { map, parentId, query } = body;
     if (!map || !parentId || !query) {
-        log('SERVER WARNING', 'Invalid body @mapNodeAdd-background');
+        log("WARNING", 'Invalid body @mapNodeAdd-background');
         return;
     }
 
@@ -61,7 +61,7 @@ exports.handler = async (event) => {
             const conversation = constructConversation(instructions, messages);        
 
             // Ask AI
-            log('SERVER DEBUG', `Asking AI @mapNodeAdd-background: ${stages[i]}`);
+            log("DEBUG", `Asking AI @mapNodeAdd-background: ${stages[i]}`);
             userMessage = await askAIBridge(conversation);
 
             // Response
@@ -76,7 +76,7 @@ exports.handler = async (event) => {
         // Parse response
         const jsonResponse = parseJSON(response);
         if (!jsonResponse || jsonResponse.length === 0) {
-            log("SERVER ERROR", "Unable to parse response from AI @mapNodeAdd-background", response);
+            log("ERROR", "Unable to parse response from AI @mapNodeAdd-background", response);
             map.creationStatus = 'failed';
             await mapUpdate(map);
             return;
@@ -118,13 +118,13 @@ exports.handler = async (event) => {
         // Update map
         const updatedMap = await mapUpdate(map);
         if (!updatedMap) {
-            log('SERVER WARNING', 'Unable to update map @mapNodeAdd-background');
+            log("WARNING", 'Unable to update map @mapNodeAdd-background');
             return;
         }
         return;
 
     } catch (error) {
-        log('SERVER ERROR', `Error in background node creation @mapNodeAdd-background for ${map.projectId}: ${error.message}`);
+        log("ERROR", `Error in background node creation @mapNodeAdd-background for ${map.projectId}: ${error.message}`);
         // Update to 'failed' on error
         map.creationStatus = 'failed';
         await mapUpdate(map);

@@ -3,7 +3,7 @@
 
 // Import modules
 import { unlinkNodeApi } from "../apis/unlinkNodeApi.js";
-import { removeLinkToolsMenu } from "./linkToolsMenu.js";
+import { removeLinkToolsMenu } from "../interface/linkToolsMenu.js";
 import { showNotification, removeNotification } from "../../common/notifications.js";
 
 export async function unlinkNode() {

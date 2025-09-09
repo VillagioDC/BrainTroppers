@@ -13,7 +13,7 @@ function parseJSON(jsonString) {
     
     // Handle error
     if (!jsonString) {
-        log("SERVER WARNING", "Empty JSON string @parseJSON");
+        log("WARNING", "Empty JSON string @parseJSON");
         return null;
     }
 
@@ -23,7 +23,7 @@ function parseJSON(jsonString) {
 
         // Handle error
         if (!jsonObject || typeof jsonObject !== "object") {
-            log("SERVER ERROR", "Unable to parse JSON string @parseJSON");
+            log("ERROR", "Unable to parse JSON string @parseJSON");
             return null;
         }
 
@@ -32,7 +32,7 @@ function parseJSON(jsonString) {
     
     // Catch error
     } catch (error) {
-        log("SERVER ERROR", "Error while parsing JSON string @parseJSON", error);
+        log("ERROR", "Error while parsing JSON string @parseJSON", error);
         return null;
     }
 }

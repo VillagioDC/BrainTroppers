@@ -23,25 +23,25 @@ function log(type, message, detail) {
     // Handle input error
     if (!type || !message) {
         const input = `type: ${typeof type}, message: ${typeof message}`; 
-        console.log(`${color.red}SERVER ERROR${color.reset}: Invalid input @log ${color.gray}${input}${color.reset}`); //console.error("SERVER ERROR: Invalid input @log.", input);
+        console.log(`${color.red}SERVER ERROR${color.reset}: Invalid input @log ${color.gray}${input}${color.reset}`); //console.error("ERROR: Invalid input @log.", input);
         return;
     }
     
     
     // Log by type
     switch (type) {
-        case "SERVER INFO":
+        case "INFO":
             console.log(`${color.green}${type}${color.reset}: ${message}`);
             if (detail) console.log(`${color.gray}${detail}${color.reset}`);
             break;
-        case "SERVER DEBUG":
+        case "DEBUG":
             console.log(`${color.purple}${type}${color.reset}: ${message}`);
             if (detail) console.log(`${color.gray}${detail}${color.reset}`);
             break;
-        case "SERVER WARNING":
+        case "WARNING":
             console.log(`${color.orange}${type}${color.reset}: ${message}`);
             if (detail) console.log(`${color.gray}${detail}${color.reset}`);
-        case "SERVER ERROR":
+        case "ERROR":
             console.log(`${color.red}${type}${color.reset}: ${message}`);
             if (detail) console.log(`${color.gray}${detail}${color.reset}`);
             break;

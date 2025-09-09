@@ -2,8 +2,8 @@
 // LINK TOOLS MENU MODULE
 
 // Import modules
-import { unlinkNode } from "./unlinkNode.js";
-import { toggleLinkType } from "./toggleLinkType.js";
+import { unlinkNode } from '../commands/unlinkNode.js';
+import { toggleLinkType } from '../commands/toggleLinkType.js';
 
 export async function openLinkToolsMenu(edge) {
     // Check edgeId

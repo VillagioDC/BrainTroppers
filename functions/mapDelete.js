@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ) {          
-          log('SERVER WARNING', 'Invalid body @mapDelete', JSON.stringify(body));
+          log("WARNING", 'Invalid body @mapDelete', JSON.stringify(body));
           return {
             statusCode: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
     const authHeader = headers.Authorization || headers.authorization;
     const token = authHeader?.match(/Bearer\s+(\S+)/i)?.[1] || '';
     if (!token || token.trim().length === 0) {
-      log('SERVER WARNING', 'Missing token @mapDelete');
+      log("WARNING", 'Missing token @mapDelete');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ exports.handler = async (event) => {
     // Anti-malicious checks
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ) {
-            log('SERVER WARNING', 'Request blocked by anti-malicious check @mapDelete');
+            log("WARNING", 'Request blocked by anti-malicious check @mapDelete');
             return {
                 statusCode: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -81,7 +81,7 @@ exports.handler = async (event) => {
     // Set session expires
     const isValid = await checkSessionExpired(userId);
     if (!isValid) {
-      log('SERVER INFO', 'Session expired');
+      log("INFO", 'Session expired');
       return {
         statusCode: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ exports.handler = async (event) => {
     // Delete map
     const deletedMap = await mapDelete(projectId);
     if (!deletedMap) {
-      log('SERVER ERROR', 'Unable to delete map @mapDelete');
+      log("ERROR", 'Unable to delete map @mapDelete');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -100,13 +100,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Delete map from user list
-    await userDeleteMap(userId, projectId);
-
-    // Read map to check if deleted
-    const updatedMap = await mapRead(projectId);
-    if (!updatedMap) {
-      log('SERVER ERROR', 'Unable to read map @mapDelete', projectId);
+    // Delete map for all users
+    const result = await userDeleteMap(projectId);
+    if (!result) {
+      log("ERROR", 'Unable to delete map from user @mapDelete');
       return {
         statusCode: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -114,17 +111,16 @@ exports.handler = async (event) => {
       };
     }
 
-
     // Return success
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedMap)
+      body: JSON.stringify({ success: 'Map deleted'})
     };
 
   // Catch error
   } catch (error) {
-    log('SERVER ERROR', `Error in mapDelete endpoint: ${error.message}`);
+    log("ERROR", `Error in mapDelete endpoint: ${error.message}`);
     return {
       statusCode: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

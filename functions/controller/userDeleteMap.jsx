@@ -15,16 +15,16 @@ async function userDeleteMap(projectId) {
     // Delete project from all users: owner and colabs
     const result = await executeDB({ collectionName: 'users',
                                      type: 'updateMany',
-                                     filter: { 'maps.projectId': projectId  },
-                                     update: { $pull: { maps: { projectId: projectId } } } });
+                                     filter: { maps: { $elemMatch: { projectId: projectId } }},
+                                     update: { $pull: { maps: { projectId: projectId } }} });
     // Handle error
     if (!result || result.modifiedCount === 0) {
-        log("SERVER ERROR", "Unable to delete map from user @userDeleteMap.");
+        log("ERROR", "Unable to delete map from user @userDeleteMap.");
         return false;
     }
 
     // Return
-    return result;
+    return true;
 }
 
 module.exports = userDeleteMap;
