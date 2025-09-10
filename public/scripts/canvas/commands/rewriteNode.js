@@ -83,7 +83,7 @@ function loadDetailContent() {
 
 // Handle node rewrite
 async function handleNodeRewrite(e) {
-    e.preventDefault();
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get selected node
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
@@ -97,10 +97,10 @@ async function handleNodeRewrite(e) {
         // Remove rewrite popup
         removeRewritePopup();
         // Show notification
-        await showNotification('Requesting...', 'info', 'wait');
+        await showNotification('Requesting', 'info', 'wait');
         // Save current map
         const currentMap = braintroop.getBackendMap();
-        let updatedMap = await updateMapApi(currentMap);
+        const updatedMap = await updateMapApi(currentMap);
         // Check error requesting map
         if (!updatedMap || typeof updatedMap !== 'object') {
             // Show error notification
@@ -108,9 +108,9 @@ async function handleNodeRewrite(e) {
             return;
         }
         // Submit query to rewrite node
-        const response = await rewriteNodeApi( { nodeId, query} );
+        const request = await rewriteNodeApi( { nodeId, query} );
         // Check error requesting map
-        if (!response || typeof response !== 'object' || !response.statusCode || response.statusCode !== 202) {
+        if (!request || typeof request !== 'object' || !request.statusCode || request.statusCode !== 202) {
             // Show error notification
             showNotification('Error rewriting node', 'error');
             return;
@@ -118,31 +118,31 @@ async function handleNodeRewrite(e) {
         // Get projectId
         const projectId = braintroop.getProjectId();
         // Pooling node
-        await showNotification('Creating...', 'info', 'wait');
+        await showNotification('Creating', 'info', 'wait');
         await pauseS(40);
         let creationStatus = 'creating';
-        updatedMap = {};
+        let result = {};
         while (creationStatus === 'creating') {
             // Call api
-            updatedMap = await updateMapGetStatus(projectId);
-            // Check status
-            if (updatedMap && updatedMap.creationStatus) {
-                creationStatus = updatedMap.creationStatus;
+            result = await updateMapGetStatus(projectId);
+            // Check status { status, map }
+            if (result && result.status) {
+                creationStatus = result.status;
             }
             // Wait
-            await pauseS(15);
+            if (creationStatus === 'creating') await pauseS(15);
         }
         // Update node
-        if (updatedMap && updatedMap.creationStatus === 'created') {
+        if (result && result.map && result.status === 'created') {
             // Set map
-            braintroop.setMap(updatedMap);           
+            braintroop.setMap(result.map);           
             // Remove notification
             removeNotification();
         } else {
             // Show error notification
             showNotification('Error rewriting node', 'error');
             // Restore map creation status
-            await updateMapApi(currentMap);
+            await updateMapApi(updatedMap);
         }
     } else {
         // Remove add popup

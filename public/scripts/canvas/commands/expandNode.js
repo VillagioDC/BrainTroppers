@@ -88,7 +88,7 @@ function closeExpandPopup() {
 
 // Handle expand node
 async function handleExpandNode(e) {
-    e.preventDefault();
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get parent node
     const parentId = braintroop.getSelectedNodeId();
     if (!parentId) { console.error('No node selected'); return; }
@@ -102,12 +102,12 @@ async function handleExpandNode(e) {
         // Remove expand popup
         removeExpandPopup();
         // Show notification
-        await showNotification('Requesting...', 'info', 'wait');
+        await showNotification('Requesting', 'info', 'wait');
         // Save current map
         const currentMap = braintroop.getBackendMap();
-        let updatedMap = await updateMapApi(currentMap);
+        const uptadedMap = await updateMapApi(currentMap);
         // Check error requesting map
-        if (!updatedMap || typeof updatedMap !== 'object') {
+        if (!uptadedMap || typeof uptadedMap !== 'object') {
             // Show error notification
             showNotification('Error creating node', 'error');
             return;
@@ -117,8 +117,8 @@ async function handleExpandNode(e) {
         // Add node with temp id
         const newNodeId = braintroop.addTempNode(newNode);
         // Submit query to expand node
-        const response = await expandNodeApi( { parentId, query} );
-        if (!response || typeof response !== 'object' || !response.statusCode || response.statusCode !== 202) {
+        const request = await expandNodeApi( { parentId, query} );
+        if (!request || typeof request !== 'object' || !request.statusCode || request.statusCode !== 202) {
             // Remove temp node (placeholder)
             braintroop.deleteNode(newNodeId);
             // Show error notification
@@ -128,33 +128,33 @@ async function handleExpandNode(e) {
         // Get projectId
         const projectId = braintroop.getProjectId();
         // Pooling node
-        await showNotification('Creating...', 'info', 'wait');
+        await showNotification('Creating', 'info', 'wait');
         await pauseS(40);
         let creationStatus = 'creating';
-        updatedMap = {};
+        let result = {};
         while (creationStatus === 'creating') {
             // Call api
-            updatedMap = await updateMapGetStatus(projectId);
-            // Check status
-            if (updatedMap && updatedMap.creationStatus) {
-                creationStatus = updatedMap.creationStatus;
+            result = await updateMapGetStatus(projectId);
+            // Check status { status, map?}
+            if (result && result.status) {
+                creationStatus = result.status;
             }
             // Wait
-            await pauseS(15);
+            if (creationStatus === 'creating') await pauseS(15);
         }
         // Remove temp node
         braintroop.deleteNode(newNodeId);
         // Update node
-        if (updatedMap && updatedMap.creationStatus === 'created') {
+        if (result && result.map && result.status === 'created') {
             // Set map
-            braintroop.setMap(updatedMap);           
+            braintroop.setMap(result.map);           
             // Remove notification
             removeNotification();
         } else {
             // Show error notification
             showNotification('Error expanding node', 'error');
             // Restore map creation status
-            await updateMapApi(currentMap);
+            await updateMapApi(uptadedMap);
         }
     } else {
         // Remove add popup

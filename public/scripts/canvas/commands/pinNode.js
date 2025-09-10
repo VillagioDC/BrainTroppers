@@ -5,7 +5,14 @@
 import { updateNode } from './updateNode.js';
 import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
+// Canvas command to pin node
+export async function requestPinNode() {
+    await pinNode();
+}
+
+// User command to pin node
 export async function pinNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Node id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }
@@ -20,7 +27,9 @@ export async function pinNode(e) {
     toggleNodeToolsButtons(node);
 }
 
+// User command to unpin node
 export async function unpinNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Node id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }

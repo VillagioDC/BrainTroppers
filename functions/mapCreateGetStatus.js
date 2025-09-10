@@ -7,14 +7,13 @@
 const loadCORSHeaders = require('./utils/loadCORSHeaders.jsx');
 const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonGetRequest = require('./utils/refuseNonGetRequest.jsx');
-const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
+const userRead = require('./controller/userRead.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
     event {queryStringParameters: {projectId, userId}, headers: {Authorization: Bearer <token>}}
-    RETURN {object} - body: {status, map?} || error
+    RETURN {object} - body: {status, user?, map?} || error
 */
 
 exports.handler = async (event) => {
@@ -88,11 +87,23 @@ exports.handler = async (event) => {
       status = 'created';
     }
 
+    // Collect user if map created
+    let user = null;
+    if (status === 'created')
+      user = await userRead(userId);
+
+    // Construct response
+    const response = {
+      status,
+      user: status === 'created' ? user : null,
+      map: status === 'created' ? map : null
+    };
+
     // Return
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(map)
+      body: JSON.stringify(response)
     };
 
   } catch (error) {

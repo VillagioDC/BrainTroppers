@@ -6,7 +6,8 @@ import { unlinkNodeApi } from "../apis/unlinkNodeApi.js";
 import { removeLinkToolsMenu } from "../interface/linkToolsMenu.js";
 import { showNotification, removeNotification } from "../../common/notifications.js";
 
-export async function unlinkNode() {
+export async function unlinkNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get selected edge
     const selectedEdgeId = braintroop.getSelectedEdgeId();
     if (!selectedEdgeId) { console.warn("No edge selected"); return; }
@@ -14,7 +15,7 @@ export async function unlinkNode() {
     if (!edge) { console.warn("Edge not found"); return; }
 
     // Show notification
-     await showNotification('Processing...', 'info', 'wait');
+     await showNotification('Processing', 'info', 'wait');
 
     // Delete link on DB
     const projectId = braintroop.getProjectId();

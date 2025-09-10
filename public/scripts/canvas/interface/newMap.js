@@ -32,7 +32,7 @@ async function initNewMap() {
 
 // New map button click
 export async function newMapClick(e) {
-    if (e) e.preventDefault();
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Remove existing map from canvas
     braintroop.deleteMap();
     // Prevent reloading new map container

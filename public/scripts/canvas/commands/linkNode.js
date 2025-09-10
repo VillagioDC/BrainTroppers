@@ -7,6 +7,7 @@ import { showNotification, removeNotification } from '../../common/notifications
 
 // Link node
 export function linkNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Show notification
     showNotification('Select node', 'info', 'connect');
     // Link node
@@ -27,7 +28,7 @@ export function endLinkCommand({nodeIdFrom, nodeIdTo}) {
 // Handle new link
 async function handleNewLink(nodeIdFrom, nodeIdTo) {
     // Show notification
-     await showNotification('Processing...', 'info', 'wait');
+     await showNotification('Processing', 'info', 'wait');
 
     // Delete link on DB
     const projectId = braintroop.getProjectId();

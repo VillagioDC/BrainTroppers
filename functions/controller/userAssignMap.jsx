@@ -3,6 +3,7 @@
 
 // Functions
 const executeDB = require('../mongoDB/executeDB.jsx');
+const userRead = require('./userRead.jsx');
 const log = require('../utils/log.jsx');
 
 /* PARAMETERS
@@ -37,10 +38,7 @@ async function userAssignMap({ assignedUserId, map }) {
     }
 
     // Read user after update
-    const user = await executeDB({ collectionName: 'users',
-                                   type: 'findOne',
-                                   filter: { userId: assignedUserId }
-    });
+    const user = await userRead(assignedUserId);
     // Handle error
     if (!user) {
         log("ERROR", "Failed to read user after assigning map", assignedUserId);

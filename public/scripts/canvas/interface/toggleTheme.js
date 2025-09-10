@@ -27,8 +27,22 @@ export function toggleTheme() {
     if (document.querySelector('.map-new-input-container'))
         document.querySelector('.map-new-input-container').classList.contains('light')?
             document.querySelector('.map-new-input-container').classList.remove('light') : document.querySelector('.map-new-input-container').classList.add('light');
-
-            // Toggle theme changes on canvas
-    // Implement here
-    
+    // Node tools / Link tools
+    if (document.querySelector('.tools')) {
+        document.querySelector('.tools').classList.contains('light') ? 
+            document.querySelector('.tools').classList.remove('light') : document.querySelector('.tools').classList.add('light');
+        document.querySelectorAll('.tools-btn').forEach(btn => btn.classList.contains('light') ? 
+            btn.classList.remove('light') : btn.classList.add('light'));
+        // Approve button
+        document.getElementById('approve-node-btn').querySelector('i').classList.contains('light') ? 
+            document.getElementById('approve-node-btn').querySelector('i').classList.remove('light') : document.getElementById('approve-node-btn').querySelector('i').classList.add('light');
+        // Trash button
+        document.getElementById('delete-node-btn').querySelector('i').classList.contains('light') ? 
+            document.getElementById('delete-node-btn').querySelector('i').classList.remove('light') : document.getElementById('delete-node-btn').querySelector('i').classList.add('light');
+    }
+    // Color scheme menu
+    if (document.getElementById('color-scheme-menu')) {
+        document.getElementById('color-scheme-menu').classList.contains('light') ? 
+            document.getElementById('color-scheme-menu').classList.remove('light') : document.getElementById('color-scheme-menu').classList.add('light');
+    }
 }

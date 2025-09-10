@@ -2,14 +2,14 @@
 // No dependencies
 
 // Functions
-const log = require('../utils/log.jsx');
+const log = require('./log.jsx');
 
 /* PARAMETERS
   input {fullMap} - map
   RETURN {map} - map || null
 */
 
-async function sanitizeMap(fullMap) {
+async function sanitizeMapToExport(fullMap) {
 
     // Check map
     if (!fullMap || typeof fullMap !== 'object' || !fullMap.projectId) {
@@ -48,4 +48,4 @@ async function sanitizeMap(fullMap) {
     return map;
 }
 
-module.exports = sanitizeMap;
+module.exports = sanitizeMapToExport;

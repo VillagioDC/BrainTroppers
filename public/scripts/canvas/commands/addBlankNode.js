@@ -6,7 +6,8 @@ import { addBlankNodeApi } from '../apis/addBlankNodeApi.js';
 import { openDetailPopup } from './detailNode.js';
 
 // Add blank node to selected node
-export async function addBlankNode() {
+export async function addBlankNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get selected node Id
     const parentId = braintroop.getSelectedNodeId();
     if (!parentId) { console.error('No node selected'); return; }

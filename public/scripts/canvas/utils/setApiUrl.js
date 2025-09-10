@@ -36,6 +36,9 @@ export function setApiUrl(api) {
         case 'renameMap':
             url += '/mapTitleUpdate';
             break;
+        case 'cloneMap':
+            url += '/mapClone';
+            break;
         case 'deleteMap':
             url += '/mapDelete';
             break;

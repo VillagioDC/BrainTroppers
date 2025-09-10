@@ -9,6 +9,7 @@ const constructConversation = require('./ai/constructConversation.jsx');
 const askAIBridge = require('./ai/askAIBridge.jsx');
 const parseJSON = require('./utils/parseJSON.jsx');
 const sanitizeMapLinks = require('./utils/sanitizeMapLinks.jsx');
+const userAssignMap = require('./controller/userAssignMap.jsx');
 const log = require('./utils/log.jsx');
 
 /* PARAMETERS
@@ -20,9 +21,9 @@ exports.handler = async (event) => {
 
     // Get projectId
     const body = JSON.parse(event.body);
-    const projectId = body.projectId || null;
-    if (!projectId) {
-        log("WARNING", 'Missing projectId @mapCreate-background', JSON.stringify(body));
+    const { userId, projectId } = body;
+    if (!userId || !projectId) {
+        log("WARNING", 'Invalid body @mapCreate-background', JSON.stringify(body));
         return;
     }
 
@@ -81,6 +82,7 @@ exports.handler = async (event) => {
 
         // Fill meta data
         map.title = jsonResponse.title;
+        map.owner = userId;
         map.nodes = jsonResponse.nodes;
         map.creationStatus = 'created';
         map.lastUpdated = new Date(Date.now());
@@ -99,8 +101,12 @@ exports.handler = async (event) => {
         // Sanitize map links
         map = sanitizeMapLinks(map);
 
+        // Assign map to user
+        const user = await userAssignMap({ assignedUserId: userId, map });
+
         // Update map
         await mapUpdate(map);
+
         return;
 
     } catch (error) {

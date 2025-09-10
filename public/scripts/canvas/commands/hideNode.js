@@ -6,6 +6,7 @@ import { updateNode } from './updateNode.js';
 import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
 export async function hideNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Node id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.warn('No node selected'); return; }
@@ -21,7 +22,8 @@ export async function hideNode(e) {
     }
 }
 
-export async function unhideNode() {
+export async function unhideNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Node id
     const nodeId = braintroop.selected.id;
     if (!nodeId) { console.warn('No node selected'); return; }

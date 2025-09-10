@@ -10,14 +10,15 @@ import { showNotification, removeNotification } from '../../common/notifications
 
 // Rewire node
 export async function rewireNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get selected node Id
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
     // Show notification
-    await showNotification('Requesting...', 'info', 'wait');
+    await showNotification('Requesting', 'info', 'wait');
     // Save current map
     const currentMap = braintroop.getBackendMap();
-    let updatedMap = await updateMapApi(currentMap);
+    const updatedMap = await updateMapApi(currentMap);
     // Check error requesting map
     if (!updatedMap || typeof updatedMap !== 'object') {
         // Show error notification
@@ -25,9 +26,9 @@ export async function rewireNode(e) {
         return;
     }
     // Submit query to rewire node
-    const response = await rewireNodeApi({nodeId});
+    const request = await rewireNodeApi({nodeId});
     // Check error requesting map
-    if (!response || typeof response !== 'object' || !response.statusCode || response.statusCode !== 202) {
+    if (!request || typeof request !== 'object' || !request.statusCode || request.statusCode !== 202) {
         // Show error notification
         showNotification('Error rewiring node', 'error');
         return;
@@ -35,30 +36,30 @@ export async function rewireNode(e) {
     // Get projectId
     const projectId = braintroop.getProjectId();
     // Pooling node
-    await showNotification('Rewiring...', 'info', 'wait');
+    await showNotification('Rewiring', 'info', 'wait');
     await pauseS(40);
     let creationStatus = 'creating';
-    updatedMap = {};
+    let result = {};
     while (creationStatus === 'creating') {
         // Call api
-        updatedMap = await updateMapGetStatus(projectId);
-        // Check status
-        if (updatedMap && updatedMap.creationStatus) {
-            creationStatus = updatedMap.creationStatus;
+        result = await updateMapGetStatus(projectId);
+        // Check status {status, user}
+        if (result && result.status) {
+            creationStatus = result.status;
         }
         // Wait
-        await pauseS(15);
+        if (creationStatus === 'creating') await pauseS(15);
     }
     // Update node
-    if (updatedMap && updatedMap.creationStatus === 'created') {
+    if (result && result.map && creationStatus === 'created') {
         // Set map
-        braintroop.setMap(updatedMap);           
+        braintroop.setMap(result.map);           
         // Remove notification
         removeNotification();
     } else {
         // Show error notification
         showNotification('Error creating node', 'error');
         // Restore map creation status
-        await updateMapApi(currentMap);
+        await updateMapApi(updatedMap);
     }
 }

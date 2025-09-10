@@ -7,8 +7,6 @@
 const loadCORSHeaders = require('./utils/loadCORSHeaders.jsx');
 const handlePreflight = require('./utils/handlePreflight.jsx');
 const refuseNonGetRequest = require('./utils/refuseNonGetRequest.jsx');
-const checkSessionExpired = require('./utils/checkExpires.jsx');
-const setSessionExpires = require('./utils/setExpires.jsx');
 const mapRead = require('./controller/mapRead.jsx');
 const log = require('./utils/log.jsx');
 
@@ -88,11 +86,17 @@ exports.handler = async (event) => {
       status = 'created';
     }
 
-    // Return
+    // Construct response {status, map?}
+    const response = {
+      status,
+      map: status === 'created' ? map : null
+    }
+
+    // Return response
     return {
       statusCode: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify(map)
+      body: JSON.stringify(response)
     };
 
   } catch (error) {

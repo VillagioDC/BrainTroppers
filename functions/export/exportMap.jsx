@@ -4,10 +4,9 @@
 // Functions
 const createTempFolder = require('./createTempFolder.jsx');
 const mapRead = require('../controller/mapRead.jsx');
-const sanitizeMap = require('./sanitizeMap.jsx');
+const sanitizeMapToExport = require('../utils/sanitizeMapToExport.jsx');
 const createPdfMap = require('./createPdfMap.jsx');
-const createPngMap = require('./createPngMap.jsx');
-const createDocMap = require('./createDocMap.jsx');
+const createDocxMap = require('./createDocxMap.jsx');
 const uploadExportMap = require('./uploadExportMap.jsx');
 const log = require('../utils/log.jsx');
 
@@ -21,6 +20,10 @@ async function exportMap(projectId, type) {
     // Check input
     if (!projectId || typeof projectId !== 'string' || !type || typeof type !== 'string') {
         log("ERROR", 'Invalid request @exportMap');    
+        return null;
+    }
+    if (type !== 'pdf' && type !== 'png' && type !== 'docx') {
+        log("ERROR", 'Invalid type @exportMap');    
         return null;
     }
 
@@ -42,22 +45,24 @@ async function exportMap(projectId, type) {
         }
 
         // Sanitize map
-        const map = await sanitizeMap(fullMap);
+        const map = await sanitizeMapToExport(fullMap);
 
         // Create source file of map
         let sourceFilepath = null;
         if (type === 'pdf') sourceFilepath = await createPdfMap(map);
-        else if (type === 'png') sourceFilepath = await createPngMap(map);
-        else if (type === 'docx') sourceFilepath = await createDocMap(map);
-        else {
-            log("ERROR", 'Invalid type @exportMap', type);
+        else if (type === 'docx') sourceFilepath = await createDocxMap(map);
+        else return null;
+
+        // Check source filepath
+        if (!sourceFilepath) {
+            log("ERROR", 'Unable to create export map @exportMap');
             return null;
         }
-
+        
         // Upload file
         const downloadUrl = await uploadExportMap(projectId, sourceFilepath);
         if (!downloadUrl) {
-            log("ERROR", 'Unable to export map @exportMap');
+            log("ERROR", 'Unable to upload map @exportMap');
             return null;
         }
 

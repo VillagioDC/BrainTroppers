@@ -14,7 +14,8 @@ import { setLocalStorageUser } from '../../common/userLocalStorage.js';
 import { pauseS } from '../utils/pauseS.js';
 
 // Create new map
-export async function createNewMap() {
+export async function createNewMap(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Element
     const queryEl = document.getElementById('map-new-query');
     if (!queryEl) { console.error('Missing query element'); return; };
@@ -26,7 +27,7 @@ export async function createNewMap() {
     // Close new map container
     removeNewMapContainer();
     // Show notification
-    await showNotification('Requesting...', 'info', 'wait');
+    await showNotification('Requesting', 'info', 'wait');
     // Request creation of map
     const reqMap = await createMapApi(query);
     // Check error requesting map
@@ -38,45 +39,51 @@ export async function createNewMap() {
         return;
     };
     // Pooling map
-    await showNotification('Creating...', 'info', 'wait');
+    await showNotification('Creating', 'info', 'wait');
     await pauseS(40);
     let creationStatus = 'creating';
-    let newMap = {};
+    let result = {};
     while (creationStatus === 'creating') {
         // Call api
-        newMap = await createMapGetStatus(reqMap.projectId);
-        // Check status
-        if (newMap && newMap.creationStatus) {
-            creationStatus = newMap.creationStatus;
+        result = await createMapGetStatus(reqMap.projectId);
+        // Check result {status, user, map}
+        if (result && result.status) {
+            creationStatus = result.status;
         }
-        // Wait
-        await pauseS(15);
+        // Pause
+        if (creationStatus === 'creating') await pauseS(15);
     }
     // Remove temp node (placeholder)
     deleteFirstNode(placeholderNodeId);
-    // Place new map
-    if (newMap && newMap.creationStatus === 'created') {
-        // Set data
-        braintroop.setMap(newMap);
-        braintroop.rebuildMap();
-        // Create map item
-        await createMapItem(newMap);
-        // Set new map item as active
-        setActiveMapItem(newMap.projectId);
-        // Add map to user as owner
-        const updatedUser = await assignMapToUserApi( {assignedUserId: newMap.owner, map: newMap} );
-        // Update user on local storage
-        setLocalStorageUser(updatedUser);
-        // Remove notification
-        removeNotification();
-    } else {
+    // Check result
+    if (!result || typeof result !== 'object' || !result.user || !result.map || result.status === 'failed') {
         // Update notification
         showNotification('Error creating map', 'error');
         // Remove map on database
-        await deleteMapApi(reqMap.projectId);
+        if (result.map.creationStatus === 'failed') await deleteMapApi(reqMap.projectId);
         // Get back to new map container
         await newMapClick(null);
+        return;
     }
+    // Update user
+    const user = result.user;
+    setLocalStorageUser(user);
+    // Remove new map container
+    removeNewMapContainer();
+    // Update map
+    const newMap = result.map;
+    // Update map list
+    await createMapItem(newMap);
+    // Set map on canvas
+    braintroop.setMap(newMap);
+    // Rebuild map 
+    braintroop.rebuildMap();
+    // Fit map to canvas
+    braintroop.zoomFit();
+    // Set active map item
+    setActiveMapItem(newMap.projectId);
+    // Remove notification
+    removeNotification();
 }
 
 // Add first node (placeholder)

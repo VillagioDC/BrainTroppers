@@ -27,9 +27,8 @@ export async function updateMapGetStatus(projectId) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get updated map
-        const updatedMap = responseData;
-        return updatedMap;
+        // Get result {status, map?}
+        return responseData;
         
         // Catch errors
         } catch (error) {

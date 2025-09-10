@@ -3,23 +3,9 @@
 // Private timeout variable
 let notificationTimeout = null;
 
-// Private function to load modal
-async function loadNotificationModal() {
-    try {
-        const res = await fetch('./snippets/notification-popup.html');
-        if (!res.ok) {
-            throw new Error('Failed to fetch notification modal');
-        }
-        const html = await res.text();
-        document.body.insertAdjacentHTML('beforeend', html);
-    } catch (error) {
-        console.error('Failed to load notification popup:', error);
-        throw error;
-    }
-}
-
 export async function showNotification(message, type = 'success', action = null) {
     try {
+        // Load notification modal
         if (!document.getElementById('notification-popup')) {
             await loadNotificationModal();
         }
@@ -29,6 +15,9 @@ export async function showNotification(message, type = 'success', action = null)
         if (!popup || !msg || !icon) {
             throw new Error('Notification elements not found');
         }
+        // Check and set notification theme
+        setNotificationTheme();
+        // Set notification message
         msg.textContent = message;
         popup.classList.remove('success', 'error', 'info');
         popup.classList.add(type);
@@ -63,6 +52,34 @@ export async function showNotification(message, type = 'success', action = null)
     }
 }
 
+// Load modal
+async function loadNotificationModal() {
+    try {
+        const res = await fetch('./snippets/notification-popup.html');
+        if (!res.ok) {
+            throw new Error('Failed to fetch notification modal');
+        }
+        const html = await res.text();
+        document.body.insertAdjacentHTML('beforeend', html);
+    } catch (error) {
+        console.error('Failed to load notification popup:', error);
+        throw error;
+    }
+}
+
+// Set notification theme for canvas only
+function setNotificationTheme() {
+    // If not canvas, return
+    if(!document.getElementById('canvas')) return;
+    // Check and set light theme
+    if(document.getElementById('canvas').classList.contains('light')) {
+        document.getElementById('notification-popup').classList.add('light');
+        document.getElementById('notification-popup').querySelector('p').classList.add('light');
+        document.getElementById('notification-popup').querySelector('i').classList.add('light');
+    }
+}
+
+// Remove notification
 export function removeNotification() {
     const popup = document.getElementById('notification-popup');
     if (popup) {

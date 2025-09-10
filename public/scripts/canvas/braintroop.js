@@ -654,6 +654,7 @@ import { pinNode } from './commands/pinNode.js';
         .attr("class", "node-text")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
+        .style("font-family", "Roboto, sans-serif")
         .style("pointer-events", "none")
         .style("user-select", "none");
 
@@ -1235,7 +1236,7 @@ import { pinNode } from './commands/pinNode.js';
       node.x = x;
       node.y = y;
       node.locked = locked;
-      if (locked === true) await pinNode(nodeId);
+      if (locked === true) await requestPinNode(nodeId);
     }
 
     // Cleans up event listeners and resources
@@ -1248,8 +1249,67 @@ import { pinNode } from './commands/pinNode.js';
       if (this.simulation) this.simulation.stop();
     }
 
+    // -------------------- EXPORT PNG PREP (host on frontend) --------------------
+    _prepareExportPng() {
+        // Get simulation nodes
+        const simNodes = this.simulation.nodes() || [];
+        // Prevent exporting empty map
+        if (simNodes.length === 0) return null;
+
+        // Compute full bounds (include negative coords, all nodes even hidden)
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        simNodes.forEach(n => {
+            const mapNode = n.__mapNode;
+            if (!mapNode) return;
+            const w = mapNode.hidden ? this.hiddenNodeWidth : this.nodeWidth;
+            const h = mapNode.hidden ? this.hiddenNodeHeight : this.nodeHeight;
+            const left = n.x - w / 2;
+            const right = n.x + w / 2;
+            const top = n.y - h / 2;
+            const bottom = n.y + h / 2;
+            // Set bounds
+            minX = Math.min(minX, left);
+            maxX = Math.max(maxX, right);
+            minY = Math.min(minY, top);
+            maxY = Math.max(maxY, bottom);
+        });
+
+        // Add padding (gridSpacing for margin around map)
+        const padding = this.gridSpacing;
+        const width = maxX - minX + 2 * padding;
+        const height = maxY - minY + 2 * padding;
+        const viewMinX = minX - padding;
+        const viewMinY = minY - padding;
+
+        // Clone SVG for export
+        const tempSvg = this.svg.node().cloneNode(true);
+
+        // Set viewBox to full bounds (handles negatives)
+        tempSvg.setAttribute('viewBox', `${viewMinX} ${viewMinY} ${width} ${height}`);
+
+        // Reset root-g transform to show absolute/full positions (ignore current zoom/pan)
+        const rootG = tempSvg.querySelector('.root-g');
+        if (rootG) { rootG.setAttribute('transform', ''); }
+
+        // Hide grid
+        const gridG = tempSvg.querySelector('.dot-grid');
+        if (gridG) { gridG.style.display = 'none'; }
+
+        // Hide selection highlights
+        tempSvg.querySelectorAll('.selection-rect').forEach(el => { el.style.display = 'none'; });
+
+        // Style
+
+        // Serialize
+        const svgString = new XMLSerializer().serializeToString(tempSvg);
+
+        return {
+          svgString,
+          bounds: { minX: viewMinX, minY: viewMinY, width, height }
+        };
+    }
+
     // -------------------- PUBLIC API --------------------
-    // Grouped at bottom for clarity. These are the functions intended for host usage.
 
     //setMap(map) - Auto-detects backend vs canvas and normalizes to internal canvas schema.
     setMap(map) {

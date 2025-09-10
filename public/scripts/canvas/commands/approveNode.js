@@ -5,7 +5,8 @@
 import { updateNode } from './updateNode.js';
 import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
-export async function approveNode() {
+export async function approveNode(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Node id
     const nodeId = braintroop.selected.id;
     if (!nodeId) { console.warn('No node selected'); return; }

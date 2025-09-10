@@ -10,7 +10,7 @@ const log = require('../utils/log.jsx');
   input {map} - map
   RETURN {bool} - sourceFilepath || null
 */
-async function createDocMap(map) {
+async function createDocxMap(map) {
 
     // Check map
     if (!map || typeof map !== 'object' || !map.projectId || !map.nodes || map.nodes.length === 0) {
@@ -204,7 +204,7 @@ async function createDocMap(map) {
     return sourceFilepath;
 }
 
-module.exports = createDocMap;
+module.exports = createDocxMap;
 
 /*
 ROLE: 'docx' library expert;

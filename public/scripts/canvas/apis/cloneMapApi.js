@@ -1,5 +1,5 @@
 // CANVAS MODULES
-// DELETE MAP API MODULE
+// CLONE MAP API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
@@ -7,7 +7,7 @@ import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
 // Create map api
-export async function deleteMapApi(projectId) {
+export async function cloneMapApi(projectId) {
     try {
         // Set parameters
         const { userId, sessionToken } = getLocalStorageCredentials();
@@ -16,7 +16,7 @@ export async function deleteMapApi(projectId) {
             'Authorization': `Bearer ${sessionToken}`,
         };
         const body = { userId, projectId };
-        const url = setApiUrl('deleteMap');
+        const url = setApiUrl('cloneMap');
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -29,7 +29,7 @@ export async function deleteMapApi(projectId) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get result
+        // Result {user, map}
         const result = responseData;
         return result;
         

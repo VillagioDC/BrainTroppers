@@ -27,9 +27,8 @@ export async function createMapGetStatus(projectId) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get new map
-        const newMap = responseData;
-        return newMap;
+        // Get result {status, user?, map?}
+        return responseData;
         
         // Catch errors
         } catch (error) {

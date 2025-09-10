@@ -83,13 +83,14 @@ function bindMapItemEvents() {
 
 // Load map
 export async function loadMap(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     // Get project id
     const projectId = e.target.closest('.map-item').dataset.projectId;
     if (!projectId) { console.error('Missing project'); return; };
     // Check if map already opened
     const currentProjectId = braintroop.map.projectId;
     if (projectId === currentProjectId) return;
-    showNotification('Loading map...', 'info', 'wait');
+    showNotification('Loading map', 'info', 'wait');
     // Remove existing map menus on canvas
     braintroop.deleteMap();
     // Load map on database

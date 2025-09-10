@@ -7,9 +7,10 @@ import { removeUserMenu } from '../interface/userMenu.js';
 import { redirectToInitialPage } from '../../common/redirectToInitialPage.js';
 import { showNotification } from '../../common/notifications.js';
 
-export function logOut() {
+export function logOut(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Show notification
-    showNotification('Logging out...', 'info', 'wait');
+    showNotification('Logging out', 'info', 'wait');
     // Remove local storage data
     removeLocalStorageUser();
     // Remove user menu

@@ -8,6 +8,7 @@ import { showNotification, removeNotification } from '../../common/notifications
 
 // Rename map
 export async function renameMap(e) {
+    e.preventDefault();
     e.stopPropagation();
     // Get current map item
     const mapList = document.getElementById('map-list');
@@ -64,14 +65,15 @@ function setRenameTitle(currentMapItem) {
 }
 
 // Rename confirm
-async function renameConfirm() {
+async function renameConfirm(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get input value
     const input = document.getElementById('rename-title-input');
     if (!input) return;
     const newTitle = input.value.trim();
     if (newTitle) {
         // Show notification
-        await showNotification('Processing...', 'info', 'wait');
+        await showNotification('Processing', 'info', 'wait');
         // Update title on database
         const updatedMap = await renameMapApi(newTitle);
         // Update title on canvas

@@ -1,13 +1,14 @@
 // CANVAS MODULES
-// LOAD MAP API MODULE
+// EXPORT MAP API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
 import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
+import { pauseS } from '../utils/pauseS.js';
 
 // Load map from database
-export async function exportMapApi({projectId, type}) {
+export async function exportMapApi(projectId, type) {
     try {
         // Set parameters
         const { userId, token } = getLocalStorageCredentials();
@@ -29,8 +30,9 @@ export async function exportMapApi({projectId, type}) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get download url
-        return responseData;
+        // Get updated node
+        const map = responseData;
+        return map;
         
     // Catch errors
     } catch (error) {

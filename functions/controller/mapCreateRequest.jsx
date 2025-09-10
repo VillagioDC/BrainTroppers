@@ -30,7 +30,7 @@ async function mapCreateRequest({userId, query}) {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ projectId: newMap.projectId })
+            body: JSON.stringify({ userId, projectId: newMap.projectId })
         });
         // Check imediate response
         if (response.status !== 202) {

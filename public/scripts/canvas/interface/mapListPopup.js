@@ -3,20 +3,30 @@
 
 // Import modules
 import { renameMap } from '../commands/renameMap.js';
-import { exportMap } from '../commands/exportMap.js';
+import { cloneMap } from '../commands/cloneMap.js';
+import { exportDocxMap, exportPngMap, exportPdfMap } from '../commands/exportMap.js';
 import { shareMap } from '../commands/shareMap.js';
 import { deleteMap } from '../commands/deleteMap.js';
 
 // Popup map menu
 export async function popupMapMenu(e) {
-    e.stopPropagation();
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     // Remove existing map menus
     await removeMapMenu();
-    // Set current map item
+    // Get current map item
     const currentMapItem = e.currentTarget.closest('.map-item');
     // Show menu
     await loadMapMenu(currentMapItem);
+    // Bind event listeners
     bindMapPopupMenuListeners();
+    // Filter map if not active
+    if (!currentMapItem.classList.contains('active')) {
+        // Remove export to Png item
+        removeExportToPngItem();
+    }
+    // Show pop menu
+    if (document.getElementById('map-menu-popup'))
+        document.getElementById('map-menu-popup').style.display = 'block';
 };
 
 // Fetch and load map menu HTML
@@ -46,15 +56,18 @@ function bindMapPopupMenuListeners() {
     // Rename
     if (document.getElementById('map-item-rename'))
         document.getElementById('map-item-rename').addEventListener('click', renameMap);
+    // Clone
+    if (document.getElementById('map-item-clone'))
+        document.getElementById('map-item-clone').addEventListener('click', cloneMap);
     // Export PDF
     if (document.getElementById('map-item-pdf'))
         document.getElementById('map-item-pdf').addEventListener('click', exportPdfMap);
+    // Export DOC
+    if (document.getElementById('map-item-docx'))
+        document.getElementById('map-item-docx').addEventListener('click', exportDocxMap);
     // Export PNG
     if (document.getElementById('map-item-image'))
         document.getElementById('map-item-image').addEventListener('click', exportPngMap);
-    // Export DOC
-    if (document.getElementById('map-item-doc'))
-        document.getElementById('map-item-doc').addEventListener('click', exportDocxMap);
     // Share
     if (document.getElementById('map-item-share'))
         document.getElementById('map-item-share').addEventListener('click', shareMap);
@@ -67,21 +80,13 @@ function bindMapPopupMenuListeners() {
     document.addEventListener('keydown', keydownHandler);
 }
 
-// Export map handlers
-async function exportPngMap(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    await exportMap({type: 'png'});
-}
-async function exportPdfMap(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    await exportMap({type: 'pdf'});
-}
-async function exportDocxMap(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    await exportMap({type: 'docx'});
+function removeExportToPngItem() {
+    // Remove event listeners
+    if (document.getElementById('map-item-image'))
+        document.getElementById('map-item-image').removeEventListener('click', exportPngMap);
+    // Remove html
+    if (document.getElementById('map-item-image'))
+        document.getElementById('map-item-image').remove();
 }
 
 // Remove map menu HTML
@@ -89,12 +94,14 @@ export async function removeMapMenu() {
     // Remove event listeners from map menu items
     if (document.getElementById('map-item-rename'))
         document.getElementById('map-item-rename').removeEventListener('click', renameMap);
+    if (document.getElementById('map-item-clone'))
+        document.getElementById('map-item-clone').removeEventListener('click', cloneMap);
     if (document.getElementById('map-item-pdf'))
         document.getElementById('map-item-pdf').removeEventListener('click', exportPdfMap);
+    if (document.getElementById('map-item-docx'))
+        document.getElementById('map-item-docx').removeEventListener('click', exportDocxMap);
     if (document.getElementById('map-item-image'))
         document.getElementById('map-item-image').removeEventListener('click', exportPngMap);
-    if (document.getElementById('map-item-doc'))
-        document.getElementById('map-item-doc').removeEventListener('click', exportDocxMap);
     if (document.getElementById('map-item-share'))
         document.getElementById('map-item-share').removeEventListener('click', shareMap);
     if (document.getElementById('map-item-delete'))

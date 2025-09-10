@@ -106,7 +106,8 @@ function showDeleteAccountConfirm() {
 }
 
 // Delete account
-function deleteAccount() {
+function deleteAccount(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Show notification
     showNotification('Coming soon', 'info');
     // Remove user account popup

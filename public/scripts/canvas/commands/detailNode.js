@@ -162,7 +162,7 @@ function finishEditing(e) {
 
 // Handle edit node
 async function handleEditNode(e) {
-    e.preventDefault();
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get selected node
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
@@ -195,7 +195,7 @@ async function handleEditNode(e) {
     // Remove detail popup
     removeDetailPopup();
     // Show notification
-    await showNotification('Processing...', 'info', 'wait');
+    await showNotification('Processing', 'info', 'wait');
     // Update node on canvas
     braintroop.updateNodeInfo({nodeId, shortName: newShortName, content: newContent, detail: newDetail});
     // If blank node, add node

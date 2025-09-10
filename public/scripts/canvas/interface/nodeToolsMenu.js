@@ -12,7 +12,6 @@ import { rewireNode } from '../commands/rewireNode.js';
 import { pinNode, unpinNode } from '../commands/pinNode.js';
 import { approveNode } from '../commands/approveNode.js';
 import { hideNode, unhideNode } from '../commands/hideNode.js';
-import { layerNode } from '../commands/layerNode.js';
 import { openColorSchemePopup } from '../commands/colorSchemeNode.js';
 import { deleteNode } from '../commands/deleteNode.js';
 
@@ -24,6 +23,8 @@ export async function openNodeToolsMenu(selectedNode) {
     removeNodeToolsMenu();
     // Load node tools menu
     await loadNodeToolsMenu();
+    // Set tools buttons theme
+    setNodeToolsButtonsTheme();
     // Toggle tool buttons
     toggleNodeToolsButtons(node);
     // Show node tools menu
@@ -46,6 +47,15 @@ async function loadNodeToolsMenu() {
         document.body.insertAdjacentHTML('beforeend', html);
     } catch (error) {
         console.error('Error loading node tools:', error);
+    }
+}
+
+function setNodeToolsButtonsTheme() {
+    // Check and set light theme
+    if(document.getElementById('canvas').classList.contains('light')) {
+        document.getElementById('node-tools').classList.add('light');
+        document.querySelectorAll('.tools-btn').forEach(btn => btn.classList.add('light'));
+        document.querySelectorAll('.tools-btn i').forEach(icon => icon.classList.add('light'));
     }
 }
 
@@ -72,10 +82,10 @@ export function toggleNodeToolsButtons(node) {
     // Approve button
     if (node.approved) {
         document.getElementById('approve-node-btn').title = 'Revoke';
-        document.querySelector('.fa-check-circle').style.color = '#7dbf4f';
+        document.querySelector('.fa-check-circle').classList.add('approved');
     } else {
         document.getElementById('approve-node-btn').title = 'Approve';
-        document.querySelector('.fa-check-circle').style.color = '#e0e0e0';
+        document.querySelector('.fa-check-circle').classList.remove('approved');
     }
 }
 
@@ -118,16 +128,13 @@ function bindNodeToolsMenuEvents() {
     // Unhide node button
     if (document.getElementById('unhide-node-btn'))
         document.getElementById('unhide-node-btn').addEventListener('click', unhideNode);
-    // Layer node
-    if (document.getElementById('layer-node-btn'))
-        document.getElementById('layer-node-btn').addEventListener('click', layerNode);
     // Color scheme node button
     if (document.getElementById('color-node-btn'))
         document.getElementById('color-node-btn').addEventListener('click', openColorSchemePopup);
     // Delete node button
     if (document.getElementById('delete-node-btn'))
         document.getElementById('delete-node-btn').addEventListener('click', deleteNode);
-    document.addEventListener('click', outsideClickHandler);
+    // No outside click handler
 }
 
 // Remove node tools menu
@@ -169,25 +176,15 @@ export function removeNodeToolsMenu() {
     // Unhide node button
     if (document.getElementById('unhide-node-btn'))
         document.getElementById('unhide-node-btn').removeEventListener('click', unhideNode);
-    // Layer node
-    if (document.getElementById('layer-node-btn'))
-        document.getElementById('layer-node-btn').removeEventListener('click', layerNode);
     // Color scheme node button
     if (document.getElementById('color-node-btn'))
         document.getElementById('color-node-btn').removeEventListener('click', openColorSchemePopup);
     // Delete node button
     if (document.getElementById('delete-node-btn'))
         document.getElementById('delete-node-btn').removeEventListener('click', deleteNode);
-    document.removeEventListener('click', outsideClickHandler);
+    // No outside click handler
     // Remove popup container
     if (document.getElementById('node-tools')) {
         document.getElementById('node-tools').remove();
     }
-}
-
-// Click outside event handler
-function outsideClickHandler(event) {
-    return;
-    const toolsMenu = document.getElementById('node-tools');
-    if (!toolsMenu.contains(event.target)) removeNodeToolsMenu();
 }

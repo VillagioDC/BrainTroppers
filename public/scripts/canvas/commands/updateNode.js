@@ -14,7 +14,7 @@ export async function updateNode(changes) {
     const map = braintroop.getBackendMap();
     if (!map) { console.error('Missing map'); return; }
     // Show notification
-    showNotification('Processing...', 'info', 'wait');
+    showNotification('Processing', 'info', 'wait');
     // Get node from map
     const node = map.nodes.find(n => n.nodeId === changes.nodeId);
     // Update node

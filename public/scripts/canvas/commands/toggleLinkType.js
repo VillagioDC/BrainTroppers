@@ -7,6 +7,7 @@ import { toggleLinkToolsButtons } from "../interface/linkToolsMenu.js";
 import { showNotification, removeNotification } from "../../common/notifications.js";
 
 export async function toggleLinkType(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get selected edge
     const selectedEdgeId = braintroop.getSelectedEdgeId();
     if (!selectedEdgeId) { console.warn("No edge selected"); return; }
@@ -14,7 +15,7 @@ export async function toggleLinkType(e) {
     if (!edge) { console.warn("Edge not found"); return; }
 
     // Show notification
-    await showNotification('Processing...', 'info', 'wait');
+    await showNotification('Processing', 'info', 'wait');
 
     // Update link type on DB
     const projectId = braintroop.getProjectId();

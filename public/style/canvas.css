@@ -11,6 +11,7 @@
   --border: #3a4d6a;
   --menu-bg: #1a283b;
   --menu-hover: #25374e;
+  --approved-color: #7dbf4f;
   --delete-color: #e5428e;
   --gold-plan: #ffc827;
   /* LIGHT MODE */
@@ -23,7 +24,8 @@
   --light-border: #d5dce5;
   --light-menu-bg: #f3f6fa;
   --light-menu-hover: #dde4ef;
-  --light-delete-color: #e5428e;
+  --light-approved-color: #549525;
+  --light-delete-color: #8e0d49;
 }
 * {
   margin: 0;
@@ -55,6 +57,10 @@ body {
 }
 
 /* CANVAS */
+#braintroop-svg {
+  font-family: 'Roboto', sans-serif;
+}
+
 .canvas {
   position: fixed;
   top: 0;
@@ -67,12 +73,15 @@ body {
 .canvas.light {
   background-color: var(--light-background);
 }
+.nodes .node {
+  font-family: 'Roboto', sans-serif;  /* Container inherits to children */
+}
 
 /* ZOOM CONTROLS */
 .zoom-controls {
   position: fixed;
   bottom: 30px;
-  right: 20px;
+  right: 1.2rem;
   width: 2.2rem;
   height: 6.4rem;
   display: flex;
@@ -294,10 +303,10 @@ body {
 .tools {
   position: fixed;
   top: 45%;
-  right: 20px;
+  right: 1.2rem;
   transform: translateY(-50%);
   width: 2.2rem;
-  height: 23rem;
+  height: 21rem;
   background: var(--background-shadow);
   display: flex;
   flex-direction: column;
@@ -313,7 +322,10 @@ body {
 .tools.link-tools {
   height: 5.4rem;
 }
-
+.tools.light {
+  background: var(--light-background-shadow);
+  border: 1px solid var(--light-border);
+}
 .tools-btn {
   display: flex;
   width: 1.1rem;
@@ -333,8 +345,20 @@ body {
   font-size: 1.1rem;
   color: var(--text);
 }
+.tools-btn.light i {
+  color: var(--light-text);
+}
+.tools-btn.approved i {
+  color: var(--approved-color);
+}
+.tools-btn.approved.light i {
+  color: var(--light-approved-color);
+}
 .tools-btn i.fa-trash {
   color: var(--delete-color);
+}
+.tools-btn i.fa-trash.light {
+  color: var(--light-delete-color);
 }
 
 /* USER MENU POPUP */
@@ -519,7 +543,7 @@ body {
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 0.4rem 0.7rem;
+  padding: 0.3rem 0.7rem;
   font-weight: 400;
   color: var(--text);
   border-radius: 6px;
@@ -789,7 +813,54 @@ body {
     background: linear-gradient(135deg, var(--accent), var(--secondary));
 }
 
-/* Pro Plan Popup */
+/* COLOR SCHEME POPUP */
+.color-scheme {
+  position: fixed;
+  top: 48.5%;
+  right: 3.8rem;
+  transform: translateY(-50%);
+  width: 4.6rem;
+  height: 15rem;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  flex-wrap: wrap;
+  z-index: 9700;
+}
+.color-scheme.light {
+  background: var(--light-background);
+  border: 1px solid var(--light-border);
+}
+.color-scheme button {
+  display: flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: yellow;
+  border: 2px solid orange;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s;
+}
+.color-scheme button:hover {
+  transform: scale(1.6);
+  margin: 0.4rem 0;
+}
+.color-scheme i {
+  font-size: 0.6rem;
+  color: var(--text);
+}
+
+/* PRO PLAN POPUP */
 .pro-plan-content {
   position: fixed;
   top: 50%;
@@ -876,9 +947,16 @@ body {
     box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.4);
     z-index: 12000;
 }
+.notification-popup.light {
+    background: var(--light-background-shadow);
+    border: 1px solid var(--light-border);
+}
 .notification-popup p {
     font-size: 0.9rem;
     color: var(--text);
+}
+.notification-popup p.light {
+    color: var(--light-text);
 }
 .notification-popup.success {
     border-left: 4px solid #27ae60;
@@ -888,6 +966,12 @@ body {
 }
 .notification-popup.info {
     border-left: 4px solid #3498db;
+}
+.notification-popup i {
+    color: var(--text);
+}
+.notification-popup i.light {
+    color: var(--light-text);
 }
 .notification-popup .spinning {
     animation: spin 0.8s linear infinite;

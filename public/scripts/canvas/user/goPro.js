@@ -43,7 +43,7 @@ function bindProPlanPopupEvents() {
 
 // Submit pro plan form
 async function proPlanFormSubmit(e) {
-    e.preventDefault();
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Call API
     const result = await userWaitlistApi();
     // Handle result

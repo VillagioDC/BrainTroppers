@@ -1,22 +1,22 @@
 // CANVAS MODULES
-// DELETE MAP API MODULE
+// LOAD MAP API MODULE
 
 // Import modules
 import { getLocalStorageCredentials } from '../../common/userLocalStorage.js';
 import { setApiUrl } from '../utils/setApiUrl.js';
 import { checkSessionExpired } from '../utils/checkSessionExpired.js';
 
-// Create map api
-export async function deleteMapApi(projectId) {
+// Load map from database
+export async function exportMapApi({projectId, type}) {
     try {
         // Set parameters
-        const { userId, sessionToken } = getLocalStorageCredentials();
+        const { userId, token } = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionToken}`,
+            'Authorization': `Bearer ${token}`,
         };
-        const body = { userId, projectId };
-        const url = setApiUrl('deleteMap');
+        const body = { userId, projectId, type };
+        const url = setApiUrl('exportMap');
         const response = await fetch(url, {
             method: 'POST',
             headers,
@@ -29,13 +29,12 @@ export async function deleteMapApi(projectId) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get result
-        const result = responseData;
-        return result;
+        // Get download url
+        return responseData;
         
-        // Catch errors
-        } catch (error) {
-            console.error('Error adding node:', error);
-            return false;
+    // Catch errors
+    } catch (error) {
+        console.error('Error exporting map:', error);
+        return false;
     }
 }
