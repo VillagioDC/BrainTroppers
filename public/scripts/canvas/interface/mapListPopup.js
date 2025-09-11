@@ -21,8 +21,8 @@ export async function popupMapMenu(e) {
     bindMapPopupMenuListeners();
     // Filter map if not active
     if (!currentMapItem.classList.contains('active')) {
-        // Remove export to Png item
-        removeExportToPngItem();
+        // Remove export items
+        removeExportItems();
     }
     // Show pop menu
     if (document.getElementById('map-menu-popup'))
@@ -80,11 +80,19 @@ function bindMapPopupMenuListeners() {
     document.addEventListener('keydown', keydownHandler);
 }
 
-function removeExportToPngItem() {
+function addExportItems() {
     // Remove event listeners
+    if (document.getElementById('map-item-pdf'))
+        document.getElementById('map-item-pdf').removeEventListener('click', exportPdfMap);
+    if (document.getElementById('map-item-docx'))
+        document.getElementById('map-item-docx').removeEventListener('click', exportDocxMap);
     if (document.getElementById('map-item-image'))
         document.getElementById('map-item-image').removeEventListener('click', exportPngMap);
     // Remove html
+    if (document.getElementById('map-item-pdf'))
+        document.getElementById('map-item-pdf').remove();
+    if (document.getElementById('map-item-docx'))
+        document.getElementById('map-item-docx').remove();
     if (document.getElementById('map-item-image'))
         document.getElementById('map-item-image').remove();
 }

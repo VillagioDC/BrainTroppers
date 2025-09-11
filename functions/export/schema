@@ -7,9 +7,7 @@
     shortName: String,        // short name
     content: String,          // node content  
     detail: String,           // node detailed description
-    x: Number ,               // x coordinate
-    y: Number,                // y coordinate
     hidden: Boolean,          // visibility
-    colorScheme: String,      // color scheme
+    colorSchemeName: String,      // color scheme
   }]
 }

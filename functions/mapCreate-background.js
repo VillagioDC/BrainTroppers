@@ -93,9 +93,9 @@ exports.handler = async (event) => {
             map.nodes[i].y = null;
             map.nodes[i].locked = false;
             map.nodes[i].approved = false;
+            map.nodes[i].maximized = false;
             map.nodes[i].hidden = false;
-            map.nodes[i].colorScheme = null;
-            map.nodes[i].layer = 1;
+            map.nodes[i].colorSchemeName = null;
         }
 
         // Sanitize map links

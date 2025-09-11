@@ -12,7 +12,7 @@ import { showNotification, removeNotification } from '../../common/notifications
 // Add node to selected node
 export async function addNewNode(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); };
-    // Get selected node Id
+    // Get selected nodeId
     const parentId = braintroop.getSelectedNodeId();
     if (!parentId) { console.error('No node selected'); return; }
     // Open add new node popup
@@ -38,7 +38,7 @@ async function openNewNodePopup() {
 async function loadAddPopup() {
     try {
         const response = await fetch('./snippets/add-node-popup.html');
-        if (!response.ok) throw new Error('Failed to load detail-node-popup.html');
+        if (!response.ok) throw new Error('Failed to load add-node-popup.html');
         const html = await response.text();
         // Add node popup
         document.body.insertAdjacentHTML('beforeend', html);

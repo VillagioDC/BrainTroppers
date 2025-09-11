@@ -228,7 +228,7 @@ FEATURES:
 9- nodes must check link to weak nodes that has only relatedLink and insert as its branch;
 10- nodes may have bilateral links (1 to 3, 3 to 1, ...), so you must avoid duplication;
 11- nodes without directLink and relatedLink will be placed at the end of the document;
-12- ignore x, y, locked, colorScheme;
+12- ignore x, y, locked, colorSchemeName;
 13- save DOCX file to already existing folder (done!)
 OUTPUT: complete code with comments
 */

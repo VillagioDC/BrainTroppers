@@ -88,6 +88,7 @@ exports.handler = async (event) => {
         map.nodes[i].content = jsonResponse.nodes[0].content;
         map.nodes[i].detail = jsonResponse.nodes[0].detail;
         map.nodes[i].approved = false;
+        map.nodes[i].maximized = false;
         map.nodes[i].hidden = false;
         
         // Sanitize map links

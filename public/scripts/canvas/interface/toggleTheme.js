@@ -13,6 +13,9 @@ export function toggleTheme() {
     // Canvas background
     document.getElementById('canvas').classList.contains('light')?
             document.getElementById('canvas').classList.remove('light') : document.getElementById('canvas').classList.add('light');
+    // Canvas theme
+    document.getElementById('canvas').classList.contains('light')?
+            braintroop.setTheme('light') : braintroop.setTheme('dark');
     // Canvas zoom
     document.querySelector('.zoom-controls').classList.contains('light')?
             document.querySelector('.zoom-controls').classList.remove('light') : document.querySelector('.zoom-controls').classList.add('light');

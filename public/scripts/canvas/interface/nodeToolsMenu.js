@@ -11,6 +11,7 @@ import { linkNode } from '../commands/linkNode.js';
 import { rewireNode } from '../commands/rewireNode.js';
 import { pinNode, unpinNode } from '../commands/pinNode.js';
 import { approveNode } from '../commands/approveNode.js';
+import { maximizeNode, minimizeNode } from '../commands/maximizeNode.js';
 import { hideNode, unhideNode } from '../commands/hideNode.js';
 import { openColorSchemePopup } from '../commands/colorSchemeNode.js';
 import { deleteNode } from '../commands/deleteNode.js';
@@ -63,14 +64,6 @@ function setNodeToolsButtonsTheme() {
 export function toggleNodeToolsButtons(node) {
     // Element
     if (!node || !node.nodeId) { console.warn('No valid node provided for toggling buttons'); return; }
-    // Hide/unhide button
-    if (node.hidden) {
-        document.getElementById('hide-node-btn').style.display = 'none';
-        document.getElementById('unhide-node-btn').style.display = 'flex';
-    } else {
-        document.getElementById('hide-node-btn').style.display = 'flex';
-        document.getElementById('unhide-node-btn').style.display = 'none';
-    }
     // Pin/unpin button
     if (!node.locked) {
         document.getElementById('unpin-node-btn').style.display = 'none';
@@ -86,6 +79,22 @@ export function toggleNodeToolsButtons(node) {
     } else {
         document.getElementById('approve-node-btn').title = 'Approve';
         document.querySelector('.fa-check-circle').classList.remove('approved');
+    }
+    // Maximize/minimize button
+    if (node.maximized) {
+        document.getElementById('maximize-node-btn').style.display = 'none';
+        document.getElementById('minimize-node-btn').style.display = 'flex';
+    } else {
+        document.getElementById('maximize-node-btn').style.display = 'flex';
+        document.getElementById('minimize-node-btn').style.display = 'none';
+    }
+    // Hide/unhide button
+    if (node.hidden) {
+        document.getElementById('hide-node-btn').style.display = 'none';
+        document.getElementById('unhide-node-btn').style.display = 'flex';
+    } else {
+        document.getElementById('hide-node-btn').style.display = 'flex';
+        document.getElementById('unhide-node-btn').style.display = 'none';
     }
 }
 
@@ -122,6 +131,12 @@ function bindNodeToolsMenuEvents() {
     // Approve node button
     if (document.getElementById('approve-node-btn'))
         document.getElementById('approve-node-btn').addEventListener('click', approveNode);
+    // Maximize node button
+    if (document.getElementById('maximize-node-btn'))
+        document.getElementById('maximize-node-btn').addEventListener('click', maximizeNode);
+    // Minimize node button
+    if (document.getElementById('minimize-node-btn'))
+        document.getElementById('minimize-node-btn').addEventListener('click', minimizeNode);
     // Hide node button
     if (document.getElementById('hide-node-btn'))
         document.getElementById('hide-node-btn').addEventListener('click', hideNode);
@@ -170,6 +185,12 @@ export function removeNodeToolsMenu() {
     // Approve node button
     if (document.getElementById('approve-node-btn'))
         document.getElementById('approve-node-btn').removeEventListener('click', approveNode);
+    // Maximize node button
+    if (document.getElementById('maximize-node-btn'))
+        document.getElementById('maximize-node-btn').removeEventListener('click', maximizeNode);
+    // Minimize node button
+    if (document.getElementById('minimize-node-btn'))
+        document.getElementById('minimize-node-btn').removeEventListener('click', minimizeNode);
     // Hide node button
     if (document.getElementById('hide-node-btn'))
         document.getElementById('hide-node-btn').removeEventListener('click', hideNode);

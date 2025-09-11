@@ -17,7 +17,7 @@ export async function updateNodeApi(node) {
         };
         // Construct body
         const projectId = braintroop.getProjectId();
-        const body = { userId, projectId, nodeId: node.nodeId, shortName: node.shortName, content: node.content, detail: node.detail, directLink: node.directLink, relatedLink: node.relatedLink, x: node.x, y: node.y, locked: node.locked, approved: node.approved, hidden: node.hidden, colorScheme: node.colorScheme, layer: node.layer };
+        const body = { userId, projectId, nodeId: node.nodeId, shortName: node.shortName, content: node.content, detail: node.detail, directLink: node.directLink, relatedLink: node.relatedLink, x: node.x, y: node.y, locked: node.locked, approved: node.approved, maximized: node.maximized, hidden: node.hidden, colorSchemeName: node.colorSchemeName };
         const url = setApiUrl('updateNode');
         const response = await fetch(url, {
             method: 'POST',

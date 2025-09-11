@@ -44,9 +44,9 @@ export async function addBlankdNodeHandler(nodeId) {
         y: node.y,
         locked: false,
         approved: true,
+        maximized: false,
         hidden: false,
-        colorScheme: node.colorScheme,
-        layer: node.layer
+        colorSchemeName: node.colorSchemeName,
     };
     // Create blank node on DB
     const updatedMap = await addBlankNodeApi({parentId: node.parentId, node: newNode});

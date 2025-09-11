@@ -86,8 +86,8 @@ exports.handler = async (event) => {
         const newNodeId = generateToken();
 
         // Get parent settings
-        const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentId).colorSchemeName;
-        const parentNodeLayer = map.nodes.find(n => n.nodeId === parentId).layer;
+        const parentNodeMaximized = map.nodes.find(n => n.nodeId === parentId).maximized;
+        const parentNodeColorSchemeName = map.nodes.find(n => n.nodeId === parentId).colorSchemeName;
 
         // Create new node
         let newNode = {
@@ -101,9 +101,9 @@ exports.handler = async (event) => {
             y: null,
             locked: false,
             approved: false,
+            maximized: parentNodeMaximized,
             hidden: false,
-            colorScheme: parentNodeColorScheme,
-            nodeLayer: parentNodeLayer
+            colorSchemeName: parentNodeColorSchemeName,
         }
         // Push new node
         map.nodes.push(newNode);

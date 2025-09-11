@@ -19,8 +19,8 @@
     "y": null,
     "locked": false,
     "approved": false,
+    "maximized": false,
     "hidden": false,
-    "scheme": null,
-    "layer": 1
+    "colorSchemeName": null
   }]  
 }  

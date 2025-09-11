@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, nodeId, shortName, content, detail, directLink, relatedLink, x, y, locked, approved, hidden, colorScheme, layer } = parsedBody;
+    const { userId, projectId, nodeId, shortName, content, detail, directLink, relatedLink, x, y, locked, approved, maximized, hidden, colorSchemeName } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
@@ -50,8 +50,7 @@ exports.handler = async (event) => {
         !nodeId || nodeId.trim().length === 0 || 
         !shortName || shortName.trim().length === 0 ||
         !directLink ||
-        !colorScheme || colorScheme.length === 0 ||
-        !layer) {          
+        !colorSchemeName || colorSchemeName.length === 0 ) {          
           log("WARNING", 'Invalid body @mapUpdateNode', JSON.stringify(body));
           return {
             statusCode: 400,
@@ -85,9 +84,9 @@ exports.handler = async (event) => {
         (y && typeof y !== 'number') ||
         (locked && typeof locked !== 'boolean') ||
         (approved && typeof approved !== 'boolean') ||
+        (maximized && typeof maximized !== 'boolean') ||
         (hidden && typeof hidden !== 'boolean') ||
-        typeof colorScheme !== 'string' || colorScheme.length > 50 ||
-        typeof layer !== 'number') {
+        (colorSchemeName && (typeof colorSchemeName !== 'string' || colorSchemeName.length > 50)) ) {
             log("WARNING", 'Request blocked by anti-malicious check @mapUpdateNode');
             return {
                 statusCode: 400,
@@ -139,9 +138,9 @@ exports.handler = async (event) => {
     node.y = y || null;
     node.locked = locked || false;
     node.approved = approved || false;
+    node.maximized = maximized || false;
     node.hidden = hidden || false;
-    node.colorScheme = colorScheme;
-    node.layer = layer;
+    node.colorSchemeName = colorSchemeName;
 
     // Update map node
     const updatedMap = await mapNodeUpdate(map, node);

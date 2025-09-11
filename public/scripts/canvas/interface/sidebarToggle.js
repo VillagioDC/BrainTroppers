@@ -13,10 +13,14 @@ export function toggleSidebar() {
         sidebar.classList.remove("collapsed");
         collapseBtn.classList.remove("collapsed");
         expandBtn.classList.remove("collapsed");
+        // New map container
+        if (document.getElementById('new-map-container')) document.getElementById('new-map-container').classList.remove('collapsed');
     // When expanded, add class list
     } else {
         sidebar.classList.add("collapsed");
         collapseBtn.classList.add("collapsed");
         expandBtn.classList.add("collapsed");
+        // New map container
+        if (document.getElementById('new-map-container')) document.getElementById('new-map-container').classList.add('collapsed');
     }
 }

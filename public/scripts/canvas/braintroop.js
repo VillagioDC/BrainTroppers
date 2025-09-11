@@ -27,10 +27,12 @@ import { pinNode } from './commands/pinNode.js';
       // UI sizing / grid defaults
       this.canvas.style.overflow = "hidden";
       this.gridSpacing = 50;
-      this.nodeWidth = 146;
+      this.nodeWidth = 146;   // default node size
       this.nodeHeight = 46;
+      this.nodeWidthMax = 196;  // max node size
+      this.nodeHeightMax = 96;
       this.nodeBorderRadius = 10;
-      this.hiddenNodeWidth = 30;
+      this.hiddenNodeWidth = 30;  // hidden node size (circle)
       this.hiddenNodeHeight = 30;
       this.hiddenNodeBorderRadius = 5;
       this.nodeSnapOffset = { x: this.nodeWidth / 2, y: this.nodeHeight / 2 };
@@ -39,40 +41,37 @@ import { pinNode } from './commands/pinNode.js';
       // Palette (themes) and color schemes
       this.palette = {
         dark: {
-          canvas: { bg: "none", gridDot: "#3a4d6a" },
+          canvas: { bg: "none", gridDot: "#657b9b" },
           node: { fill: "#1f2f45", stroke: "#3a4d6a", text: "#e0e0e0", selected: "#54c3eb" },
           edge: { stroke: "#3a4d6a", strokeSelected: "#54c3eb", style: "solid" } },
         light: {
-          canvas: { bg: "none", gridDot: "#d5dce5" },
+          canvas: { bg: "none", gridDot: "#7d9cc5" },
           node: { fill: "#f3f6fa", stroke: "#d5dce5", text: "#1a1a1a", selected: "#00a3d4" },
           edge: { stroke: "#d5dce5", strokeSelected: "#00a3d4", style: "solid" } } };
       // Color schemes
       // Logo palette #c36cf9, #e13f8b, #723ce8, #fc9933, #ffc827, #4ec4ec, #549ec1
-      this.colorSchemes = {
-        "ocean": { "fill": "#1f2f45", "stroke": "#3a4d6a", "strokeSelected": "#54c3eb", "text": "#e0e0e0" },
-        "pearl": { "fill": "#f3f6fa", "stroke": "#d5dce5", "strokeSelected": "#ffffff", "text": "#1a1a1a" },
-        "lavender": { "fill": "#c36cf9", "stroke": "#8a4daa", "strokeSelected": "#ffffff", "text": "#1a1a1a" },
-        "flame": { "fill": "#e13f8b", "stroke": "#a12b62", "strokeSelected": "#ffffff", "text": "#ffffff" },
-        "amethyst": { "fill": "#723ce8", "stroke": "#502a9e", "strokeSelected": "#c3b4f9", "text": "#ffffff" },
-        "tangerine": { "fill": "#fc9933", "stroke": "#b46d25", "strokeSelected": "#ffe0b3", "text": "#1a1a1a" },
-        "sunflower": { "fill": "#ffc827", "stroke": "#b38c1c", "strokeSelected": "#fff4cc", "text": "#1a1a1a" },
-        "sky": { "fill": "#4ec4ec", "stroke": "#3789a3", "strokeSelected": "#a7e1ea", "text": "#1a1a1a" },
-        "emerald": { "fill": "#0a7a5a", "stroke": "#075940", "strokeSelected": "#80e0c0", "text": "#ffffff" },
-        "lime": { "fill": "#7dbf4f", "stroke": "#5a8a39", "strokeSelected": "#d9f7b0", "text": "#1a1a1a" },
-        "fog": { "fill": "#7a8c99", "stroke": "#5f717e", "strokeSelected": "#c2d0dc", "text": "#ffffff" },
-        "wine": { "fill": "#5a181f", "stroke": "#3a1015", "strokeSelected": "#e04b57", "text": "#ffffff" },
-        "caribean": { "fill": "#549ec1", "stroke": "#3b6f87", "strokeSelected": "#a7d0e5", "text": "#1a1a1a" },
-        "cherry": { "fill": "#9e2a4a", "stroke": "#6b1c33", "strokeSelected": "#e05c7c", "text": "#ffffff" },
-        "eggplant": { "fill": "#4a2655", "stroke": "#32193a", "strokeSelected": "#b787c9", "text": "#ffffff" },
-        "blush": { "fill": "#f8d0e0", "stroke": "#c791b0", "strokeSelected": "#ffe0f0", "text": "#1a1a1a" }
-      };
+      this.colorSchemes = [
+        { "name":"charcoal",   "fill": "#2e2f2f", "stroke": "#686869", "strokeSelected": "#cacbcb", "text": "#e0e0e0" },
+        { "name":"pearl",      "fill": "#f3f6fa", "stroke": "#d5dce5", "strokeSelected": "#ffffff", "text": "#1a1a1a" },
+        { "name":"ocean",      "fill": "#1f2f45", "stroke": "#3a4d6a", "strokeSelected": "#54c3eb", "text": "#e0e0e0" },
+        { "name":"caribean",   "fill": "#549ec1", "stroke": "#3b6f87", "strokeSelected": "#a7d0e5", "text": "#1a1a1a" },
+        { "name":"amethyst",   "fill": "#723ce8", "stroke": "#502a9e", "strokeSelected": "#c3b4f9", "text": "#ffffff" },
+        { "name":"sky",        "fill": "#4ec4ec", "stroke": "#3789a3", "strokeSelected": "#a7e1ea", "text": "#1a1a1a" },
+        { "name":"eggplant",   "fill": "#4a2655", "stroke": "#32193a", "strokeSelected": "#b787c9", "text": "#ffffff" },
+        { "name":"lavender",   "fill": "#c36cf9", "stroke": "#8a4daa", "strokeSelected": "#ffffff", "text": "#1a1a1a" },
+        { "name":"tangerine",  "fill": "#fc9933", "stroke": "#b46d25", "strokeSelected": "#ffe0b3", "text": "#1a1a1a" },
+        { "name":"sunflower",  "fill": "#ffc827", "stroke": "#b38c1c", "strokeSelected": "#fff4cc", "text": "#1a1a1a" },
+        { "name":"wine",       "fill": "#5a181f", "stroke": "#3a1015", "strokeSelected": "#e04b57", "text": "#ffffff" },
+        { "name":"cherry",     "fill": "#ab1540", "stroke": "#6b1c33", "strokeSelected": "#e05c7c", "text": "#ffffff" },
+        { "name":"emerald",    "fill": "#0a7a5a", "stroke": "#075940", "strokeSelected": "#80e0c0", "text": "#ffffff" },
+        { "name":"lime",       "fill": "#7dbf4f", "stroke": "#5a8a39", "strokeSelected": "#d9f7b0", "text": "#1a1a1a" },
+        { "name":"flame",      "fill": "#e13f8b", "stroke": "#a12b62", "strokeSelected": "#ffffff", "text": "#ffffff" },
+        { "name":"fog",        "fill": "#7a8c99", "stroke": "#5f717e", "strokeSelected": "#c2d0dc", "text": "#ffffff" },
+      ];
 
-      // Theme & layer defaults
+      // Theme defaults
       this.currentTheme = "dark";
-      this.currentColorScheme = "eggplant";
-
-      // Current layer index for toggles
-      this.currentLayer = 1;
+      this.currentColorSchemeName = "eggplant";
 
       // Map model stored in-canvas
       this.map = {
@@ -218,29 +217,38 @@ import { pinNode } from './commands/pinNode.js';
 
     // -------------------- GRID MANAGEMENT --------------------
     _updateDotGrid() {
-      // Compute a grid of dots larger than the viewport so panning doesn't reveal empty space
-      const bbox = this.canvas.getBoundingClientRect();
-      const width = Math.max(bbox.width, 2 * window.innerWidth);
-      const height = Math.max(bbox.height, 2 * window.innerHeight);
+      // Remove any existing grid defs
+      this.svg.select("defs#grid-defs").remove();
 
-      const dots = [];
-      for (let gx = 0; gx <= width; gx += this.gridSpacing) {
-        for (let gy = 0; gy <= height; gy += this.gridSpacing) {
-          dots.push({ x: gx, y: gy });
-        }
-      }
-
-      const sel = this.gridG.selectAll("circle.grid-dot").data(dots, d => `${d.x},${d.y}`);
-      sel.enter()
+      // Create grid pattern definition
+      const defs = this.svg.append("defs").attr("id", "grid-defs");
+      defs.append("pattern")
+        .attr("id", "grid-pattern")
+        .attr("width", this.gridSpacing)
+        .attr("height", this.gridSpacing)
+        .attr("patternUnits", "userSpaceOnUse")
         .append("circle")
-        .attr("class", "grid-dot")
-        .merge(sel)
+        .attr("cx", 0.5)
+        .attr("cy", 0.5)
         .attr("r", 1.2)
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y)
         .style("fill", this.palette[this.currentTheme].canvas.gridDot)
         .style("opacity", 0.5);
-      sel.exit().remove();
+
+      // Apply background rect with grid pattern fill
+      const bbox = this.canvas.getBoundingClientRect();
+      const width = Math.max(bbox.width, window.innerWidth * 2);
+      const height = Math.max(bbox.height, window.innerHeight * 2);
+
+      const bg = this.gridG.selectAll("rect.grid-bg").data([0]);
+      bg.enter()
+        .append("rect")
+        .attr("class", "grid-bg")
+        .merge(bg)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", -width / 2)
+        .attr("y", -height / 2)
+        .style("fill", "url(#grid-pattern)");
     }
 
     // -------------------- FORCES: enable/disable drag forces & magnetic force --------------------
@@ -649,14 +657,37 @@ import { pinNode } from './commands/pinNode.js';
         .style("stroke-width", 1)
         .style("cursor", "pointer");
 
-      // Node text centered inside rect
+      // Node title (shortName)
       nodeEnter.append("text")
-        .attr("class", "node-text")
+        .attr("class", "node-title")
         .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
+        .attr("dominant-baseline", "hanging")
         .style("font-family", "Roboto, sans-serif")
         .style("pointer-events", "none")
-        .style("user-select", "none");
+        .style("user-select", "none")
+        .style("font-size", "0.9rem");
+
+      // Node content (only shown when maximized)
+      nodeEnter.append("text")
+        .attr("class", "node-content")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "hanging")
+        .style("font-family", "Roboto, sans-serif")
+        .style("pointer-events", "none")
+        .style("user-select", "none")
+        .style("font-size", "0.7rem")
+        .style("display", "none");
+
+      // Check mark (approved)
+      nodeEnter.append("text")
+        .attr("class", "node-approved")
+        .attr("text-anchor", "end")
+        .attr("dominant-baseline", "hanging")
+        .style("font-weight", "500")
+        .style("font-size", "0.5rem")
+        .style("user-select", "none")
+        .style("display", "none")
+        .text("\u2713");
 
       // Clicking a node selects it or completes a pending connection
       this.nodesG.selectAll("g.node-group")
@@ -680,19 +711,26 @@ import { pinNode } from './commands/pinNode.js';
       const allNodeGroups = this.nodesG.selectAll("g.node-group");
       allNodeGroups.each((d, i, nodes) => { d.__containerNode = nodes[i]; });
 
-      // Update visuals (fill, stroke, size, text) for every node group
+      // Update visuals (fill, stroke, size, shortName, content, check mark) for every node group
       allNodeGroups.each((d, i, nodes) => {
         const g = d3.select(nodes[i]);
         const mapNode = d.__mapNode;
-        const w = mapNode.hidden ? this.hiddenNodeWidth : this.nodeWidth;
-        const h = mapNode.hidden ? this.hiddenNodeHeight : this.nodeHeight;
+
+        // Determine width/height based on hidden/maximized/default
+        let w, h;
+        if (mapNode.hidden) { w = this.hiddenNodeWidth; h = this.hiddenNodeHeight;
+        } else if (mapNode.maximized) { w = this.nodeWidthMax; h = this.nodeHeightMax;
+        } else { w = this.nodeWidth; h = this.nodeHeight;
+        }
+
         const borderRadius = mapNode.hidden ? this.hiddenNodeBorderRadius : this.nodeBorderRadius;
-        const scheme = this.colorSchemes[mapNode.colorSchemeName] || null;
+        const scheme = this._getSchemeByName(mapNode.colorSchemeName) || null;
         const fill = scheme ? scheme.fill : this.palette[this.currentTheme].node.fill;
         const stroke = scheme ? scheme.stroke : this.palette[this.currentTheme].node.stroke;
         const strokeSelected = scheme ? scheme.strokeSelected : this.palette[this.currentTheme].node.selected;
         const textColor = scheme ? scheme.text : this.palette[this.currentTheme].node.text;
 
+        // Update main rect
         g.select(".selected-node")
           .attr("width", w)
           .attr("height", h)
@@ -701,10 +739,10 @@ import { pinNode } from './commands/pinNode.js';
           .style("fill", fill)
           .style("stroke", (this.selected && this.selected.type === "node" && this.selected.id === mapNode.nodeId) ? strokeSelected : stroke);
 
+        // Update selection rect to match size + small padding
         const pad = 3;
         const selWidth = w + pad * 2;
         const selHeight = h + pad * 2;
-
         g.select(".selection-rect")
           .attr("x", -pad)
           .attr("y", -pad)
@@ -715,15 +753,64 @@ import { pinNode } from './commands/pinNode.js';
           .style("fill", this.palette[this.currentTheme].node.selected)
           .style("display", (this.selected && this.selected.type === "node" && this.selected.id === mapNode.nodeId) ? null : "none");
 
-        const nodeText = mapNode.hidden ? "+" : (mapNode.shortName || "");
-        g.select(".node-text")
+        // Text handling:
+        // shortName (title) is always present unless hidden - same font size across states
+        // content is only shown when maximized; multiple lines supported via newline -> tspans
+        const titleText = mapNode.hidden ? "+" : (mapNode.shortName || "");
+        const titleEl = g.select(".node-title")
           .attr("x", w / 2)
-          .attr("y", h / 2)
+          .attr("y", (mapNode.hidden ? (h / 2 - 8) : 8)) // center for hidden; top margin for others
           .style("fill", textColor)
-          .style("font-size", mapNode.hidden ? "1.2rem" : "0.9rem")
-          .text(nodeText);
+          .style("display", mapNode.hidden ? null : null) // title shows in all states (hidden uses "+")
+          .text(titleText);
 
-        // Position group according to simulation coordinates
+        // Content element: show only when maximized (and not hidden)
+        const contentEl = g.select(".node-content");
+        if (mapNode.maximized && !mapNode.hidden) {
+          // Show content and wrap by newline if necessary
+          contentEl.style("display", null)
+            .style("fill", textColor);
+
+          // clear old tspans and set new ones based on content lines
+          contentEl.selectAll("tspan").remove();
+          const lines = (mapNode.content || "").split(/\r?\n/).slice(0, 8); // limit lines
+          // Position content below the title
+          const topPadding = 12; // spacing from top
+          const titleHeight = 18; // approx title height
+          const startY = titleHeight + topPadding;
+          lines.forEach((ln, idx) => {
+            contentEl.append("tspan")
+              .attr("x", w / 2)
+              .attr("dy", idx === 0 ? `${startY}px` : "1.1em")
+              .text(ln);
+          });
+        } else {
+          // Hide content when not maximized
+          contentEl.style("display", "none").selectAll("tspan").remove();
+        }
+
+        // Approved check rendering
+        const approvedEl = g.select(".node-approved");
+        if (!mapNode.hidden) {
+          const scheme = this._getSchemeByName(mapNode.colorSchemeName);
+          approvedEl
+            .attr("x", w - 6)
+            .attr("y", h - 12)
+            .style("display", null)
+            .style("fill", mapNode.approved ? scheme.text : scheme.stroke);
+        } else {
+          approvedEl.style("display", "none");
+        }
+
+        // For hidden nodes, we want the '+' centered vertically; adjust title y accordingly above
+        if (mapNode.hidden) {
+          g.select(".node-title").attr("y", h / 2 - 6).attr("dominant-baseline", "central");
+        } else {
+          // For non-hidden nodes, set title baseline to hanging (near top)
+          g.select(".node-title").attr("dominant-baseline", "hanging");
+        }
+
+        // Position group according to simulation coordinates (centered on node width/height)
         g.attr("transform", `translate(${d.x - w / 2}, ${d.y - h / 2})`);
       });
 
@@ -735,8 +822,8 @@ import { pinNode } from './commands/pinNode.js';
       this.simulation.on("tick.updateDOM", () => {
         this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
           const mapNode = d.__mapNode;
-          const w = mapNode.hidden ? this.hiddenNodeWidth : this.nodeWidth;
-          const h = mapNode.hidden ? this.hiddenNodeHeight : this.nodeHeight;
+          const w = mapNode.hidden ? this.hiddenNodeWidth : (mapNode.maximized ? this.nodeWidthMax : this.nodeWidth);
+          const h = mapNode.hidden ? this.hiddenNodeHeight : (mapNode.maximized ? this.nodeHeightMax : this.nodeHeight);
           d3.select(nodes[i]).attr("transform", `translate(${d.x - w / 2}, ${d.y - h / 2})`);
         });
 
@@ -757,8 +844,8 @@ import { pinNode } from './commands/pinNode.js';
     _tickUpdatePositions() {
       this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
         const mapNode = d.__mapNode;
-        const w = mapNode.hidden ? this.hiddenNodeWidth : this.nodeWidth;
-        const h = mapNode.hidden ? this.hiddenNodeHeight : this.nodeHeight;
+        const w = mapNode.hidden ? this.hiddenNodeWidth : (mapNode.maximized ? this.nodeWidthMax : this.nodeWidth);
+        const h = mapNode.hidden ? this.hiddenNodeHeight : (mapNode.maximized ? this.nodeHeightMax : this.nodeHeight);
         d3.select(nodes[i]).attr("transform", `translate(${d.x - w / 2}, ${d.y - h / 2})`);
       });
       this.edgesG.selectAll("g.edge-group").each((d, i, nodes) => {
@@ -782,9 +869,9 @@ import { pinNode } from './commands/pinNode.js';
         y: typeof n.y === "number" ? n.y : null,
         locked: !!n.locked,
         approved: !!n.approved,
+        maximized: !!n.maximized,
         hidden: !!n.hidden,
-        colorSchemeName: n.colorSchemeName || n.colorScheme || "ocean",
-        layer: typeof n.layer === "number" ? n.layer : 1,
+        colorSchemeName: n.colorSchemeName || "ocean",
       };
     }
 
@@ -849,7 +936,7 @@ import { pinNode } from './commands/pinNode.js';
       this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
         const g = d3.select(nodes[i]);
         const mapNode = d.__mapNode;
-        const scheme = this.colorSchemes[mapNode.colorSchemeName] || null;
+        const scheme = this._getSchemeByName(mapNode.colorSchemeName) || null;
         const stroke = scheme ? scheme.stroke : this.palette[this.currentTheme].node.stroke;
         const strokeSelected = scheme ? scheme.strokeSelected : this.palette[this.currentTheme].node.selected;
         const isSelected = (this.selected && this.selected.type === "node" && this.selected.id === mapNode.nodeId);
@@ -858,12 +945,17 @@ import { pinNode } from './commands/pinNode.js';
       });
     }
 
+    // Get color scheme by name
+    _getSchemeByName(name) {
+      return this.colorSchemes.find(s => s.name === name) || null;
+    }
+
     _updateNodeStrokes() {
       // Called to recompute node stroke styles across nodes
       this.nodesG.selectAll("g.node-group").each((d, i, nodes) => {
         const g = d3.select(nodes[i]);
         const mapNode = d.__mapNode;
-        const scheme = this.colorSchemes[mapNode.colorSchemeName] || this.colorSchemes[this.currentColorScheme];
+        const scheme = this._getSchemeByName(mapNode.colorSchemeName) || this._getSchemeByName(this.currentColorSchemeName);
         const stroke = (scheme && scheme.stroke) || this.palette[this.currentTheme].node.stroke;
         const strokeSelected = this._getSelectedNodeStroke(mapNode.nodeId);
         const isSelected = (this.selected.type === "node" && this.selected.id === mapNode.nodeId);
@@ -876,7 +968,7 @@ import { pinNode } from './commands/pinNode.js';
       // Return the stroke color to use when this node is selected
       const node = (this.map.nodes || []).find(n => n.nodeId === nodeId);
       if (!node) return this.palette[this.currentTheme].edge.strokeSelected;
-      const scheme = this.colorSchemes[node.colorSchemeName];
+      const scheme = this._getSchemeByName(mapNode.colorSchemeName);
       if (scheme && scheme.strokeSelected) return scheme.strokeSelected;
       return this.palette[this.currentTheme].edge.strokeSelected;
     }
@@ -1032,9 +1124,9 @@ import { pinNode } from './commands/pinNode.js';
           const y = typeof n.y === "number" ? n.y : null;
           const locked = !!n.locked;
           const approved = !!n.approved;
+          const maximized = !!n.maximized;
           const hidden = !!n.hidden;
-          const colorSchemeName = n.colorScheme || this.currentColorScheme;
-          const layer = typeof n.layer === "number" ? n.layer : 1;
+          const colorSchemeName = n.colorSchemeName || this.currentColorSchemeName;
 
           nodes.push(this._normalizeNode({
             nodeId,
@@ -1047,9 +1139,9 @@ import { pinNode } from './commands/pinNode.js';
             y,
             locked,
             approved,
+            maximized,
             hidden,
             colorSchemeName,
-            layer,
           }));
 
           // If no coordinates at all, center the first node
@@ -1139,9 +1231,9 @@ import { pinNode } from './commands/pinNode.js';
           y: typeof n.y === "number" ? n.y : null,
           locked: !!n.locked,
           approved: !!n.approved,
+          maximized: !!n.maximized,
           hidden: !!n.hidden,
-          colorScheme: n.colorSchemeName || this.currentColorScheme,
-          layer: typeof n.layer === "number" ? n.layer : 1
+          colorSchemeName: n.colorSchemeName || this.currentColorSchemeName
         };
       });
 
@@ -1172,16 +1264,16 @@ import { pinNode } from './commands/pinNode.js';
     }
 
     // Add node
-    _addNodeInternal({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
+    _addNodeInternal({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
       if (!parentId) return;
       // Create node
-      const node = this._createNode({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, hidden, colorSchemeName, layer });
+      const node = this._createNode({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, maximized, hidden, colorSchemeName });
       this.updateMap();
       return node.nodeId;
     }
 
     // Create new node
-    _createNode ({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
+    _createNode ({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
       if (!parentId) return;
       // Create node id
       if (!nodeId) nodeId = `temp_${Date.now()}_${Math.floor(Math.random() * 99)}`;
@@ -1200,7 +1292,7 @@ import { pinNode } from './commands/pinNode.js';
       locked = false;
       if (this.map.nodes.length === 0) locked = true;
       // Set color scheme
-      if (!colorSchemeName) colorSchemeName = this.currentColorScheme;
+      if (!colorSchemeName) colorSchemeName = this.currentColorSchemeName;
       const parentNode = this.map.nodes.find(n => n.nodeId === parentId);
       if (parentNode && parentNode.colorSchemeName) colorSchemeName = parentNode.colorSchemeName;
       // Create node
@@ -1213,10 +1305,10 @@ import { pinNode } from './commands/pinNode.js';
         x,
         y,
         locked,
-        approved: false,
-        hidden: false,
-        colorSchemeName,
-        layer: typeof layer === "number" ? layer : this.currentLayer,
+        approved: approved,
+        maximized: maximized,
+        hidden: hidden,
+        colorSchemeName: colorSchemeName
       };
       // Add node to map
       this.map.nodes.push(this._normalizeNode(node));
@@ -1386,9 +1478,9 @@ import { pinNode } from './commands/pinNode.js';
     }
 
     // Creates a new node linked to parentId
-    addNode({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, hidden = false, colorSchemeName = this.currentColorScheme, layer = 1 } = {}) {
+    addNode({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
       // Delegate to internal helper but keep public name stable
-      const newNodeId = this._addNodeInternal({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, hidden, colorSchemeName, layer });
+      const newNodeId = this._addNodeInternal({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, maximized, hidden, colorSchemeName });
       return newNodeId;
     }
 
@@ -1445,31 +1537,30 @@ import { pinNode } from './commands/pinNode.js';
     setTheme(themeName) {
       if (!this.palette[themeName]) return;
       this.currentTheme = themeName;
-      this._updateDotGrid();
+      console.log(`Setting theme to ${themeName}`);
+
+      // Update arrow color
       const markerPath = this.svg.select("defs marker#arrow path");
       if (!markerPath.empty()) {
         markerPath.attr("fill", this.palette[this.currentTheme].edge.stroke);
       }
+
+      // Update grid pattern color
+      this.svg.select("#grid-pattern circle")
+        .style("fill", this.palette[this.currentTheme].canvas.gridDot);
+
       this.updateMap(true);
     }
+
 
     // setColorScheme(nodeId, schemeName)
     setColorScheme(nodeId, schemeName) {
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
-      if (!this.colorSchemes[schemeName]) schemeName = this.currentColorScheme;
+      if (!this._getSchemeByName(schemeName)) schemeName = this.currentColorSchemeName;
       node.colorSchemeName = schemeName;
-      this.currentColorScheme = schemeName;
-      this.updateMap();
-    }
-
-    // Toggles hidden state for nodes whose layer >= layerId
-    toggleLayer(layerId) {
-      if (typeof layerId !== "number") return;
-      this.map.nodes.forEach(n => {
-        if (n.layer >= layerId) n.hidden = !n.hidden;
-      });
-      this.updateMap();
+      this.currentColorSchemeName = schemeName;
+      this.updateMap(true);
     }
 
     // Delete node
@@ -1561,6 +1652,24 @@ import { pinNode } from './commands/pinNode.js';
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       node.approved = false;
+      this.updateMap(true);
+    }
+
+    // Maximize node
+    maximizeNode(nodeId) {
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
+      if (!node) return;
+      node.maximized = true;
+      node.hidden = false;
+      this.updateMap(true);
+    }
+
+    // Minimize node
+    minimizeNode(nodeId) {
+      const node = this.map.nodes.find(n => n.nodeId === nodeId);
+      if (!node) return;
+      node.maximized = false;
+      node.hidden = false;
       this.updateMap(true);
     }
 

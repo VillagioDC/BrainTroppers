@@ -36,10 +36,8 @@ async function sanitizeMapToExport(fullMap) {
         node.detail = fullMap.nodes[i].detail;
         node.directLink = fullMap.nodes[i].directLink;
         node.relatedLink = fullMap.nodes[i].relatedLink;
-        node.x = fullMap.nodes[i].x;
-        node.y = fullMap.nodes[i].y;
         node.hidden = fullMap.nodes[i].hidden;
-        node.colorScheme = fullMap.nodes[i].colorScheme;
+        node.colorSchemeName = fullMap.nodes[i].colorSchemeName;
         // Insert node
         map.nodes.push(node);
     }

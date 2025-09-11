@@ -85,8 +85,8 @@ exports.handler = async (event) => {
         const newNodes = jsonResponse.nodes || [];
 
         // Get parent settings
-        const parentNodeColorScheme = map.nodes.find(n => n.nodeId === parentId).colorSchemeName;
-        const parentNodeLayer = map.nodes.find(n => n.nodeId === parentId).layer;
+        const parentNodeMaximized = map.nodes.find(n => n.nodeId === parentId).maximized;
+        const parentNodeColorSchemeName = map.nodes.find(n => n.nodeId === parentId).colorSchemeName;
 
         // Update map with new nodes
         let node = {};
@@ -103,9 +103,9 @@ exports.handler = async (event) => {
             node.y = null;
             node.locked = false;
             node.approved = false;
+            node.maximized = parentNodeMaximized;
             node.hidden = false;
-            node.colorScheme = parentNodeColorScheme;
-            node.layer = parentNodeLayer;
+            node.colorSchemeName = parentNodeColorSchemeName;
             // Push node
             map.nodes.push(node);
         }

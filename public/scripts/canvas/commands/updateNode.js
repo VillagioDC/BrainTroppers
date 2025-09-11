@@ -29,9 +29,9 @@ export async function updateNode(changes) {
         y: changes.y || node.y,
         locked: changes.locked || node.locked,
         approved: changes.approved || node.approved,
+        maximized: changes.maximized || node.maximized,
         hidden: changes.hidden || node.hidden,
-        colorScheme: changes.colorScheme || node.colorScheme,
-        layer: changes.layer || node.layer
+        colorSchemeName: changes.colorSchemeName || node.colorSchemeName,
     };
     // Update node on map
     const n = map.nodes.findIndex(n => n.nodeId === node.nodeId);

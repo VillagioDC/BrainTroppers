@@ -11,10 +11,10 @@ import { pauseS } from '../utils/pauseS.js';
 export async function exportMapApi(projectId, type) {
     try {
         // Set parameters
-        const { userId, token } = getLocalStorageCredentials();
+        const { userId, sessionToken} = getLocalStorageCredentials();
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${sessionToken}`,
         };
         const body = { userId, projectId, type };
         const url = setApiUrl('exportMap');
@@ -30,9 +30,9 @@ export async function exportMapApi(projectId, type) {
             checkSessionExpired(responseData);
             return false;
         }
-        // Get updated node
-        const map = responseData;
-        return map;
+        // Get download url
+        const downloadUrl = responseData;
+        return downloadUrl;
         
     // Catch errors
     } catch (error) {

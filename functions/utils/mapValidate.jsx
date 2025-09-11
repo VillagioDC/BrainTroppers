@@ -111,7 +111,7 @@ function mapValidate(map) {
             return false;
         }
         // Define expected node fields
-        const validNodeFields = ['nodeId', 'shortName', 'content', 'detail', 'directLink', 'relatedLink', 'x', 'y', 'locked', 'approved', 'hidden', 'colorScheme', 'layer'];
+        const validNodeFields = ['nodeId', 'shortName', 'content', 'detail', 'directLink', 'relatedLink', 'x', 'y', 'locked', 'approved', 'maximized', 'hidden', 'colorSchemeName'];
         if (Object.keys(node).some(field => !validNodeFields.includes(field))) {
             log("WARNING", "Invalid node fields @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
@@ -166,19 +166,19 @@ function mapValidate(map) {
             log("WARNING", "Invalid approved @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
         }
+        // Validate maximized (boolean)
+        if (typeof node.maximized !== 'boolean') {
+            log("WARNING", "Invalid maximized @mapValidate", `node: ${JSON.stringify(node)}`);
+            return false;
+        }
         // Validate hidden (boolean)
         if (typeof node.hidden !== 'boolean') {
             log("WARNING", "Invalid hidden @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
         }
         // Validate colorScheme (string, max 20 chars)
-        if (!node.colorScheme || typeof node.colorScheme !== 'string' || node.colorScheme.length > 20 || !/^#?[A-Za-z0-9]+$/.test(node.colorScheme)) {
-            log("WARNING", "Invalid colorScheme @mapValidate", `node: ${JSON.stringify(node)}`);
-            return false;
-        }
-        // Validate layer (non-negative integer)
-        if (typeof node.layer !== 'number' || !Number.isInteger(node.layer) || node.layer < 0) {
-            log("WARNING", "Invalid layer @mapValidate", `node: ${JSON.stringify(node)}`);
+        if (!node.colorSchemeName || typeof node.colorSchemeName !== 'string' || node.colorSchemeName.length > 20) {
+            log("WARNING", "Invalid colorSchemeName @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
         }
     }
