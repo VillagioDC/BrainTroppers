@@ -78,6 +78,9 @@ export function setApiUrl(api) {
         case 'deleteNode':
             url += '/mapDeleteNode';
             break;
+        case 'updateUser':
+            url += '/userUpdate';
+            break;
         case 'assignMapToUser':
             url += '/userAssignMap';
             break;

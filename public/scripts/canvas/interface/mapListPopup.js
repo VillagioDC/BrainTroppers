@@ -80,7 +80,7 @@ function bindMapPopupMenuListeners() {
     document.addEventListener('keydown', keydownHandler);
 }
 
-function addExportItems() {
+function removeExportItems() {
     // Remove event listeners
     if (document.getElementById('map-item-pdf'))
         document.getElementById('map-item-pdf').removeEventListener('click', exportPdfMap);

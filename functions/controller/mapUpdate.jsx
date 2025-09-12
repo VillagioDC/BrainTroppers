@@ -7,7 +7,7 @@ const log = require('../utils/log.jsx');
 
 /* PARAMETERS
     input {string, object} - map
-    RETURN {map} - map
+    RETURN {object} - map
 */
 
 async function mapUpdate(map) {

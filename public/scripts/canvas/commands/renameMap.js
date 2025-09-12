@@ -8,8 +8,7 @@ import { showNotification, removeNotification } from '../../common/notifications
 
 // Rename map
 export async function renameMap(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) { e.preventDefault(); e.stopPropagation(); };
     // Get current map item
     const mapList = document.getElementById('map-list');
     const popupMapMenu = document.getElementById('map-menu-popup');
@@ -39,13 +38,16 @@ async function loadRenameMapPopup() {
 
 // Bind event listeners
 function bindRenameMapListeners() {
-    // Elements
-    const confirmBtn = document.getElementById('rename-title-confirm');
-    const cancelBtn = document.getElementById('rename-title-cancel');
-    // Event listeners
-    if (confirmBtn) confirmBtn.addEventListener('click', renameConfirm);
-    if (cancelBtn) cancelBtn.addEventListener('click', renameCancel);
+    // Rename confirm
+    if (document.getElementById('rename-title-confirm'))
+        document.getElementById('rename-title-confirm').addEventListener('click', renameConfirm);
+    // Rename cancel
+    if (document.getElementById('rename-title-cancel'))
+        document.getElementById('rename-title-cancel').addEventListener('click', renameCancel);
+    // Outside click handler
     document.addEventListener('click', outsideRenameMapClickHandler);
+    // Escape key handler
+    document.addEventListener('keydown', escapeKeyHandler);
 }
 
 // Set rename title popup and input
@@ -112,6 +114,7 @@ function removeRename() {
     if (document.getElementById('rename-title-cancel'))
         document.getElementById('rename-title-cancel').removeEventListener('click', renameCancel);
     document.removeEventListener('click', outsideRenameMapClickHandler);
+    document.removeEventListener('keydown', escapeKeyHandler);
     // Remove popup container
     if (document.getElementById('rename-title-popup'))
         document.getElementById('rename-title-popup').remove();
@@ -120,6 +123,13 @@ function removeRename() {
 // Outside click handler
 function outsideRenameMapClickHandler(e) {
     if (!document.getElementById('rename-title-popup') || !document.getElementById('rename-title-popup').contains(e.target)) {
+        removeRename();
+    }
+}
+
+// Escape key handler
+function escapeKeyHandler(e) {
+    if (e.key === 'Escape') {
         removeRename();
     }
 }

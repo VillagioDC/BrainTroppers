@@ -64,10 +64,14 @@ async function userSignIn(credentials) {
     const auth = {
         userId: user.userId,
         email: user.email,
+        // authToken: not passed
         name: user.name,
         icon: user.icon,
         plan: user.plan,
+        waitlist: user.waitlist,
+        proPlanTrial: user.proPlanTrial,
         maps: refresh.maps || user.maps,
+        theme: user.theme,
         sessionToken: sessionToken,
         expires: expires
     }
