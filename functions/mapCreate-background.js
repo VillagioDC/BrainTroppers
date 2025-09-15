@@ -38,57 +38,126 @@ exports.handler = async (event) => {
       return;
     }
 
+    // Initialize
+    let jsonResponse = null;
+
     try {
         // Update to 'creating'
-        map.creationStatus = 'creating';
+        map.creationStatus = 'Creating';
         await mapUpdate(map);
 
         // Set stages
-        const stages = ["brainstorm", "transformer"];
+        const stages = ["1-seed", "2-grow", "3-enrich"];
+        const transformer = "9-transformer";
 
         // Set user message from stored prompt
+        let instructions, messages, conversation, response, parsedResponse, stageMap = null;
         let userMessage = map.userPrompt;
 
         // Construct nodes via AI loop
-        let response = "";
         for (let i = 0; i < stages.length; i++) {
             // Get instructions
-            const instructions = await getInstructionsTxt(stages[i]);
+            instructions = await getInstructionsTxt(stages[i]);
 
             // Set messages
-            const messages = [
+            messages = [
                 { speaker: "assistant", message: "i'll follow the instructions strickly" },
                 { speaker: "user", message: userMessage }
             ];
 
             // Construct conversation
-            const conversation = constructConversation(instructions, messages);
+            conversation = constructConversation(instructions, messages);
 
             // Ask AI
             log("DEBUG", `Asking AI @mapCreate-background: ${stages[i]}`);
-            userMessage = await askAIBridge(conversation);
+            response = await askAIBridge(conversation);
+            console.log(response);
 
-            // Response
-            response = userMessage;
+            // Parse response
+            parsedResponse = parseJSON(response);
+            // If parsing successfull, skip transformer
+            if (parsedResponse) {
+                log("DEBUG", `Skipping transformer @mapCreate-background: ${stages[i]}`);
+            // Or run transformer
+            } else {
+                // Get transformer instructions
+                instructions = await getInstructionsTxt(transformer);
+                // Set messages
+                messages = [
+                    { speaker: "assistant", message: "i'll follow the instructions strickly" },
+                    { speaker: "user", message: response }
+                ];
+                // Construct conversation
+                conversation = constructConversation(instructions, messages);
+                // Ask AI
+                log("DEBUG", `Asking AI transformer @mapCreate-background: ${stages[i]}`);
+                response = await askAIBridge(conversation);
+                // Parse response
+                parsedResponse = parseJSON(response);
+                if (!parsedResponse) {
+                    log("WARNING", `Transformer failed @mapCreate-background: ${stages[i]}`);
+                    break;
+                }
+            }
 
-            // Pause if not last stage
+            // Construct map
+            map.title = parsedResponse.title || map.title;
+            map.owner = userId;
+            map.lastUpdated = new Date(Date.now());
+            // Seed stage
+            if (stages[i] === "1-seed") {
+                // Status
+                map.creationStatus = 'Brainstorming';
+                // Nodes
+                map.nodes = parsedResponse.nodes;
+                // Links
+                for (let n = 0; n < map.nodes.length; n++) {
+                    if (n > 0) map.nodes[n].directLink = [map.nodes[0].nodeId];
+                    map.nodes[n].relatedLink = [];
+                }
+                // Update map
+                await mapUpdate(map);
+                // Assign map to user
+                const user = await userAssignMap({ assignedUserId: userId, map });
+
+            // Grow stage
+            } else if (stages[i] === "2-grow") {
+                // Add nodes
+                map.nodes = [...parsedResponse.nodes, ...map.nodes];
+                // Status
+                map.creationStatus = 'Enriching';
+                // Update map
+                await mapUpdate(map);
+
+            // Enrich stage
+            } else if (stages[i] === "3-enrich") {
+                // Overlay nodes
+                map.nodes = parsedResponse.nodes;
+            }
+
+            // Construct next stage map
             if (i < stages.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                stageMap = {
+                    userPrompt: map.userPrompt,
+                    title: map.title,
+                    nodes: map.nodes.map(node => ({ 
+                        nodeId: node.nodeId,
+                        topic: node.topic,
+                        content: node.content,
+                        directLink: node.directLink,
+                        relatedLink: node.relatedLink }))
+                };
+                userMessage = JSON.stringify(stageMap);
             }
         }
 
-        // Parse response
-        const jsonResponse = parseJSON(response);
-
-        // Fill meta data
-        map.title = jsonResponse.title;
-        map.owner = userId;
-        map.nodes = jsonResponse.nodes;
-        map.creationStatus = 'created';
-        map.lastUpdated = new Date(Date.now());
-
-        // Fill nodes
+        // Final map
+        map.creationStatus = 'Created';
+        map.nodes = map.nodes ? map.nodes : [];
         for (let i = 0; i < map.nodes.length; i++) {
+            map.nodes[i].detail = map.nodes[i].detail ? map.nodes[i].detail : "";
+            map.nodes[i].directLink = map.nodes[i].directLink ? map.nodes[i].directLink : [];
+            map.nodes[i].relatedLink = map.nodes[i].relatedLink ? map.nodes[i].relatedLink : [];
             map.nodes[i].x = null;
             map.nodes[i].y = null;
             map.nodes[i].locked = false;
@@ -101,9 +170,6 @@ exports.handler = async (event) => {
         // Sanitize map links
         map = sanitizeMapLinks(map);
 
-        // Assign map to user
-        const user = await userAssignMap({ assignedUserId: userId, map });
-
         // Update map
         await mapUpdate(map);
 
@@ -112,7 +178,7 @@ exports.handler = async (event) => {
     } catch (error) {
         log("ERROR", `Error in background map creation for ${projectId}: ${error.message}`);
         // Update to 'failed' on error
-        map.creationStatus = 'failed';
+        map.creationStatus = 'Failed';
         await mapUpdate(map);
     }
 };

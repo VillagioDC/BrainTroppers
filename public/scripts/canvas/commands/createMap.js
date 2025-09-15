@@ -39,24 +39,33 @@ export async function createNewMap(e) {
         return;
     };
     // Pooling map
+    // Creating, Brainstorming, Enriching, Created, Failed
     await showNotification('Creating', 'info', 'wait');
     await pauseS(40);
-    let creationStatus = 'creating';
+    let creationStatus = 'Creating';
     let result = {};
-    while (creationStatus === 'creating') {
+    while (creationStatus !== 'Created' && creationStatus !== 'Failed') {
         // Call api
         result = await createMapGetStatus(reqMap.projectId);
         // Check result {status, user, map}
-        if (result && result.status) {
+        if (result && typeof result === 'object' && result.status) {
+            // Update status
+            if (result.status !== creationStatus)
+                await showNotification(result.status, 'info', 'wait');
             creationStatus = result.status;
+            // Update map
+            if (result.map) {
+                // Remove temp node (placeholder)
+                deleteFirstNode(placeholderNodeId);
+                braintroop.setMap(result.map);
+                braintroop.rebuildMap();
+            }
         }
-        // Pause
-        if (creationStatus === 'creating') await pauseS(15);
+        // Wait for completion or error
+        if (creationStatus !== 'Created' && creationStatus !== 'Failed') await pauseS(15);
     }
-    // Remove temp node (placeholder)
-    deleteFirstNode(placeholderNodeId);
     // Check result
-    if (!result || typeof result !== 'object' || !result.user || !result.map || result.status === 'failed') {
+    if (!result || typeof result !== 'object' || !result.user || !result.map || result.status === 'Failed') {
         // Update notification
         showNotification('Error creating map', 'error');
         // Remove map on database

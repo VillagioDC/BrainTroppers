@@ -18,23 +18,24 @@ function parseJSON(jsonString) {
     }
 
     // Parse json string using Relaxed Json library
+    let jsonObject = null;
     try {
-        const jsonObject = rjson.parse(jsonString);
+        jsonObject = rjson.parse(jsonString);
 
-        // Handle error
-        if (!jsonObject || typeof jsonObject !== "object") {
-            log("ERROR", "Unable to parse JSON string @parseJSON");
-            return null;
-        }
-
-        // Return
-        return jsonObject;
-    
     // Catch error
     } catch (error) {
         log("ERROR", "Error while parsing JSON string @parseJSON", error);
         return null;
     }
+
+    // Handle error
+    if (!jsonObject || typeof jsonObject !== "object") {
+        log("ERROR", "Unable to parse JSON string @parseJSON");
+        return null;
+    }
+
+    // Return
+    return jsonObject;    
 }
 
 module.exports = parseJSON;

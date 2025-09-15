@@ -73,30 +73,24 @@ exports.handler = async (event) => {
     }
 
     // Map status
-    let status;
-    // If creating
-    if (map.creationStatus === 'requested' || map.creationStatus === 'creating') {
-      status = 'creating';
     // If failed
-    } else if (map.creationStatus === 'failed') {
+    if (map.creationStatus === 'Failed') {
       log("ERROR", `Map creation failed @mapUpdateGetStatus: ${projectId}`);
-      status = 'failed';
     // If created
-    } else {
+    } else if (map.creationStatus === 'Created') {
       log("INFO", "Map created @mapUpdateGetStatus:");
-      status = 'created';
     }
 
     // Collect user if map created
     let user = null;
-    if (status === 'created')
+    if (map.creationStatus === 'Created')
       user = await userRead(userId);
 
     // Construct response
     const response = {
-      status,
-      user: status === 'created' ? user : null,
-      map: status === 'created' ? map : null
+      status: map.creationStatus, // Requesting, Creating, Brainstorming, Enriching, Created, Failed
+      user: map.creationStatus !== 'Failed' ? user : null,
+      map: map.creationStatus !== 'Failed' ? map : null
     };
 
     // Return
