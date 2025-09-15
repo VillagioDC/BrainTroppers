@@ -90,9 +90,9 @@ export async function createNewMap(e) {
 function addFirstNode() {
     // Add first node (placeholder)
     const parentId = 1;
-    const shortName = "New map";
+    const topic = "New map";
     // Add temp node (create, update)
-    const nodeId = braintroop.addTempNode({parentId, shortName});
+    const nodeId = braintroop.addTempNode({parentId, topic});
     return nodeId;
 }
 

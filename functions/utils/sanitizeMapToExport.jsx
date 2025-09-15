@@ -31,7 +31,7 @@ async function sanitizeMapToExport(fullMap) {
         // Create node
         const node = {}; 
         node.nodeId = fullMap.nodes[i].nodeId;
-        node.shortName = fullMap.nodes[i].shortName;
+        node.topic = fullMap.nodes[i].topic;
         node.content = fullMap.nodes[i].content;
         node.detail = fullMap.nodes[i].detail;
         node.directLink = fullMap.nodes[i].directLink;

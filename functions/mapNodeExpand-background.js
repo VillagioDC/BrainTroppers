@@ -94,7 +94,7 @@ exports.handler = async (event) => {
             // Create new node
             node = {};
             node.nodeId = newNodes[i].nodeId;
-            node.shortName = newNodes[i].shortName;
+            node.topic = newNodes[i].topic;
             node.content = newNodes[i].content;
             node.detail = newNodes[i].detail;
             node.directLink = [parentId];

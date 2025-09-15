@@ -52,9 +52,9 @@ function bindDetailPopupEvents() {
     // Close detail popup
     if (document.getElementById('close-detail-node-popup'))
         document.getElementById('close-detail-node-popup').addEventListener('click', closeDetailPopup);
-    // Short name 
-    if (document.getElementById('detail-node-short-name'))
-        document.getElementById('detail-node-short-name').addEventListener('click', () => editElement('short-name'));
+    // Topic 
+    if (document.getElementById('detail-node-topic'))
+        document.getElementById('detail-node-topic').addEventListener('click', () => editElement('topic'));
     // Content
     if (document.getElementById('detail-node-content'))
         document.getElementById('detail-node-content').addEventListener('click', () => editElement('content'));
@@ -77,10 +77,10 @@ function loadDetailContent(nodeId) {
     // Get node from map
     const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
     if (!node) { console.warn('No node found'); return; }
-    // Set short name
-    const shortName = node ? node.shortName : "Title";
-    const shortNameEl = document.getElementById('detail-node-short-name');
-    if (shortNameEl) shortNameEl.innerHTML = shortName;
+    // Set topic
+    const topic = node ? node.topic : "Topic";
+    const topicEl = document.getElementById('detail-node-topic');
+    if (topicEl) topicEl.innerHTML = topic;
     // Set content
     const content = node ? node.content : "Content";
     const contentEl = document.getElementById('detail-node-content');
@@ -90,7 +90,7 @@ function loadDetailContent(nodeId) {
     const detailEl = document.getElementById('detail-node-detail');
     if (detailEl) detailEl.innerText = detail;
     // Set node content
-    const nodeContent = { shortName, content, detail };
+    const nodeContent = { topic, content, detail };
     document.getElementById('detail-node-popup').dataset.nodeContent = JSON.stringify(nodeContent);
 }
 
@@ -115,9 +115,9 @@ function editElement(type) {
     textarea.value = el.innerText;
     // Select lines and clean up
     switch (type) {
-        case 'short-name':
+        case 'topic':
             textarea.rows = 1;
-            if (textarea.value === 'Title') textarea.value = '';
+            if (textarea.value === 'Topic') textarea.value = '';
             break;
         case 'content':
             textarea.rows = 2;
@@ -152,7 +152,7 @@ function finishEditing(e) {
     textarea.parentNode.replaceChild(newEl, textarea);
     // Rebind click event based on ID
     let type;
-    if (originalId === 'detail-node-short-name') type = 'short-name';
+    if (originalId === 'detail-node-topic') type = 'topic';
     else if (originalId === 'detail-node-content') type = 'content';
     else if (originalId === 'detail-node-detail') type = 'detail';
     if (type) {
@@ -167,7 +167,7 @@ async function handleEditNode(e) {
     const nodeId = braintroop.getSelectedNodeId();
     if (!nodeId) { console.error('No node selected'); return; }
     // Get input elements (could be original or textarea)
-    const shortNameInput = document.getElementById('detail-node-short-name');
+    const topicInput = document.getElementById('detail-node-topic');
     const contentInput = document.getElementById('detail-node-content');
     const detailInput = document.getElementById('detail-node-detail');
     const detailPopup = document.getElementById('detail-node-popup');
@@ -178,13 +178,13 @@ async function handleEditNode(e) {
         const rawValue = (tag === 'textarea') ? input.value : input.innerText;
         return sanitizeInput(rawValue.trim());
     };
-    const newShortName = getValue(shortNameInput);
+    const newTopic = getValue(topicInput);
     const newContent = getValue(contentInput);
     const newDetail = getValue(detailInput);
     // Get original content
     const originalContent = detailPopup ? JSON.parse(detailPopup.dataset.nodeContent) : null;
     // Check no changes
-    if (newShortName === originalContent.shortName.trim() && 
+    if (newTopic === originalContent.topic.trim() && 
         newContent === originalContent.content.trim() && 
         newDetail === originalContent.detail.trim()) {
         // Remove detail popup
@@ -197,14 +197,14 @@ async function handleEditNode(e) {
     // Show notification
     await showNotification('Processing', 'info', 'wait');
     // Update node on canvas
-    braintroop.updateNodeInfo({nodeId, shortName: newShortName, content: newContent, detail: newDetail});
+    braintroop.updateNodeInfo({nodeId, topic: newTopic, content: newContent, detail: newDetail});
     // If blank node, add node
     if (nodeId.includes('temp_')) {
         // Add blank node on DB
         await addBlankdNodeHandler(nodeId);
     } else {
         // Update node on DB
-        const changes = { nodeId, shortName: newShortName, content: newContent, detail: newDetail };
+        const changes = { nodeId, topic: newTopic, content: newContent, detail: newDetail };
         await updateNode(changes);
     }
     // Remove notification
@@ -229,8 +229,8 @@ function removeDetailPopup() {
     if (document.getElementById("detail-node-submit"))
         document.getElementById("detail-node-submit").removeEventListener("click", closeDetailPopup);
     // Remove edit event listeners
-    if (document.getElementById("detail-node-short-name"))
-        document.getElementById("detail-node-short-name").removeEventListener("click", () => editElement('short-name'));
+    if (document.getElementById("detail-node-topic"))
+        document.getElementById("detail-node-topic").removeEventListener("click", () => editElement('topic'));
     if (document.getElementById("detail-node-content"))
         document.getElementById("detail-node-content").removeEventListener("click", () => editElement('content'));
     if (document.getElementById("detail-node-detail"))

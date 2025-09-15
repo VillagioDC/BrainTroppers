@@ -63,7 +63,7 @@ async function mapNodeRewrite(map, nodeId, query) {
 
     // Update node
     let reviewNode = map.nodes.find(n => n.nodeId === nodeId);
-    reviewNode.shortName = jsonResponse.shortName;
+    reviewNode.topic = jsonResponse.topic;
     reviewNode.content = jsonResponse.content;
     reviewNode.detail = jsonResponse.detail;
     reviewNode.approved = false;

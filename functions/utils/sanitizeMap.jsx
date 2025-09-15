@@ -31,7 +31,7 @@ function sanitizeMap({map, type}) {
         const smallNode = {};
         // To all
         smallNode.nodeId = map.nodes[i].nodeId;
-        smallNode.shortName = map.nodes[i].shortName;
+        smallNode.topic = map.nodes[i].topic;
         smallNode.content = map.nodes[i].content;
         smallNode.detail = map.nodes[i].detail;
         // According to type

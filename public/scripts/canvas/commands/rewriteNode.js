@@ -2,6 +2,7 @@
 // REWRITE NODE MODULE
 
 // Import modules
+import { svgSpark } from "../interface/svgSpark.js";
 import { checkQuery } from "../utils/validate.js";
 import { updateMapApi } from "../apis/updateMapApi.js";
 import { rewriteNodeApi } from "../apis/rewriteNodeApi.js";
@@ -27,6 +28,9 @@ async function openRewriteNodePopup() {
     bindRewritePopupEvents();
     // Load detail content
     loadDetailContent();
+    // Add spark icon
+    if (document.getElementById('rewrite-node-submit'))
+        document.getElementById('rewrite-node-submit').innerHTML += '&nbsp;' + svgSpark();
     // Show rewrite popup
     if (document.getElementById('rewrite-node-popup'))
         document.getElementById('rewrite-node-popup').style.display = 'flex';
@@ -67,10 +71,10 @@ function loadDetailContent() {
     if (!nodeId) { console.warn('No node selected'); return; }
     const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
     if (!node) { console.warn('No node found'); return; }
-    // Set short name
-    const shortName = node ? node.shortName : "Title";
-    const shortNameEl = document.getElementById('rewrite-node-title');
-    if (shortNameEl) shortNameEl.innerText = shortName;
+    // Set topic
+    const topic = node ? node.topic : "Topic";
+    const topicEl = document.getElementById('rewrite-node-topic');
+    if (topicEl) topicEl.innerText = topic;
     // Set content
     const content = node ? node.content : "Content";
     const contentEl = document.getElementById('rewrite-node-content');

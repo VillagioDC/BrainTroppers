@@ -3,7 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brain Troopers Roadmap</title>
+  <title>Braintrooper Roadmap</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="./favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="./favicon/favicon-64.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./favicon/favicon-96.png">
+  <link rel="apple-touch-icon-precomposed" href="./favicon/apple-touch-icon-192.png">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="msapplication-TileColor" content="#e0e0e0">
+  <meta name="msapplication-square70x70logo" content="./favicon/ms-icon-70.png">
+  <meta name="msapplication-square150x150logo" content="./favicon/ms-icon-150.png">
+  <meta name="msapplication-square310x310logo" content="./favicon/ms-icon-310.png">
+  <!-- Style -->  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
@@ -513,7 +525,7 @@
           <li class="completed">Handle schema to canvas conversion</li>
           <li class="completed">Handle canvas update</li>
           <li class="completed">Rewrite canvas function</li>
-          <li class="completed">Generate node short name at prompt</li>
+          <li class="completed">Generate node topic at prompt</li>
         </ul>
       </div>
     </div>
@@ -772,32 +784,42 @@
     <!-- Day 31 -->
     <div class="day-section">
       <div class="day-card">
-        <span class="day-number">Day 31</span>
+        <span class="day-number">Sept 14</span>
         <ul class="tasks">
-          <li class="in-progress">Create share modal</li>
-          <li class="in-progress">Create share function (frontend)</li>
-          <li class="in-progress">Create share function (backend)</li>
-          <li class="in-progress">Create sign up email template</li>
-          <li class="in-progress">Create reset password email template</li>
-          <li class="in-progress">Review landing page features</li>
-          <li class="in-progress">Create self-remove-unwanted-text LLM function</li>
-          <li class="in-progress">Security review level 1</li>
-          <li class="in-progress">Implement JWT-based authentication</li>
-          <li class="in-progress">Protect backend routes with auth middleware</li>
-          <li class="in-progress">Secure API endpoints against unauthorized access</li>
-          <li class="in-progress">Sanitize inputs to prevent XSS attacks</li>
-          <li class="in-progress">Reconstruct endpoints to open/close DB</li>
-          <li class="in-progress">Reconstruct executeDB function</li>
+          <li class="completed">Change shortName to topic</li>
+          <li class="completed">Normalize Braintrooper</li>
+          <li class="completed">Draft emails</li>
+          <li class="completed">Convert logo to vector</li>
+          <li class="completed">Update logo</li>
+          <li class="completed">Create favicons</li>
         </ul>
       </div>
     </div>
     <!-- Day 32 -->
     <div class="day-section">
       <div class="day-card">
-        <span class="day-number">Day 32</span>
+        <span class="day-number">Sept 15</span>
         <ul class="tasks">
-          <li class="in-progress">Set up environment variables for production</li>
-          <li class="in-progress">Deploy latest build to Netlify</li>
+          <li class="completed">Create 404 page automatic redirect</li>
+          <li class="completed">Adjust icons between font awesome and bootstrap</li>
+          <li class="completed">Create sign up email template</li>
+          <li class="completed">Create welcome email template</li>
+          <li class="completed">Create reset password email template</li>
+          <li class="completed">Create confirm password reset email template</li>
+          <li class="completed">Inject spark icon svg on html</li>
+          <li class="in-progress">Architecture pseudo streaming content creation</li>
+          <li class="in-progress">Transform instructions into topic, content, detail</li>
+          <li class="in-progress">Review create new map function (frontend)</li>
+          <li class="in-progress">Review create new map function (backend)</li>
+          <li class="in-progress">Review add node function (frontend)</li>
+          <li class="in-progress">Review add node function (backend)</li>
+          <li class="in-progress">Review expand node function (frontend)</li>
+          <li class="in-progress">Review expand node function (backend)</li>
+          <li class="in-progress">Create share modal</li>
+          <li class="in-progress">Create share function (frontend)</li>
+          <li class="in-progress">Create share function (backend)</li>
+          <li class="in-progress">Reconstruct endpoints to open/close DB</li>
+          <li class="in-progress">Reconstruct executeDB function</li>
         </ul>
       </div>
     </div>
@@ -806,12 +828,38 @@
       <div class="day-card">
         <span class="day-number">Day 33</span>
         <ul class="tasks">
+          <li class="in-progress">Review landing page features, images and icons</li>
+          <li class="in-progress">Create self-remove-unwanted-text LLM function</li>
+          <li class="in-progress">Security review level 1</li>
+          <li class="in-progress">Implement JWT-based authentication</li>
+          <li class="in-progress">Protect backend routes with auth middleware</li>
+          <li class="in-progress">Secure API endpoints against unauthorized access</li>
+          <li class="in-progress">Sanitize inputs to prevent XSS attacks</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 34 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 34</span>
+        <ul class="tasks">
+          <li class="in-progress">Create and implement email and domain</li>
+          <li class="in-progress">Create send email function</li>
+          <li class="in-progress">Implement send email function</li>
+          <li class="in-progress">Test and bug fixing</li>
+          <li class="in-progress">Set up environment variables for production</li>
+          <li class="in-progress">Deploy latest build to Netlify</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Day 35 -->
+    <div class="day-section">
+      <div class="day-card">
+        <span class="day-number">Day 35</span>
+        <ul class="tasks">
           <li class="in-progress">Conduct internal QA testing of all features</li>
           <li class="in-progress">Fix bugs found during testing</li>
           <li class="in-progress">Invite beta testers for feedback</li>
-          <li class="in-progress">Create and implement email and domain</li>
-          <li class="in-progress">Create and implement send email function</li>
-          <li class="in-progress">Create email html template</li>
           <li class="in-progress">Collect performance metrics (load times, errors)</li>
           <li class="in-progress">Iterate on UI/UX based on user feedback</li>
           <li class="in-progress">Optimize backend and frontend for speed</li>

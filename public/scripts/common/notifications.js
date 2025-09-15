@@ -18,21 +18,25 @@ export async function showNotification(message, type = 'success', action = null)
         // Check and set notification theme
         setNotificationTheme();
         // Set notification message
+        // Error <i class="bi bi-exclamation-triangle-fill"></i>
+        // Info <i class="bi bi-info-circle-fill"></i>
+        // Success <i class="bi bi-check-circle-fill"></i>
+        // Spinner <i class="bi bi-arrow-clockwise"></i>
         msg.textContent = message;
         popup.classList.remove('success', 'error', 'info');
         popup.classList.add(type);
-        icon.classList.remove('fa-spinner', 'spinning', 'fa-solic', 'fa-hand', 'fa-check-circle', 'fa-times-circle', 'fa-info-circle');
+        icon.classList.remove('bi-exclamation-triangle-fill', 'bi-info-circle-fill', 'bi-check-circle-fill');
+        icon.classList.remove('bi-arrow-clockwise', 'spinning');
         // Set action icons
-        if (action === 'wait') {
-            icon.classList.add('fa-spinner', 'spinning');
-        } else if (action === 'connect') {
-            icon.classList.remove('fas');
-            icon.classList.add('fa-solid','fa-hand','info');
+        if (action === 'wait') { // wait for response
+            icon.classList.add('bi-arrow-clockwise', 'spinning');
+        } else if (action === 'connect') { // conect node
+            icon.classList.add('bi-crosshair','info');
         } else {
-            icon.classList.add(
-                type === 'success' ? 'fa-check-circle' :
-                type === 'error' ? 'fa-times-circle' :
-                'fa-info-circle'
+            icon.classList.add( // success, error, info
+                type === 'success' ? 'bi-check-circle-fill' :
+                type === 'error' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
             );
         }
         // Clear previous timeout

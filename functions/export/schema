@@ -4,7 +4,7 @@
   lastUpdated: Date,          // last update date
   nodes: [{  
     nodeId: String,           // node id
-    shortName: String,        // short name
+    topic: String,            // topic
     content: String,          // node content  
     detail: String,           // node detailed description
     hidden: Boolean,          // visibility

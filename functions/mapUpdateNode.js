@@ -42,13 +42,13 @@ exports.handler = async (event) => {
     // Parse body
     const parsedBody = handleJsonParse(body, corsHeaders);
     if (!parsedBody || parsedBody.statusCode === 400) return parsedBody;
-    const { userId, projectId, nodeId, shortName, content, detail, directLink, relatedLink, x, y, locked, approved, maximized, hidden, colorSchemeName } = parsedBody;
+    const { userId, projectId, nodeId, topic, content, detail, directLink, relatedLink, x, y, locked, approved, maximized, hidden, colorSchemeName } = parsedBody;
 
     // Check required fields
     if (!userId || userId.trim().length === 0 ||
         !projectId || projectId.trim().length === 0 ||
         !nodeId || nodeId.trim().length === 0 || 
-        !shortName || shortName.trim().length === 0 ||
+        !topic || topic.trim().length === 0 ||
         !directLink ||
         !colorSchemeName || colorSchemeName.length === 0 ) {          
           log("WARNING", 'Invalid body @mapUpdateNode', JSON.stringify(body));
@@ -75,7 +75,7 @@ exports.handler = async (event) => {
     if (typeof userId !== 'string' || userId.length > 50 ||
         typeof projectId !== 'string' || projectId.length > 50 ||
         typeof nodeId !== 'string' || nodeId.length > 50 ||
-        typeof shortName !== 'string' || shortName.length > 50 ||
+        typeof topic !== 'string' || topic.length > 50 ||
         (content && (typeof content !== 'string' || content.length > 500)) ||
         (detail && (typeof detail !== 'string' || detail.length > 500)) ||
         !Array.isArray(directLink) ||
@@ -129,7 +129,7 @@ exports.handler = async (event) => {
     }
 
     // Update node
-    node.shortName = shortName;
+    node.topic = topic;
     node.content = content || "";
     node.detail = detail || "";
     node.directLink = directLink;

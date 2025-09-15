@@ -92,7 +92,7 @@ exports.handler = async (event) => {
         // Create new node
         let newNode = {
             nodeId: newNodeId,
-            shortName: jsonResponse.nodes[0].shortName,
+            topic: jsonResponse.nodes[0].topic,
             content: jsonResponse.nodes[0].content,
             detail: jsonResponse.nodes[0].detail,
             directLink: [parentId],

@@ -9,7 +9,7 @@
   "selectedNode": "",
   "nodes": [{  
     "nodeId": "",
-    "shortName": "",
+    "topic": "",
     "content": "",
     "detail": "",
     "status": "pending",

@@ -47,7 +47,7 @@ function setCurrentTheme() {
     if (!menuTheme) return;
     // Set current theme
     if (themeToggle.classList.contains('light'))
-        menuTheme.innerHTML = '<i class="fas fa-sun"></i>&nbsp;Light Mode';
+        menuTheme.innerHTML = '<i class="bi bi-brightness-high-fill"></i>&nbsp;Light Mode';
 }
 
 // Bind event listeners to user menu items

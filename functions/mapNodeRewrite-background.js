@@ -84,7 +84,7 @@ exports.handler = async (event) => {
 
         // Replace node data (keep other features)
         const i = map.nodes.findIndex(n => n.nodeId === nodeId);
-        map.nodes[i].shortName = jsonResponse.nodes[0].shortName;
+        map.nodes[i].topic = jsonResponse.nodes[0].topic;
         map.nodes[i].content = jsonResponse.nodes[0].content;
         map.nodes[i].detail = jsonResponse.nodes[0].detail;
         map.nodes[i].approved = false;

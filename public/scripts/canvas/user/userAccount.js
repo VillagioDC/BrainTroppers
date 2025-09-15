@@ -45,7 +45,7 @@ function fillUserAccountInfo() {
     // Set user name
     const userName = document.getElementById("user-account-name");
     if (user && user.name && typeof user.name === 'string' && user.name)
-        userName.innerHTML = `${user.name}&nbsp;<i id="user-account-edit-name" class="fas fa-pencil-alt button"></i>`;
+        userName.innerHTML = `${user.name}&nbsp;<i id="user-account-edit-name" class="bi bi-pencil button"></i>`;
     // Set user email
     const userEmail = document.getElementById("user-account-email");
     if (user && user.email && typeof user.email === 'string' && user.email)
@@ -118,7 +118,7 @@ function updateUserIcon(e) {
     // Reconstruct user icon
     if (document.getElementById("user-account-icon")) {
         if (newUserIcon) document.getElementById("user-account-icon").innerHTML = newUserIcon;
-        else document.getElementById("user-account-icon").innerHTML = '<i class="fas fa-user-alt"></i>';
+        else document.getElementById("user-account-icon").innerHTML = '<i class="bi bi-person-fill"></i>';
         document.getElementById("user-account-icon").style.display = "flex";
     }
     // Keep popup and update database only when removed
@@ -152,7 +152,7 @@ function updateUserName(e) {
         document.getElementById("user-account-name-input").style.display = "none";
     // Reconstruct user name
     if (document.getElementById("user-account-name")) {
-        if (newUserName) document.getElementById("user-account-name").innerHTML = `${newUserName}&nbsp;<i class="fas fa-pencil-alt button"></i>`;
+        if (newUserName) document.getElementById("user-account-name").innerHTML = `${newUserName}&nbsp;<i class="bi bi-pencil"></i>`;
         document.getElementById("user-account-name").style.display = "flex";
     }
     // Keep popup and update database only when removed

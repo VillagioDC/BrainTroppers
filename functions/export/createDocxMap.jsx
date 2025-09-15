@@ -54,12 +54,12 @@ async function createDocxMap(map) {
         // Check hidden attribute
         const nodeHidden = !!node.hidden;
 
-        // Topic title / subtitle = node.shortName
-        const shortName = (typeof node.shortName === 'string' && node.shortName.trim().length) ? node.shortName.trim() : `(untitled ${node.nodeId})`;
+        // Topic title / subtitle = node.topic
+        const topic = (typeof node.topic === 'string' && node.topic.trim().length) ? node.topic.trim() : `(untitled ${node.nodeId})`;
         const headingLevel = nodeHidden ? HeadingLevel.HEADING_2 : HeadingLevel.HEADING_1;
         paragraphs.push(new Paragraph({
             heading: headingLevel,
-            children: [buildTextRun(shortName, nodeHidden, { bold: true })],
+            children: [buildTextRun(topic, nodeHidden, { bold: true })],
                 spacing: { before: 80, after: 80},
         }));
 
@@ -82,12 +82,12 @@ async function createDocxMap(map) {
         // Notes = relatedLink names expanded
         const relatedIds = node.relatedLink;
         if (relatedIds.length > 0) {
-            // Construct related link short names
+            // Construct related link topic
             const relatedNames = relatedIds.map((rid) => {
                 // Get node by id
                 const rn = nodesById.get(rid);
-                // Set short name
-                if (rn && typeof rn.shortName === 'string') return rn.shortName.trim();
+                // Set topic
+                if (rn && typeof rn.topic === 'string') return rn.topic.trim();
             });
             // Add note if any related link
             if (relatedNames.length > 0) {
@@ -221,8 +221,8 @@ FEATURES:
 2- doc has title (map.title);
 3- each node is a topic;
 4- if node is hidden, color it gray;
-5- each topic has a sub title (node.shortName), first paragraph (node.content), second paragraph (node.detail) and note (node.relatedLink);
-6- notes will be 'related to: ${node.shortName}, ...', where node.shortName is the title of each nodeId inside the relatedLink array;
+5- each topic has a sub title (node.topic), first paragraph (node.content), second paragraph (node.detail) and note (node.relatedLink);
+6- notes will be 'related to: ${node.topic}, ...', where node.topic is the title of each nodeId inside the relatedLink array;
 7- first topic will be the first node in the map.nodes array (map.nodes[0]);
 8- next topics must follow a tree-branch structure, conducted by directLink array;
 9- nodes must check link to weak nodes that has only relatedLink and insert as its branch;

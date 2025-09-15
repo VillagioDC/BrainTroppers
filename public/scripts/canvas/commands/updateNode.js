@@ -20,7 +20,7 @@ export async function updateNode(changes) {
     // Update node
     const updatedNode = {
         nodeId: node.nodeId,
-        shortName: changes.shortName || node.shortName,
+        topic: changes.topic || node.topic,
         content: changes.content || node.content,
         detail: changes.detail || node.detail,
         directLink: changes.directLink || node.directLink,

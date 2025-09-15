@@ -657,9 +657,9 @@ import { pinNode } from './commands/pinNode.js';
         .style("stroke-width", 1)
         .style("cursor", "pointer");
 
-      // Node title (shortName)
+      // Node topic
       nodeEnter.append("text")
-        .attr("class", "node-title")
+        .attr("class", "node-topic")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "hanging")
         .style("font-family", "Roboto, sans-serif")
@@ -711,7 +711,7 @@ import { pinNode } from './commands/pinNode.js';
       const allNodeGroups = this.nodesG.selectAll("g.node-group");
       allNodeGroups.each((d, i, nodes) => { d.__containerNode = nodes[i]; });
 
-      // Update visuals (fill, stroke, size, shortName, content, check mark) for every node group
+      // Update visuals (fill, stroke, size, topic, content, check mark) for every node group
       allNodeGroups.each((d, i, nodes) => {
         const g = d3.select(nodes[i]);
         const mapNode = d.__mapNode;
@@ -754,15 +754,15 @@ import { pinNode } from './commands/pinNode.js';
           .style("display", (this.selected && this.selected.type === "node" && this.selected.id === mapNode.nodeId) ? null : "none");
 
         // Text handling:
-        // shortName (title) is always present unless hidden - same font size across states
+        // Topic is always present unless hidden - same font size across states
         // content is only shown when maximized; multiple lines supported via newline -> tspans
-        const titleText = mapNode.hidden ? "+" : (mapNode.shortName || "");
-        const titleEl = g.select(".node-title")
+        const topicText = mapNode.hidden ? "+" : (mapNode.topic || "");
+        const topicEl = g.select(".node-topic")
           .attr("x", w / 2)
-          .attr("y", (mapNode.hidden ? (h / 2 - 8) : 8)) // center for hidden; top margin for others
+          .attr("y", (mapNode.hidden ? (h / 2 - 12) : 12)) // center for hidden; top margin for others
           .style("fill", textColor)
-          .style("display", mapNode.hidden ? null : null) // title shows in all states (hidden uses "+")
-          .text(titleText);
+          .style("display", mapNode.hidden ? null : null) // topic shows in all states (hidden uses "+")
+          .text(topicText);
 
         // Content element: show only when maximized (and not hidden)
         const contentEl = g.select(".node-content");
@@ -774,10 +774,10 @@ import { pinNode } from './commands/pinNode.js';
           // clear old tspans and set new ones based on content lines
           contentEl.selectAll("tspan").remove();
           const lines = (mapNode.content || "").split(/\r?\n/).slice(0, 8); // limit lines
-          // Position content below the title
+          // Position content below the topic
           const topPadding = 12; // spacing from top
-          const titleHeight = 18; // approx title height
-          const startY = titleHeight + topPadding;
+          const topicHeight = 18; // approx topic height
+          const startY = topicHeight + topPadding;
           lines.forEach((ln, idx) => {
             contentEl.append("tspan")
               .attr("x", w / 2)
@@ -802,12 +802,12 @@ import { pinNode } from './commands/pinNode.js';
           approvedEl.style("display", "none");
         }
 
-        // For hidden nodes, we want the '+' centered vertically; adjust title y accordingly above
+        // For hidden nodes, we want the '+' centered vertically; adjust topic y accordingly above
         if (mapNode.hidden) {
-          g.select(".node-title").attr("y", h / 2 - 6).attr("dominant-baseline", "central");
+          g.select(".node-topic").attr("y", h / 2 - 6).attr("dominant-baseline", "central");
         } else {
-          // For non-hidden nodes, set title baseline to hanging (near top)
-          g.select(".node-title").attr("dominant-baseline", "hanging");
+          // For non-hidden nodes, set topic baseline to hanging (near top)
+          g.select(".node-topic").attr("dominant-baseline", "hanging");
         }
 
         // Position group according to simulation coordinates (centered on node width/height)
@@ -862,7 +862,7 @@ import { pinNode } from './commands/pinNode.js';
       return {
         nodeId: String(n.nodeId),
         parentId: n.parentId || n.parent || null,
-        shortName: n.shortName || "",
+        topic: n.topic || "",
         content: n.content || "",
         detail: n.detail || "",
         x: typeof n.x === "number" ? n.x : null,
@@ -1116,7 +1116,7 @@ import { pinNode } from './commands/pinNode.js';
         backendMap.nodes.forEach((n, idx) => {
           const nodeId = n.nodeId || `node_${Date.now()}_${idx}`;
           const parentId = n.parentId || null;
-          const shortName = n.shortName || "";
+          const topic = n.topic || "";
           const content = n.content || "";
           const detail = n.detail || "";
           const status = n.status || null;
@@ -1131,7 +1131,7 @@ import { pinNode } from './commands/pinNode.js';
           nodes.push(this._normalizeNode({
             nodeId,
             parentId,
-            shortName,
+            topic,
             content,
             detail,
             status,
@@ -1222,7 +1222,7 @@ import { pinNode } from './commands/pinNode.js';
       const nodes = (this.map.nodes || []).map(n => {
         return {
           nodeId: n.nodeId,
-          shortName: n.shortName || "",
+          topic: n.topic || "",
           content: n.content || "",
           detail: n.detail || "",
           directLink: directLinks[n.nodeId] || [],
@@ -1255,25 +1255,25 @@ import { pinNode } from './commands/pinNode.js';
     // such as normalizing nodes/edges and calling updateMap as appropriate.
 
     // Add temp node
-    _addTempNode({parentId, shortName = 'New node'}) {
+    _addTempNode({parentId, topic = 'New node'}) {
       if (!parentId) return;
       // Create new node
-      const node = this._createNode({parentId, shortName});
+      const node = this._createNode({parentId, topic});
       this.updateMap();
       return node.nodeId;
     }
 
     // Add node
-    _addNodeInternal({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
+    _addNodeInternal({ parentId, nodeId, topic = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
       if (!parentId) return;
       // Create node
-      const node = this._createNode({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, maximized, hidden, colorSchemeName });
+      const node = this._createNode({ parentId, nodeId, topic, content, detail, x, y, locked, approved, maximized, hidden, colorSchemeName });
       this.updateMap();
       return node.nodeId;
     }
 
     // Create new node
-    _createNode ({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
+    _createNode ({ parentId, nodeId, topic = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
       if (!parentId) return;
       // Create node id
       if (!nodeId) nodeId = `temp_${Date.now()}_${Math.floor(Math.random() * 99)}`;
@@ -1299,7 +1299,7 @@ import { pinNode } from './commands/pinNode.js';
       const node = {
         nodeId,
         parentId,
-        shortName,
+        topic,
         content,
         detail,
         x,
@@ -1471,27 +1471,27 @@ import { pinNode } from './commands/pinNode.js';
     }
 
     // Creates a temporary new node linked to parentId
-    addTempNode({ parentId = 1, shortName = "New node" }) {
+    addTempNode({ parentId = 1, topic = "New node" }) {
       // Delegate to internal helper but keep public name stable
-      const newNodeId = this._addTempNode({ parentId, shortName });
+      const newNodeId = this._addTempNode({ parentId, topic });
       return newNodeId;
     }
 
     // Creates a new node linked to parentId
-    addNode({ parentId, nodeId, shortName = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
+    addNode({ parentId, nodeId, topic = "", content = "", detail = "", x = null, y = null, locked = false, approved = false, maximized = false, hidden = false, colorSchemeName = this.currentColorSchemeName } = {}) {
       // Delegate to internal helper but keep public name stable
-      const newNodeId = this._addNodeInternal({ parentId, nodeId, shortName, content, detail, x, y, locked, approved, maximized, hidden, colorSchemeName });
+      const newNodeId = this._addNodeInternal({ parentId, nodeId, topic, content, detail, x, y, locked, approved, maximized, hidden, colorSchemeName });
       return newNodeId;
     }
 
     // Updates the node info
-    updateNodeInfo({ nodeId, newNodeId, shortName, content, detail }) {
+    updateNodeInfo({ nodeId, newNodeId, topic, content, detail }) {
       if (!nodeId) return;
       const node = this.map.nodes.find(n => n.nodeId === nodeId);
       if (!node) return;
       // Node info
       node.nodeId = newNodeId || node.nodeId;
-      node.shortName = shortName || node.shortName;
+      node.topic = topic || node.topic;
       node.content = content || node.content;
       node.detail = detail || node.detail;
       // Edge info

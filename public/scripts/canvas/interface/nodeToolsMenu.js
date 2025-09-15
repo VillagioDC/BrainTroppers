@@ -74,11 +74,11 @@ export function toggleNodeToolsButtons(node) {
     }
     // Approve button
     if (node.approved) {
-        document.getElementById('approve-node-btn').title = 'Revoke';
-        document.querySelector('.fa-check-circle').classList.add('approved');
+        document.getElementById('approve-node-btn').style.display = 'none';
+        document.getElementById('revoke-node-btn').style.display = 'flex';
     } else {
-        document.getElementById('approve-node-btn').title = 'Approve';
-        document.querySelector('.fa-check-circle').classList.remove('approved');
+        document.getElementById('approve-node-btn').style.display = 'flex';
+        document.getElementById('revoke-node-btn').style.display = 'none';
     }
     // Maximize/minimize button
     if (node.maximized) {

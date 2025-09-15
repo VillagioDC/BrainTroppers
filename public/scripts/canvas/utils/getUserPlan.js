@@ -5,15 +5,15 @@
 import { getLocalStorageUser } from '../../common/userLocalStorage.js';
 
 export function getUserPlan() {
-    let planHtml = 'Free Plan&nbsp;<i class="fas fa-gift"></i>'
+    let planHtml = 'Free Plan&nbsp;<i class="bi bi-gift-fill"></i>'
     const user = getLocalStorageUser();
     if (user && user.plan) {
         switch (user.plan) {
             case 'Pro Plan':
-                planHtml = 'Pro Plan&nbsp;<i class="fas fa-crown pro-plan"></i';
+                planHtml = 'Pro Plan&nbsp;<i class="bi bi-trophy-fill"></i>';
                 break;
             default:
-                planHtml = 'Free Plan&nbsp;<i class="fas fa-gift"></i>';
+                planHtml = 'Free Plan&nbsp;<i class="bi bi-gift-fill"></i>';
                 break;
         }
     }

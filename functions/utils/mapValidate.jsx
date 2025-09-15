@@ -111,7 +111,7 @@ function mapValidate(map) {
             return false;
         }
         // Define expected node fields
-        const validNodeFields = ['nodeId', 'shortName', 'content', 'detail', 'directLink', 'relatedLink', 'x', 'y', 'locked', 'approved', 'maximized', 'hidden', 'colorSchemeName'];
+        const validNodeFields = ['nodeId', 'topic', 'content', 'detail', 'directLink', 'relatedLink', 'x', 'y', 'locked', 'approved', 'maximized', 'hidden', 'colorSchemeName'];
         if (Object.keys(node).some(field => !validNodeFields.includes(field))) {
             log("WARNING", "Invalid node fields @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
@@ -121,9 +121,9 @@ function mapValidate(map) {
             log("WARNING", "Invalid nodeId @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
         }
-        // Validate shortName (non-empty string, max 100 chars, no malicious content)
-        if (!node.shortName || typeof node.shortName !== 'string' || node.shortName.length > 50) {
-            log("WARNING", "Invalid shortName @mapValidate", `node: ${JSON.stringify(node)}`);
+        // Validate topic (non-empty string, max 100 chars, no malicious content)
+        if (!node.topic || typeof node.topic !== 'string' || node.topic.length > 50) {
+            log("WARNING", "Invalid topic @mapValidate", `node: ${JSON.stringify(node)}`);
             return false;
         }
         // Validate content (non-empty string, max 200 chars, no malicious content)

@@ -2,6 +2,7 @@
 // ADD NEW NODE MODULE
 
 // Import modules
+import { svgSpark } from '../interface/svgSpark.js';
 import { checkQuery } from '../utils/validate.js';
 import { updateMapApi } from '../apis/updateMapApi.js';
 import { addNewNodeApi } from '../apis/addNewNodeApi.js'
@@ -29,6 +30,9 @@ async function openNewNodePopup() {
     bindAddPopupEvents();
     // Load detail content
     loadDetailContent();
+    // Add spark icon 
+    if (document.getElementById('add-node-submit'))
+        document.getElementById('add-node-submit').innerHTML += '&nbsp;' + svgSpark();
     // Show add popup
     if (document.getElementById('add-node-popup'))
         document.getElementById('add-node-popup').style.display = 'flex';
@@ -69,10 +73,10 @@ function loadDetailContent() {
     if (!nodeId) { console.warn('No node selected'); return; }
     const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
     if (!node) { console.warn('No node found'); return; }
-    // Set short name
-    const shortName = node ? node.shortName : "Title";
-    const shortNameEl = document.getElementById('add-node-title');
-    if (shortNameEl) shortNameEl.innerText = shortName;
+    // Set topic
+    const topic = node ? node.topic : "Topic";
+    const topicEl = document.getElementById('add-node-topic');
+    if (topicEl) topicEl.innerText = topic;
     // Set content
     const content = node ? node.content : "Content";
     const contentEl = document.getElementById('add-node-content');
@@ -110,7 +114,7 @@ async function handleAddNode(e) {
             return;
         }
         // New node
-        const newNode = { parentId, shortName: 'New node'}
+        const newNode = { parentId, topic: 'New node'}
         // Add node with temp id
         const newNodeId = braintroop.addTempNode(newNode);
         // Submit query to add node

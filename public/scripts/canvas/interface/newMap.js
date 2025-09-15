@@ -2,6 +2,7 @@
 // NEW MAP MODULE
 
 // Import modules
+import { svgSpark } from './svgSpark.js';
 import { createNewMap } from '../commands/createMap.js';
 import { getLocalStorageUser } from '../../common/userLocalStorage.js';
 
@@ -48,10 +49,15 @@ async function loadNewMapContainer() {
         .then(res => res.text())
         .then(html => {
             document.body.insertAdjacentHTML('beforeend', html);
-            // Bind new map events
-            bindNewMapEvents();
             // Replace user name
             replaceUserNameOnNewMap();
+            // Inject spark on create button
+            if (document.getElementById('map-new-submit'))
+                document.getElementById('map-new-submit').innerHTML += '&nbsp;' + svgSpark();
+            // Bind new map events
+            bindNewMapEvents();
+            // Show container
+            document.getElementById("new-map-container").style.display = "flex";
             // Focus on text area
             document.getElementById('map-new-query').focus();
         });

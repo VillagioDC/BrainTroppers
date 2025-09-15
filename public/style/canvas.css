@@ -12,7 +12,7 @@
   --menu-bg: #1a283b;
   --menu-hover: #25374e;
   --approved-color: #7dbf4f;
-  --delete-color: #ab1540;
+  --delete-color: #e5428e;
   --gold-plan: #ffc827;
   /* LIGHT MODE */
   --light-background: #f7f9fc;
@@ -25,7 +25,7 @@
   --light-menu-bg: #f3f6fa;
   --light-menu-hover: #dde4ef;
   --light-approved-color: #0a7a5a;
-  --light-delete-color: #5a181f;
+  --light-delete-color: #741922;
 }
 * {
   margin: 0;
@@ -260,6 +260,7 @@ body {
 
 /* SIDEBAR NEW MAP BUTTON */
 .new-map-btn {
+  display: flex;
   margin: 1rem;
   padding: 0.65rem;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -269,11 +270,12 @@ body {
   cursor: pointer;
   font-size: 0.9rem;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 0.5rem;
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -309,7 +311,7 @@ body {
   right: 1.2rem;
   transform: translateY(-50%);
   width: 2.2rem;
-  height: 23rem;
+  height: 25rem;
   background: var(--background-shadow);
   display: flex;
   flex-direction: column;
@@ -357,11 +359,14 @@ body {
 .tools-btn.approved.light i {
   color: var(--light-approved-color);
 }
-.tools-btn i.fa-trash {
+.tools-btn i.bi-trash-fill {
   color: var(--delete-color);
 }
-.tools-btn i.fa-trash.light {
+.tools-btn i.bi-trash-fill.light {
   color: var(--light-delete-color);
+}
+.tools-btn i.bi-scissors.rotate-135 {
+  transform: rotate(-135deg);
 }
 
 /* USER MENU POPUP */
@@ -547,6 +552,7 @@ body {
 .user-info button {
     width: 100%;
     padding: 0.8rem 1.5rem;
+    vertical-align: bottom;
     font-size: 1rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: var(--text);
@@ -888,15 +894,21 @@ body {
 }
 
 .popup-content button {
+    position: relative;
     width: 100%;
+    margin: 0;
     padding: 0.8rem 1.5rem;
-    font-size: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: var(--text);
+    font-size: 0.9rem;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
 }
 .popup-content button:hover {
     background: linear-gradient(135deg, var(--accent), var(--secondary));

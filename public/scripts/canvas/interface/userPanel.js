@@ -21,7 +21,7 @@ import { getUserPlan } from "../utils/getUserPlan.js";
     if (user && user.icon) {
         userIcon.innerHTML = user.icon
     } else {
-        userIcon.innerHTML = '<i class="fas fa-user-alt"></i>';
+        userIcon.innerHTML = '<i class="bi bi-person-fill"></i>';
     }
 
     // Set user plan

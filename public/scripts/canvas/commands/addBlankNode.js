@@ -15,7 +15,7 @@ export async function addBlankNode(e) {
     // Add blank node
     const blankNode = {
         parentId,
-        shortName: "New node",
+        topic: "New node",
         content: "",
         detail: ""
     }
@@ -35,7 +35,7 @@ export async function addBlankdNodeHandler(nodeId) {
     // Construct new node
     const newNode = {
         nodeId: node.nodeId,
-        shortName: node.shortName,
+        topic: node.topic,
         content: node.content,
         detail: node.detail,
         directLink: [node.parentId],
