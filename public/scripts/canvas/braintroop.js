@@ -4,7 +4,7 @@
 import { openNodeToolsMenu, removeNodeToolsMenu } from './interface/nodeToolsMenu.js';
 import { openLinkToolsMenu, removeLinkToolsMenu } from './interface/linkToolsMenu.js';
 import { endLinkCommand } from './commands/linkNode.js';
-import { pinNode } from './commands/pinNode.js';
+import { requestPinNode } from './commands/pinNode.js';
 
 (function () {
   // Require d3 v7
@@ -413,6 +413,8 @@ import { pinNode } from './commands/pinNode.js';
         // Emit select by element or none
         if (type === "node") {
           this.selected = { type, id };
+          const node = this.map.nodes.find(n => n.nodeId === id) || null;
+          console.log('Pin state:', node.locked);
           this._applySelectionUI(id, null);
         }
         else if (type === "edge") {
@@ -914,7 +916,7 @@ import { pinNode } from './commands/pinNode.js';
             const snappedX = Math.round(n.x / grid) * grid;
             const snappedY = Math.round(n.y / grid) * grid;
             n.x = snappedX; n.y = snappedY; n.fx = snappedX; n.fy = snappedY; n.vx = 0; n.vy = 0;
-            mapNode.x = snappedX; mapNode.y = snappedY; mapNode.locked = true;
+            mapNode.x = snappedX; mapNode.y = snappedY;
           }
         });
         this._disableDragForces();

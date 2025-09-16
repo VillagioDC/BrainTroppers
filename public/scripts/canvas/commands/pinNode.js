@@ -6,8 +6,15 @@ import { updateNode } from './updateNode.js';
 import { toggleNodeToolsButtons } from '../interface/nodeToolsMenu.js';
 
 // Canvas command to pin node
-export async function requestPinNode() {
-    await pinNode();
+export async function requestPinNode(nodeId) {
+    if (!nodeId) { console.warn('No node selected'); return; }
+    const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
+    if (!node) { console.warn('No node found'); return; }
+    // Update node on DB
+    const changes = { nodeId, x: node.x, y: node.y, locked: true };
+    await updateNode(changes);
+    // Toggle node tools
+    toggleNodeToolsButtons(node);
 }
 
 // User command to pin node

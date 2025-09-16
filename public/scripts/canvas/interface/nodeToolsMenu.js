@@ -74,11 +74,11 @@ export function toggleNodeToolsButtons(node) {
     }
     // Approve button
     if (node.approved) {
-        document.getElementById('approve-node-btn').style.display = 'none';
-        document.getElementById('revoke-node-btn').style.display = 'flex';
-    } else {
         document.getElementById('approve-node-btn').style.display = 'flex';
         document.getElementById('revoke-node-btn').style.display = 'none';
+    } else {
+        document.getElementById('approve-node-btn').style.display = 'none';
+        document.getElementById('revoke-node-btn').style.display = 'flex';
     }
     // Maximize/minimize button
     if (node.maximized) {

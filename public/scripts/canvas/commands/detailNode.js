@@ -78,15 +78,15 @@ function loadDetailContent(nodeId) {
     const node = braintroop.map.nodes.find(n => n.nodeId === nodeId);
     if (!node) { console.warn('No node found'); return; }
     // Set topic
-    const topic = node ? node.topic : "Topic";
+    const topic = node.topic ? node.topic : "Topic";
     const topicEl = document.getElementById('detail-node-topic');
     if (topicEl) topicEl.innerHTML = topic;
     // Set content
-    const content = node ? node.content : "Content";
+    const content = node.content ? node.content : "Content";
     const contentEl = document.getElementById('detail-node-content');
     if (contentEl) contentEl.innerText = content;
     // Set detail
-    const detail = node ? node.detail : "Detail";
+    const detail = node.detail ? node.detail : "Detail";
     const detailEl = document.getElementById('detail-node-detail');
     if (detailEl) detailEl.innerText = detail;
     // Set node content
